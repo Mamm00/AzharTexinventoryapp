@@ -3,7 +3,6 @@ package com.alazhartex.stock.data.repo
 import com.alazhartex.stock.data.local.AppDatabase
 import com.alazhartex.stock.domain.gauge.Utilisation
 import com.alazhartex.stock.domain.stock.StockMath
-import java.util.Locale
 
 /** Read-side of the repository (UI queries). No writes here; writes go through TransactionRunner. */
 class ReadRepository(private val database: AppDatabase) {

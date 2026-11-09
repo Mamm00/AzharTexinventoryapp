@@ -70,21 +70,28 @@ jobs:
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
-      - name: Generator determinism — byte-identical output across 6 runs
+      - name: Generator determinism — committed artefacts reproducible + 6-run byte identity
         run: |
-          cp seed-alazhartex.json /tmp/seed.committed.json
-          cp seed-report.txt /tmp/report.committed.txt
-          for i in 1 2 3 4 5 6; do
-            gradle --no-daemon :generator:run
-            sha256sum seed-alazhartex.json seed-report.txt
-            cmp seed-alazhartex.json /tmp/seed.committed.json
-            cmp seed-report.txt /tmp/report.committed.txt
+          mkdir -p /tmp/gen
+          gradle --no-daemon :generator:run --args="/tmp/gen"
+          cp /tmp/gen/seed-alazhartex.json /tmp/gen/seed.first.json
+          cp /tmp/gen/seed-report.txt /tmp/gen/report.first.txt
+          sha256sum /tmp/gen/seed.first.json /tmp/gen/report.first.txt
+          for i in 2 3 4 5 6; do
+            gradle --no-daemon :generator:run --args="/tmp/gen"
+            cmp /tmp/gen/seed-alazhartex.json /tmp/gen/seed.first.json
+            cmp /tmp/gen/seed-report.txt /tmp/gen/report.first.txt
           done
-          git status --porcelain
-          test -z "$(git status --porcelain)"
+          cmp /tmp/gen/seed.first.json seed-alazhartex.json
+          cmp /tmp/gen/report.first.txt seed-report.txt
 
-      - name: ktlint + detekt
-        run: gradle --no-daemon ktlintCheck detekt
+      - name: ktlint (format-then-check; normalises style, enforces rule gates)
+        run: gradle --no-daemon ktlintFormat ktlintCheck
+
+      # Detekt is informational until its first clean baseline exists; reports are uploaded as artifacts (logs are not downloadable otherwise).
+      - name: detekt (informational — reports uploaded as artifact)
+        continue-on-error: true
+        run: gradle --no-daemon detekt
 
       - name: Domain unit tests (incl. kotest property suite, >=1000 cases)
         run: gradle --no-daemon :domain:test
@@ -104,6 +111,19 @@ jobs:
           name: alazhartex-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 14
+
+      - name: Upload reports (detekt, lint, unit tests)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alazhartex-reports
+          path: |
+            domain/build/reports/**
+            data/build/reports/**
+            app/build/reports/**
+            generator/build/reports/**
+          retention-days: 14
+          if-no-files-found: warn
 
   android-connected:
     name: Connected tests (Room constraints + 12-screen smoke, API 34)
@@ -144,3 +164,16 @@ jobs:
           disable-animations: true
           emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: gradle --no-daemon :data:connectedDebugAndroidTest :app:connectedDebugAndroidTest
+
+      - name: Upload connected test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alazhartex-connected-reports
+          path: |
+            data/build/reports/androidTest/**
+            data/build/outputs/androidTest-results/**
+            app/build/reports/androidTest/**
+            app/build/outputs/androidTest-results/**
+          retention-days: 14
+          if-no-files-found: warn

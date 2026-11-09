@@ -9,7 +9,6 @@ import com.alazhartex.stock.R
 import com.alazhartex.stock.domain.model.RbacDeniedException
 import com.alazhartex.stock.domain.model.SessionClockAnomalyException
 import com.alazhartex.stock.domain.model.ShortfallException
-import com.alazhartex.stock.ui.LocalSnackbar
 
 const val ACTOR_ADMIN = "admin"
 
