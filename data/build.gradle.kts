@@ -1,0 +1,41 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.klint)
+}
+
+android {
+    namespace = "com.alazhartex.stock.data"
+    compileSdk = libs.versions.compile.sdk.get().toInt()
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toInt()
+        consumerProguardFiles("consumer-rules.pro")
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+            arg("room.incremental", "true")
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures { buildConfig = true }
+    testOptions { unitTests { isIncludeAndroidResources = true } }
+}
+
+dependencies {
+    api(project(":domain"))
+    api(libs.room.runtime)
+    api(libs.room.ktx)
+    implementation(libs.sqlite.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.coroutines.android)
+    ksp(libs.room.compiler)
+    testImplementation(libs.junit)
+    testImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.android.test.ext.junit)
+    androidTestImplementation(libs.android.test.runner)
+    androidTestImplementation(libs.android.test.rules)
+    androidTestImplementation(libs.room.testing)
+}
