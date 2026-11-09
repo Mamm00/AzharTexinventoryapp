@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main, arena/6dcc36ce-azhartexinventoryapp]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    name: Static checks (seed pin, G7, spec lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Seed artefact SHA-256 pin (§9.12)
+        run: |
+          expected="a71988826a28ef283c36f5dad91c214617ec53f010fa53d7b86220272e511fe6"
+          actual=$(sha256sum seed-alazhartex.json | cut -d' ' -f1)
+          echo "expected=$expected"
+          echo "actual=  $actual"
+          test "$actual" = "$expected"
+
+      - name: G7 forbidden token scan
+        run: bash tools/check_forbidden_tokens.sh
+
+      - name: G10 contradiction scanner (spec_lint)
+        run: python3 tools/spec_lint.py
+
+  oracles:
+    name: Seed oracles (O2 oracle, determinism x6, D19 auditor)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: O2 spec oracle — report must be reproducible
+        run: |
+          cp spec_report.txt /tmp/spec_report.committed.txt
+          python3 tools/independent_checks/spec_oracle.py
+          diff -u /tmp/spec_report.committed.txt spec_report.txt
+
+      - name: D19 external auditor (SQLite mirror)
+        run: |
+          python3 tools/independent_checks/seed_to_sqlite.py seed-alazhartex.json /tmp/audit.db
+          python3 tools/independent_checks/audit_checks.py /tmp/audit.db seed-report.txt
+
+  build-and-test:
+    name: Build, unit tests, lint, detekt, ktlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Install Android SDK platform 35
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - name: Generator determinism — byte-identical output across 6 runs
+        run: |
+          cp seed-alazhartex.json /tmp/seed.committed.json
+          cp seed-report.txt /tmp/report.committed.txt
+          for i in 1 2 3 4 5 6; do
+            gradle --no-daemon :generator:run
+            sha256sum seed-alazhartex.json seed-report.txt
+            cmp seed-alazhartex.json /tmp/seed.committed.json
+            cmp seed-report.txt /tmp/report.committed.txt
+          done
+          git status --porcelain
+          test -z "$(git status --porcelain)"
+
+      - name: ktlint + detekt
+        run: gradle --no-daemon ktlintCheck detekt
+
+      - name: Domain unit tests (incl. kotest property suite, >=1000 cases)
+        run: gradle --no-daemon :domain:test
+
+      - name: Assemble debug APK
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: App unit tests
+        run: gradle --no-daemon :app:testDebugUnitTest
+
+      - name: Lint (release, warnings-as-errors)
+        run: gradle --no-daemon :app:lintRelease
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: alazhartex-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+  android-connected:
+    name: Connected tests (Room constraints + 12-screen smoke, API 34)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Install Android SDK platform 35
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run connected tests on emulator (API 34, x86_64, pixel_7)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: default
+          profile: pixel_7
+          disable-animations: true
+          emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: gradle --no-daemon :data:connectedDebugAndroidTest :app:connectedDebugAndroidTest

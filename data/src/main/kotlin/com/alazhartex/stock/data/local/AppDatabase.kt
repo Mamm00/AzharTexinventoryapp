@@ -45,6 +45,12 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun manifestDao(): ManifestDao
 
     class TriggersCallback : Callback() {
+        override fun onConfigure(db: SupportSQLiteDatabase) {
+            super.onConfigure(db)
+            // FK enforcement is a spec requirement (§4.3 RESTRICT); set explicitly, don't rely on defaults.
+            db.setForeignKeyConstraintsEnabled(true)
+        }
+
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             db.execSQL(
