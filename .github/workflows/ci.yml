@@ -93,8 +93,17 @@ jobs:
       - name: ktlint :generator (check)
         run: gradle --no-daemon :generator:ktlintCheck
 
-      - name: ktlint :domain
-        run: gradle --no-daemon :domain:ktlintFormat :domain:ktlintCheck
+      - name: ktlint :domain (main format)
+        run: gradle --no-daemon :domain:ktlintMainSourceSetFormat
+
+      - name: ktlint :domain (main check)
+        run: gradle --no-daemon :domain:ktlintMainSourceSetCheck
+
+      - name: ktlint :domain (test format)
+        run: gradle --no-daemon :domain:ktlintTestSourceSetFormat
+
+      - name: ktlint :domain (test check)
+        run: gradle --no-daemon :domain:ktlintTestSourceSetCheck
 
       - name: ktlint :data (main)
         run: gradle --no-daemon :data:ktlintMainSourceSetFormat :data:ktlintMainSourceSetCheck
