@@ -1,0 +1,32 @@
+# Secrets & key material
+*.jks
+*.keystore
+keystore.properties
+local.properties
+*.pem
+*.p12
+
+# Local DBs & seed-runtime artifacts (seed-alazhartex.json IS committed; runtime DBs are not)
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+/app/schemas/**/migration-*.json.orig
+
+# Build outputs
+build/
+out/
+.gradle/
+.idea/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# OS / tooling
+.DS_Store
+*.log
+.capture/
+snapshot-repo/
