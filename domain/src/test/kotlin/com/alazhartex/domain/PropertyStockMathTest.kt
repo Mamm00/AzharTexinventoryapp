@@ -16,7 +16,7 @@ class PropertyStockMathTest {
     @Test
     fun arbitrary_valid_sequences_preserve_zero_drift() = runTest {
         val opsArb = Arb.list(Arb.int(0..4), 0..40)
-        val qtyArb = Arb.list(Arb.int(1..12), 64)
+        val qtyArb = Arb.list(Arb.int(1..12), 64..64)
         checkAll(1000, opsArb, Arb.int(1..500), qtyArb) { ops, opening, quantities ->
             var stock = opening.toLong()
             var deltaSum = 0L

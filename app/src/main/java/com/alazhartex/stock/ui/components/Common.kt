@@ -27,6 +27,7 @@ import com.alazhartex.stock.ui.theme.GaugeAmber
 import com.alazhartex.stock.ui.theme.GaugeGreen
 import com.alazhartex.stock.ui.theme.GaugeRed
 
+@Composable
 fun gaugeColor(bucket: GaugeBucket?): Color = when (bucket) {
     GaugeBucket.GREEN -> GaugeGreen
     GaugeBucket.AMBER -> GaugeAmber
