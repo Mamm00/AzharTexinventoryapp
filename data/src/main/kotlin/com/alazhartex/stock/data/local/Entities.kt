@@ -17,7 +17,8 @@ data class AccountEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: String,
     @ColumnInfo(name = "username") val username: String,
     @ColumnInfo(name = "password_pbkdf2_sha256") val passwordPbkdf2Sha256: String,
-    @ColumnInfo(name = "role") val role: String, // ADMIN | KEEPER | SALES_MANAGER
+    // ADMIN | KEEPER | SALES_MANAGER
+    @ColumnInfo(name = "role") val role: String,
     @ColumnInfo(name = "display_name") val displayName: String,
 )
 
@@ -63,7 +64,8 @@ data class ColourEntity(
     @ColumnInfo(name = "code") val code: String,
     @ColumnInfo(name = "name_ar") val nameAr: String,
     @ColumnInfo(name = "name_en") val nameEn: String,
-    @ColumnInfo(name = "grade") val grade: String, // A|B|C|D (DB trigger enforces)
+    // A|B|C|D (DB trigger enforces)
+    @ColumnInfo(name = "grade") val grade: String,
     @ColumnInfo(name = "family") val family: String,
     @ColumnInfo(name = "keeper_code") val keeperCode: String?,
     @ColumnInfo(name = "is_active") val isActive: Boolean,
@@ -114,13 +116,16 @@ data class InventoryEntity(
 )
 data class MovementEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: String,
-    @ColumnInfo(name = "type") val type: String, // IN|OUT|TRANSFER_OUT|TRANSFER_IN|ADJUSTMENT
+    // IN|OUT|TRANSFER_OUT|TRANSFER_IN|ADJUSTMENT
+    @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "mapping_id") val mappingId: String,
-    @ColumnInfo(name = "qty_delta") val qtyDelta: Long, // DB trigger enforces <> 0
+    // DB trigger enforces <> 0
+    @ColumnInfo(name = "qty_delta") val qtyDelta: Long,
     @ColumnInfo(name = "transfer_pair_id") val transferPairId: String?,
     @ColumnInfo(name = "idempotency_key") val idempotencyKey: String,
     @ColumnInfo(name = "actor_account_id") val actorAccountId: String,
-    @ColumnInfo(name = "at") val at: Long, // epoch millis UTC
+    // epoch millis UTC
+    @ColumnInfo(name = "at") val at: Long,
     @ColumnInfo(name = "note") val note: String,
 )
 
@@ -132,7 +137,8 @@ data class MovementEntity(
 data class RollEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: String,
     @ColumnInfo(name = "mapping_id") val mappingId: String,
-    @ColumnInfo(name = "state") val state: String, // ACTIVE|INACTIVE
+    // ACTIVE|INACTIVE
+    @ColumnInfo(name = "state") val state: String,
     @ColumnInfo(name = "count") val count: Long,
 )
 
@@ -143,7 +149,8 @@ data class AuditLogEntity(
     @ColumnInfo(name = "actor_id") val actorId: String,
     @ColumnInfo(name = "action") val action: String,
     @ColumnInfo(name = "target") val target: String,
-    @ColumnInfo(name = "result") val result: String, // ALLOWED|BLOCKED
+    // ALLOWED|BLOCKED
+    @ColumnInfo(name = "result") val result: String,
     @ColumnInfo(name = "reason") val reason: String?,
     @ColumnInfo(name = "idempotency_key") val idempotencyKey: String?,
 )

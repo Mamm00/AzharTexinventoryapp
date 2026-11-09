@@ -79,7 +79,16 @@ class CsvTest {
             val c = text[i]
             when {
                 inQuotes -> when (c) {
-                    '"' -> if (i + 1 < text.length && text[i + 1] == '"') { cell.append('"'); i += 2; continue } else { inQuotes = false; i += 1; continue }
+                    '"' -> {
+                        if (i + 1 < text.length && text[i + 1] == '"') {
+                            cell.append('"')
+                            i += 2
+                        } else {
+                            inQuotes = false
+                            i += 1
+                        }
+                        continue
+                    }
                     else -> { cell.append(c); i += 1; continue }
                 }
                 c == '"' -> { inQuotes = true; i += 1; continue }

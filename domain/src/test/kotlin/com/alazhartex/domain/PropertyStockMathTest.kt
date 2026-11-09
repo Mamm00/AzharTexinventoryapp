@@ -28,12 +28,18 @@ class PropertyStockMathTest {
                     }
                     1 -> { // OUT, bounded by available stock
                         val q = qty.coerceAtMost(stock)
-                        if (q > 0) { stock -= q; deltaSum -= q }
+                        if (q > 0) {
+                            stock -= q
+                            deltaSum -= q
+                        }
                     }
                     2 -> { // TRANSFER out-leg; pair nets to zero by StockMath contract
                         val q = qty.coerceAtMost(stock)
                         assertTrue(StockMath.transferPairNetsToZero(-q, q))
-                        if (q > 0) { stock -= q; deltaSum -= q }
+                        if (q > 0) {
+                            stock -= q
+                            deltaSum -= q
+                        }
                     }
                     3 -> { // ADJUSTMENT, alternating sign
                         val delta = if (step % 2 == 0) qty else -qty.coerceAtMost(stock)
