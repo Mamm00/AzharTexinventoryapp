@@ -87,8 +87,11 @@ jobs:
 
       # Split per module so a failing step localises the offending module (CI logs are not
       # downloadable here; step outcome is the diagnostic channel).
-      - name: ktlint :generator
-        run: gradle --no-daemon :generator:ktlintFormat :generator:ktlintCheck
+      - name: ktlint :generator (format)
+        run: gradle --no-daemon :generator:ktlintFormat
+
+      - name: ktlint :generator (check)
+        run: gradle --no-daemon :generator:ktlintCheck
 
       - name: ktlint :domain
         run: gradle --no-daemon :domain:ktlintFormat :domain:ktlintCheck
@@ -183,7 +186,9 @@ jobs:
           profile: pixel_7
           disable-animations: true
           emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
-          script: gradle --no-daemon :data:connectedDebugAndroidTest :app:connectedDebugAndroidTest
+          script: |
+            gradle --no-daemon :data:connectedDebugAndroidTest
+            gradle --no-daemon :app:connectedDebugAndroidTest
 
       - name: Upload connected test reports
         if: always()

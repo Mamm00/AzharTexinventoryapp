@@ -38,6 +38,7 @@ fun gaugeColor(bucket: GaugeBucket?): Color = when (bucket) {
  * Accessible utilisation gauge (T16): never colour-only — always bucket label + value text
  * + full contentDescription ("<shed> utilisation X% — bucket").
  */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun UtilisationGauge(
     label: String,
