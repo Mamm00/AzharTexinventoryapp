@@ -4,10 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.alazhartex.stock.data.repo.WriteContext
 
 /**
- * DAO contract (spec §4.7/§9.6, RES-014): every write suspend fun takes a WriteContext;
+ * DAO contract (spec §4.7/§9.6, RES-014): DAO methods are pure SQL; the audited WriteContext
+ * lives in the repository layer (TransactionRunner/SessionManager), which Room cannot receive.
  * the repository is the ONLY caller; every read-check-write path runs in one Room
  * withTransaction {} block that also performs the write. No AllowMainThreadQueries anywhere.
  */
@@ -20,10 +20,10 @@ interface AccountDao {
     suspend fun getById(id: String): AccountEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(accounts: List<AccountEntity>, writeContext: WriteContext)
+    suspend fun insertAll(accounts: List<AccountEntity>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(account: AccountEntity, writeContext: WriteContext)
+    suspend fun insert(account: AccountEntity)
 }
 
 @Dao
@@ -35,13 +35,13 @@ interface WarehouseDao {
     suspend fun getById(id: String): WarehouseEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<WarehouseEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<WarehouseEntity>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(row: WarehouseEntity, writeContext: WriteContext)
+    suspend fun insert(row: WarehouseEntity)
 
     @Query("UPDATE warehouses SET capacity_rolls = :capacity WHERE id = :id")
-    suspend fun updateCapacity(id: String, capacity: Long, writeContext: WriteContext): Int
+    suspend fun updateCapacity(id: String, capacity: Long): Int
 }
 
 @Dao
@@ -50,7 +50,7 @@ interface ShedAssignmentDao {
     suspend fun shedsFor(accountId: String): List<String>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<ShedAssignmentEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<ShedAssignmentEntity>)
 }
 
 @Dao
@@ -62,16 +62,16 @@ interface FabricDao {
     suspend fun getById(id: String): FabricEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<FabricEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<FabricEntity>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(row: FabricEntity, writeContext: WriteContext)
+    suspend fun insert(row: FabricEntity)
 
     @Query("SELECT COUNT(*) FROM mappings WHERE fabric_id = :fabricId")
     suspend fun mappingCountForFab(fabricId: String): Long
 
     @Query("DELETE FROM fabrics WHERE id = :id")
-    suspend fun delete(id: String, writeContext: WriteContext): Int
+    suspend fun delete(id: String): Int
 }
 
 @Dao
@@ -86,16 +86,16 @@ interface ColourDao {
     suspend fun getByCode(code: String): ColourEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<ColourEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<ColourEntity>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(row: ColourEntity, writeContext: WriteContext)
+    suspend fun insert(row: ColourEntity)
 
     @Query("UPDATE colours SET grade = :grade WHERE id = :id")
-    suspend fun updateGrade(id: String, grade: String, writeContext: WriteContext): Int
+    suspend fun updateGrade(id: String, grade: String): Int
 
     @Query("UPDATE colours SET is_active = :isActive WHERE id = :id")
-    suspend fun updateActive(id: String, isActive: Boolean, writeContext: WriteContext): Int
+    suspend fun updateActive(id: String, isActive: Boolean): Int
 
     @Query("SELECT COUNT(*) FROM colours WHERE keeper_code = :keeperCode")
     suspend fun countByKeeperCode(keeperCode: String): Long
@@ -125,13 +125,13 @@ interface MappingDao {
     suspend fun countInactive(): Long
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<MappingEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<MappingEntity>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(row: MappingEntity, writeContext: WriteContext)
+    suspend fun insert(row: MappingEntity)
 
     @Query("UPDATE mappings SET is_active = :isActive WHERE id = :id")
-    suspend fun updateActive(id: String, isActive: Boolean, writeContext: WriteContext): Int
+    suspend fun updateActive(id: String, isActive: Boolean): Int
 }
 
 @Dao
@@ -150,16 +150,16 @@ interface InventoryDao {
 
     /** Atomic conditional decrement — the concurrency guarantee for negative-stock refusal (§9.6, T5). */
     @Query("UPDATE inventory SET closing = closing - :qty, last_event_at = :at WHERE mapping_id = :mappingId AND closing - :qty >= 0")
-    suspend fun conditionalDecrement(mappingId: String, qty: Long, at: Long, writeContext: WriteContext): Int
+    suspend fun conditionalDecrement(mappingId: String, qty: Long, at: Long): Int
 
     @Query("UPDATE inventory SET closing = closing + :qty, last_event_at = :at WHERE mapping_id = :mappingId")
-    suspend fun increment(mappingId: String, qty: Long, at: Long, writeContext: WriteContext): Int
+    suspend fun increment(mappingId: String, qty: Long, at: Long): Int
 
     @Query("UPDATE inventory SET opening_cache = :openingCache, last_event_at = :at WHERE mapping_id = :mappingId")
-    suspend fun updateOpeningCache(mappingId: String, openingCache: Long, at: Long, writeContext: WriteContext): Int
+    suspend fun updateOpeningCache(mappingId: String, openingCache: Long, at: Long): Int
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<InventoryEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<InventoryEntity>)
 }
 
 @Dao
@@ -177,10 +177,10 @@ interface MovementDao {
     suspend fun countByType(type: String): Long
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(row: MovementEntity, writeContext: WriteContext)
+    suspend fun insert(row: MovementEntity)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<MovementEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<MovementEntity>)
 }
 
 @Dao
@@ -198,10 +198,10 @@ interface RollDao {
     suspend fun sumActiveForShed(warehouseId: String): Long
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAll(rows: List<RollEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<RollEntity>)
 
     @Query("UPDATE rolls SET count = :count WHERE mapping_id = :mappingId AND state = :state")
-    suspend fun updateCount(mappingId: String, state: String, count: Long, writeContext: WriteContext): Int
+    suspend fun updateCount(mappingId: String, state: String, count: Long): Int
 }
 
 @Dao
@@ -222,7 +222,7 @@ interface AuditDao {
     suspend fun countByIdempotency(key: String): Long
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(row: AuditLogEntity, writeContext: WriteContext)
+    suspend fun insert(row: AuditLogEntity)
 }
 
 @Dao
@@ -231,10 +231,10 @@ interface SessionDao {
     suspend fun latestActive(accountId: String): SessionEntity?
 
     @Query("UPDATE sessions SET is_active = 0 WHERE account_id = :accountId")
-    suspend fun deactivateFor(accountId: String, writeContext: WriteContext): Int
+    suspend fun deactivateFor(accountId: String): Int
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(row: SessionEntity, writeContext: WriteContext)
+    suspend fun insert(row: SessionEntity)
 }
 
 @Dao
@@ -246,7 +246,7 @@ interface AppSettingsDao {
     suspend fun get(key: String): String?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(row: AppSettingEntity, writeContext: WriteContext)
+    suspend fun upsert(row: AppSettingEntity)
 }
 
 @Dao
@@ -255,8 +255,8 @@ interface ManifestDao {
     suspend fun getAll(): List<ManifestEntity>
 
     @Query("DELETE FROM _manifest")
-    suspend fun clear(writeContext: WriteContext): Int
+    suspend fun clear(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(rows: List<ManifestEntity>, writeContext: WriteContext)
+    suspend fun insertAll(rows: List<ManifestEntity>)
 }

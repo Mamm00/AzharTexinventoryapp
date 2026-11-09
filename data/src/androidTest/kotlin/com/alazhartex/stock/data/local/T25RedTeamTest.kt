@@ -4,7 +4,6 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.alazhartex.stock.data.repo.StockRepository
-import com.alazhartex.stock.data.repo.WriteContext
 import com.alazhartex.stock.domain.idempotency.MutationOutcome
 import com.alazhartex.stock.domain.model.MovementType
 import com.alazhartex.stock.domain.model.RbacDeniedException
@@ -29,7 +28,6 @@ import org.junit.runner.RunWith
 class T25RedTeamTest {
 
     private lateinit var database: AppDatabase
-    private val ctx = WriteContext("test", "t25", "t25.op", 1_700_000_000_000L)
 
     @Before
     fun setUp() {
@@ -51,38 +49,32 @@ class T25RedTeamTest {
                 AccountEntity("keeper1", "keeper1", "pbkdf2\$210000\$s\$h", "KEEPER", "Keeper One"),
                 AccountEntity("keeper2", "keeper2", "pbkdf2\$210000\$s\$h", "KEEPER", "Keeper Two"),
             ),
-            ctx,
         )
         database.warehouseDao().insertAll(
             listOf(
                 WarehouseEntity("wh-a", "أ", "Shed A", 10L, "keeper1"),
                 WarehouseEntity("wh-b", "ب", "Shed B", 3L, "keeper2"),
             ),
-            ctx,
         )
         database.shedAssignmentDao().insertAll(
             listOf(ShedAssignmentEntity("keeper1", "wh-a"), ShedAssignmentEntity("keeper2", "wh-b")),
-            ctx,
         )
-        database.fabricDao().insert(FabricEntity("fab-1", "قطن", "Cotton", "Cotton"), ctx)
-        database.colourDao().insert(ColourEntity("col-1", "C-1", "أحمر", "Red", "A", "Cotton", null, true), ctx)
+        database.fabricDao().insert(FabricEntity("fab-1", "قطن", "Cotton", "Cotton"))
+        database.colourDao().insert(ColourEntity("col-1", "C-1", "أحمر", "Red", "A", "Cotton", null, true))
         database.mappingDao().insertAll(
             listOf(
                 MappingEntity("map-a", "wh-a", "fab-1", "col-1", true),
                 MappingEntity("map-b", "wh-b", "fab-1", "col-1", true),
             ),
-            ctx,
         )
         database.inventoryDao().insertAll(
             listOf(
                 InventoryEntity("inv-a", "map-a", 8L, 8L, 1_700_000_000_000L),
                 InventoryEntity("inv-b", "map-b", 2L, 2L, 1_700_000_000_000L),
             ),
-            ctx,
         )
         database.rollDao().insertAll(
             listOf(RollEntity("roll-a", "map-a", "ACTIVE", 8L), RollEntity("roll-b", "map-b", "ACTIVE", 2L)),
-            ctx,
         )
     }
 

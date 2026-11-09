@@ -50,7 +50,6 @@ class AppContainer(private val context: Context) {
                         reason = reason,
                         idempotencyKey = ctx.idempotencyKey,
                     ),
-                    ctx,
                 )
             },
             clock = clock,

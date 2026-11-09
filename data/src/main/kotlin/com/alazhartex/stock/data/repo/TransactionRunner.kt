@@ -43,7 +43,6 @@ class TransactionRunner(
                                 reason = null,
                                 idempotencyKey = idempotencyKey,
                             ),
-                            ctx,
                         )
                     }
                     MutationOutcome.AlreadyApplied -> Unit
@@ -65,7 +64,6 @@ class TransactionRunner(
         }
         try {
             database.withTransaction {
-                val ctx = WriteContext(actorId, idempotencyKey, action, wallClock())
                 database.auditDao().insert(
                     AuditLogEntity(
                         id = UUID.randomUUID().toString(),
@@ -77,7 +75,6 @@ class TransactionRunner(
                         reason = reason,
                         idempotencyKey = idempotencyKey,
                     ),
-                    ctx,
                 )
             }
         } catch (auditFailure: Exception) {

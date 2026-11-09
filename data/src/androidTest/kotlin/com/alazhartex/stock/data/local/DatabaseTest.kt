@@ -3,7 +3,6 @@ package com.alazhartex.stock.data.local
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.alazhartex.stock.data.repo.WriteContext
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -22,7 +21,6 @@ import org.junit.runner.RunWith
 class DatabaseTest {
 
     private lateinit var database: AppDatabase
-    private val ctx = WriteContext("test-actor", "test-idem", "test.op", 1_700_000_000_000L)
 
     @Before
     fun setUp() {
@@ -38,24 +36,23 @@ class DatabaseTest {
     }
 
     private suspend fun seedBase() {
-        database.accountDao().insert(AccountEntity("admin", "admin", "pbkdf2\$210000\$salt\$hash", "ADMIN", "Admin"), ctx)
-        database.warehouseDao().insert(WarehouseEntity("wh-1", "مستودع", "Warehouse One", 100L, "admin"), ctx)
-        database.fabricDao().insert(FabricEntity("fabric-1", "قطن", "Cotton", "Cotton"), ctx)
-        database.colourDao().insert(ColourEntity("colour-1", "C-1", "أحمر", "Red", "A", "Cotton", null, true), ctx)
-        database.mappingDao().insert(MappingEntity("mapping-1", "wh-1", "fabric-1", "colour-1", true), ctx)
+        database.accountDao().insert(AccountEntity("admin", "admin", "pbkdf2\$210000\$salt\$hash", "ADMIN", "Admin"))
+        database.warehouseDao().insert(WarehouseEntity("wh-1", "مستودع", "Warehouse One", 100L, "admin"))
+        database.fabricDao().insert(FabricEntity("fabric-1", "قطن", "Cotton", "Cotton"))
+        database.colourDao().insert(ColourEntity("colour-1", "C-1", "أحمر", "Red", "A", "Cotton", null, true))
+        database.mappingDao().insert(MappingEntity("mapping-1", "wh-1", "fabric-1", "colour-1", true))
         database.inventoryDao().insertAll(
             listOf(InventoryEntity("inv-1", "mapping-1", 10L, 10L, 1_700_000_000_000L)),
-            ctx,
         )
-        database.rollDao().insertAll(listOf(RollEntity("roll-1", "mapping-1", "ACTIVE", 10L)), ctx)
+        database.rollDao().insertAll(listOf(RollEntity("roll-1", "mapping-1", "ACTIVE", 10L)))
     }
 
     @Test
     fun conditionalDecrementRefusesBelowZero() = runBlocking {
         seedBase()
-        val ok = database.inventoryDao().conditionalDecrement("mapping-1", 10L, 1_700_000_001_000L, ctx)
+        val ok = database.inventoryDao().conditionalDecrement("mapping-1", 10L, 1_700_000_001_000L)
         assertEquals(1, ok)
-        val refused = database.inventoryDao().conditionalDecrement("mapping-1", 1L, 1_700_000_002_000L, ctx)
+        val refused = database.inventoryDao().conditionalDecrement("mapping-1", 1L, 1_700_000_002_000L)
         assertEquals(0, refused)
         assertEquals(0L, database.inventoryDao().getByMapping("mapping-1")?.closing)
     }
@@ -71,7 +68,6 @@ class DatabaseTest {
                         transferPairId = null, idempotencyKey = "zero-delta",
                         actorAccountId = "admin", at = 1_700_000_003_000L, note = "must fail",
                     ),
-                    ctx,
                 )
             }
         }
@@ -84,7 +80,6 @@ class DatabaseTest {
             runBlocking {
                 database.colourDao().insert(
                     ColourEntity("colour-2", "C-2", "أزرق", "Blue", "E", "Cotton", null, true),
-                    ctx,
                 )
             }
         }
@@ -98,10 +93,10 @@ class DatabaseTest {
             transferPairId = null, idempotencyKey = "dup-key",
             actorAccountId = "admin", at = 1_700_000_004_000L, note = "first",
         )
-        database.movementDao().insert(movement, ctx)
+        database.movementDao().insert(movement)
         assertThrows(Exception::class.java) {
             runBlocking {
-                database.movementDao().insert(movement.copy(id = "mv-2", note = "replay-with-different-row"), ctx)
+                database.movementDao().insert(movement.copy(id = "mv-2", note = "replay-with-different-row"))
             }
         }
     }
@@ -124,9 +119,8 @@ class DatabaseTest {
                 transferPairId = null, idempotencyKey = "sum-check",
                 actorAccountId = "admin", at = 1_700_000_005_000L, note = "",
             ),
-            ctx,
         )
-        database.inventoryDao().increment("mapping-1", 4L, 1_700_000_005_000L, ctx)
+        database.inventoryDao().increment("mapping-1", 4L, 1_700_000_005_000L)
         val deltas = database.movementDao().sumDeltaFor("mapping-1")
         val row = database.inventoryDao().getByMapping("mapping-1")
         assertNotNull(row)

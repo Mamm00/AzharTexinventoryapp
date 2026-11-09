@@ -13,7 +13,6 @@ import com.alazhartex.stock.data.local.RollEntity
 import com.alazhartex.stock.data.local.ShedAssignmentEntity
 import com.alazhartex.stock.data.local.WarehouseEntity
 import com.alazhartex.stock.data.repo.TransactionRunner
-import com.alazhartex.stock.data.repo.WriteContext
 import com.alazhartex.stock.domain.idempotency.MutationOutcome
 import org.json.JSONObject
 import java.time.Instant
@@ -34,22 +33,22 @@ class SeedLoader(
             return MutationOutcome.AlreadyApplied
         }
         val json = context.assets.open("seed-alazhartex.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
-        return runner.withAudit("system", "seed.apply", SEED_KEY, "seed") { ctx ->
-            applySeed(JSONObject(json), ctx)
-            database.appSettingsDao().upsert(AppSettingEntity("seed_applied", "true"), ctx)
-            database.appSettingsDao().upsert(AppSettingEntity("app_version", APP_VERSION), ctx)
+        return runner.withAudit("system", "seed.apply", SEED_KEY, "seed") { _ ->
+            applySeed(JSONObject(json))
+            database.appSettingsDao().upsert(AppSettingEntity("seed_applied", "true"))
+            database.appSettingsDao().upsert(AppSettingEntity("app_version", APP_VERSION))
             MutationOutcome.Applied()
         }
     }
 
-    private suspend fun applySeed(root: JSONObject, ctx: WriteContext) {
+    private suspend fun applySeed(root: JSONObject) {
         val accounts = root.getJSONArray("accounts").let { arr ->
             (0 until arr.length()).map { i ->
                 val o = arr.getJSONObject(i)
                 AccountEntity(o.getString("id"), o.getString("username"), o.getString("password_pbkdf2_sha256"), o.getString("role"), o.getString("display_name"))
             }
         }
-        database.accountDao().insertAll(accounts, ctx)
+        database.accountDao().insertAll(accounts)
 
         val warehouses = root.getJSONArray("warehouses").let { arr ->
             (0 until arr.length()).map { i ->
@@ -57,7 +56,7 @@ class SeedLoader(
                 WarehouseEntity(o.getString("id"), o.getString("name_ar"), o.getString("name_en"), o.getLong("capacity_rolls"), o.getString("keeper_account_id"))
             }
         }
-        database.warehouseDao().insertAll(warehouses, ctx)
+        database.warehouseDao().insertAll(warehouses)
 
         val assignments = root.getJSONArray("shed_assignments").let { arr ->
             (0 until arr.length()).map { i ->
@@ -65,7 +64,7 @@ class SeedLoader(
                 ShedAssignmentEntity(o.getString("account_id"), o.getString("warehouse_id"))
             }
         }
-        database.shedAssignmentDao().insertAll(assignments, ctx)
+        database.shedAssignmentDao().insertAll(assignments)
 
         val fabrics = root.getJSONArray("fabrics").let { arr ->
             (0 until arr.length()).map { i ->
@@ -73,7 +72,7 @@ class SeedLoader(
                 FabricEntity(o.getString("id"), o.getString("name_ar"), o.getString("name_en"), o.getString("family"))
             }
         }
-        database.fabricDao().insertAll(fabrics, ctx)
+        database.fabricDao().insertAll(fabrics)
 
         val colours = root.getJSONArray("colours").let { arr ->
             (0 until arr.length()).map { i ->
@@ -90,7 +89,7 @@ class SeedLoader(
                 )
             }
         }
-        database.colourDao().insertAll(colours, ctx)
+        database.colourDao().insertAll(colours)
 
         val mappings = root.getJSONArray("mappings").let { arr ->
             (0 until arr.length()).map { i ->
@@ -98,7 +97,7 @@ class SeedLoader(
                 MappingEntity(o.getString("id"), o.getString("warehouse_id"), o.getString("fabric_id"), o.getString("colour_id"), o.getBoolean("is_active"))
             }
         }
-        database.mappingDao().insertAll(mappings, ctx)
+        database.mappingDao().insertAll(mappings)
 
         val rolls = root.getJSONArray("rolls").let { arr ->
             (0 until arr.length()).map { i ->
@@ -106,7 +105,7 @@ class SeedLoader(
                 RollEntity(o.getString("id"), o.getString("mapping_id"), o.getString("state"), o.getLong("count"))
             }
         }
-        database.rollDao().insertAll(rolls, ctx)
+        database.rollDao().insertAll(rolls)
 
         val inventory = root.getJSONArray("inventory").let { arr ->
             (0 until arr.length()).map { i ->
@@ -114,7 +113,7 @@ class SeedLoader(
                 InventoryEntity(o.getString("id"), o.getString("mapping_id"), o.getLong("closing"), o.getLong("opening_cache"), null)
             }
         }
-        database.inventoryDao().insertAll(inventory, ctx)
+        database.inventoryDao().insertAll(inventory)
 
         val movements = root.getJSONArray("movements").let { arr ->
             (0 until arr.length()).map { i ->
@@ -132,7 +131,7 @@ class SeedLoader(
                 )
             }
         }
-        database.movementDao().insertAll(movements, ctx)
+        database.movementDao().insertAll(movements)
 
         val settings = root.getJSONArray("settings").let { arr ->
             (0 until arr.length()).map { i ->
@@ -141,7 +140,7 @@ class SeedLoader(
             }
         }
         for (setting in settings) {
-            database.appSettingsDao().upsert(setting, ctx)
+            database.appSettingsDao().upsert(setting)
         }
     }
 

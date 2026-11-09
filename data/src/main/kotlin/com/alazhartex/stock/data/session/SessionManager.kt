@@ -38,7 +38,7 @@ class SessionManager(
         when (verdict) {
             SessionPolicy.Verdict.ACTIVE -> Unit
             SessionPolicy.Verdict.EXPIRED_REFRESHABLE -> {
-                sessionDao.deactivateFor("admin", writeContextFor("admin", "session.reissue"))
+                sessionDao.deactivateFor("admin")
                 issueSession("admin", boot)
                 auditWriter(writeContextFor("admin", "session.reissue"), "session.reissue", "admin", "ALLOWED", "expired_reissue")
             }
@@ -70,7 +70,7 @@ class SessionManager(
         )
         val resolution = SessionPolicy.resolveForMutation(actorIsAdmin, verdict)
         if (resolution == SessionPolicy.MutationResolution.SILENT_REISSUE_AND_PROCEED) {
-            sessionDao.deactivateFor(actorId, writeContextFor(actorId, "session.refresh"))
+            sessionDao.deactivateFor(actorId)
             issueSession(actorId, boot)
             auditWriter(writeContextFor(actorId, "session.refresh"), "session.refresh", actorId, "ALLOWED", "silent_refresh")
             return SessionPolicy.MutationResolution.PROCEED
@@ -92,7 +92,7 @@ class SessionManager(
             expiresAtWall = now + SessionPolicy.SESSION_DURATION_MILLIS,
             isActive = true,
         )
-        sessionDao.insert(row, writeContextFor(accountId, "session.issue"))
+        sessionDao.insert(row)
         return row
     }
 
@@ -102,7 +102,7 @@ class SessionManager(
     /** Debug-only account switch for androidTest (RES-022); never exposed in release builds. */
     suspend fun debugSwitchAccountForTests(accountId: String) {
         val boot = currentBootId()
-        sessionDao.deactivateFor(accountId, writeContextFor(accountId, "debug.switch"))
+        sessionDao.deactivateFor(accountId)
         issueSession(accountId, boot)
     }
 }

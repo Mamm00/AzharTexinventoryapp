@@ -31,7 +31,7 @@ class MastersSettingsRepository(
     // ---------- masters: add (ADMIN + KEEPER) ----------
     suspend fun addColour(actorId: String, code: String, nameEn: String, nameAr: String, grade: String, family: String, keeperCode: String?, idempotencyKey: String): MutationOutcome {
         require(grade in setOf("A", "B", "C", "D")) { "grade must be A, B, C or D" }
-        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "colour:$code") { ctx ->
+        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "colour:$code") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersAdd(role), Rbac.ACTION_MASTERS_ADD, code)
             database.colourDao().insert(
@@ -39,19 +39,17 @@ class MastersSettingsRepository(
                     id = UUID.randomUUID().toString(), code = code, nameEn = nameEn, nameAr = nameAr,
                     grade = grade, family = family, keeperCode = keeperCode, isActive = true,
                 ),
-                ctx,
             )
             MutationOutcome.Applied()
         }
     }
 
     suspend fun addFabric(actorId: String, nameEn: String, nameAr: String, family: String, idempotencyKey: String): MutationOutcome {
-        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "fabric:$nameEn") { ctx ->
+        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "fabric:$nameEn") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersAdd(role), Rbac.ACTION_MASTERS_ADD, nameEn)
             database.fabricDao().insert(
                 com.alazhartex.stock.data.local.FabricEntity(UUID.randomUUID().toString(), nameEn = nameEn, nameAr = nameAr, family = family),
-                ctx,
             )
             MutationOutcome.Applied()
         }
@@ -59,14 +57,13 @@ class MastersSettingsRepository(
 
     suspend fun addWarehouse(actorId: String, id: String, nameEn: String, nameAr: String, capacityRolls: Long, keeperAccountId: String, idempotencyKey: String): MutationOutcome {
         require(capacityRolls >= 0) { "capacity must be >= 0" }
-        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "warehouse:$id") { ctx ->
+        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "warehouse:$id") { _ ->
             val role = actorRole(actorId)
             if (role != Role.ADMIN) {
                 throw RbacDeniedException(role, Rbac.ACTION_MASTERS_ADD, id, "rbac.deny.keeper_warehouse_provision")
             }
             database.warehouseDao().insert(
                 com.alazhartex.stock.data.local.WarehouseEntity(id, nameAr, nameEn, capacityRolls, keeperAccountId),
-                ctx,
             )
             MutationOutcome.Applied()
         }
@@ -74,14 +71,13 @@ class MastersSettingsRepository(
 
     /** Add mapping (+ its zero inventory row + zero ACTIVE roll row) — one transaction. */
     suspend fun addMapping(actorId: String, warehouseId: String, fabricId: String, colourId: String, idempotencyKey: String): MutationOutcome {
-        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "mapping:$warehouseId|$fabricId|$colourId") { ctx ->
+        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_ADD, idempotencyKey, "mapping:$warehouseId|$fabricId|$colourId") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersAdd(role), Rbac.ACTION_MASTERS_ADD, "$warehouseId|$fabricId|$colourId")
             val mappingId = UUID.randomUUID().toString()
-            database.mappingDao().insert(MappingEntity(mappingId, warehouseId, fabricId, colourId, true), ctx)
+            database.mappingDao().insert(MappingEntity(mappingId, warehouseId, fabricId, colourId, true))
             database.inventoryDao().insertAll(
                 listOf(com.alazhartex.stock.data.local.InventoryEntity(UUID.randomUUID().toString(), mappingId, 0L, 0L, null)),
-                ctx,
             )
             MutationOutcome.Applied()
         }
@@ -90,32 +86,32 @@ class MastersSettingsRepository(
     // ---------- masters: delete / regrade (ADMIN only) ----------
     suspend fun regradeColour(actorId: String, colourId: String, newGrade: String, idempotencyKey: String): MutationOutcome {
         require(newGrade in setOf("A", "B", "C", "D")) { "grade must be A, B, C or D" }
-        return runner.withAudit(actorId, Rbac.ACTION_REGRADE, idempotencyKey, "colour:$colourId") { ctx ->
+        return runner.withAudit(actorId, Rbac.ACTION_REGRADE, idempotencyKey, "colour:$colourId") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersDeleteOrRegrade(role), Rbac.ACTION_REGRADE, colourId)
-            database.colourDao().updateGrade(colourId, newGrade, ctx)
+            database.colourDao().updateGrade(colourId, newGrade)
             MutationOutcome.Applied()
         }
     }
 
     suspend fun deleteFabric(actorId: String, fabricId: String, idempotencyKey: String): MutationOutcome {
-        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_DELETE, idempotencyKey, "fabric:$fabricId") { ctx ->
+        return runner.withAudit(actorId, Rbac.ACTION_MASTERS_DELETE, idempotencyKey, "fabric:$fabricId") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersDeleteOrRegrade(role), Rbac.ACTION_MASTERS_DELETE, fabricId)
             if (database.fabricDao().mappingCountForFab(fabricId) > 0L) {
                 throw com.alazhartex.stock.domain.model.InvariantViolationException("fabric_has_mappings fabric=$fabricId")
             }
-            database.fabricDao().delete(fabricId, ctx)
+            database.fabricDao().delete(fabricId)
             MutationOutcome.Applied()
         }
     }
 
     // ---------- settings (ADMIN only; keepers: NO settings) ----------
     suspend fun setSetting(actorId: String, key: String, value: String, idempotencyKey: String): MutationOutcome {
-        return runner.withAudit(actorId, Rbac.ACTION_SETTINGS, idempotencyKey, "setting:$key") { ctx ->
+        return runner.withAudit(actorId, Rbac.ACTION_SETTINGS, idempotencyKey, "setting:$key") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canSettings(role), Rbac.ACTION_SETTINGS, key)
-            database.appSettingsDao().upsert(AppSettingEntity(key, value), ctx)
+            database.appSettingsDao().upsert(AppSettingEntity(key, value))
             MutationOutcome.Applied()
         }
     }

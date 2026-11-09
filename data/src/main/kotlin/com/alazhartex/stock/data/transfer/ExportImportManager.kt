@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.room.withTransaction
 import com.alazhartex.stock.data.local.AppDatabase
 import com.alazhartex.stock.data.local.ManifestEntity
-import com.alazhartex.stock.data.repo.WriteContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -58,7 +57,6 @@ class ExportImportManager(
     }
 
     private suspend fun rewriteManifest() {
-        val ctx = WriteContext("system", UUID.randomUUID().toString(), "export.manifest", wallClock())
         val tables = listOf(
             "accounts", "warehouses", "shed_assignments", "fabrics", "colours", "mappings",
             "inventory", "movements", "rolls", "audit_log", "sessions", "app_settings",
@@ -69,10 +67,9 @@ class ExportImportManager(
             table to count
         }.toMap()
         database.withTransaction {
-            database.manifestDao().clear(ctx)
+            database.manifestDao().clear()
             database.manifestDao().insertAll(
                 counts.map { (table, count) -> ManifestEntity(table, count, 1, appVersionName, wallClock()) },
-                ctx,
             )
         }
     }

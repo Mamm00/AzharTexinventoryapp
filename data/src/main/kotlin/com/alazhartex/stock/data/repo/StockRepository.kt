@@ -54,7 +54,7 @@ class StockRepository(
         val deltas = database.movementDao().sumDeltaFor(mappingId)
         val opening = StockMath.derivedOpening(row.closing, deltas)
         StockMath.requireNonNegative(row.closing)
-        database.inventoryDao().updateOpeningCache(mappingId, opening, wallClock(), WriteContext("system", "invariant", "invariant.recheck", wallClock()))
+        database.inventoryDao().updateOpeningCache(mappingId, opening, wallClock())
         StockMath.checkInvariant(mappingId, opening, row.closing, deltas)
     }
 
@@ -67,9 +67,9 @@ class StockRepository(
             val mapping = requireMapping(mappingId)
             requireWriteScope(role, mapping.warehouseId, assignments)
             if (isReplay(idempotencyKey)) return@withAudit MutationOutcome.AlreadyApplied
-            database.inventoryDao().increment(mappingId, qty, wallClock(), ctx)
-            applyRollDelta(mappingId, qty, ctx)
-            database.movementDao().insert(movement(ctx, mappingId, type, qty, null, note), ctx)
+            database.inventoryDao().increment(mappingId, qty, wallClock())
+            applyRollDelta(mappingId, qty)
+            database.movementDao().insert(movement(ctx, mappingId, type, qty, null, note))
             recheckRow(mappingId)
             MutationOutcome.Applied()
         }
@@ -85,13 +85,13 @@ class StockRepository(
             requireWriteScope(role, mapping.warehouseId, assignments)
             if (isReplay(idempotencyKey)) return@withAudit MutationOutcome.AlreadyApplied
             val now = wallClock()
-            val updated = database.inventoryDao().conditionalDecrement(mappingId, qty, now, ctx)
+            val updated = database.inventoryDao().conditionalDecrement(mappingId, qty, now)
             if (updated == 0) {
                 val available = database.inventoryDao().getByMapping(mappingId)?.closing ?: 0L
                 throw ShortfallException(mappingId, qty, available)
             }
-            applyRollDelta(mappingId, -qty, ctx)
-            database.movementDao().insert(movement(ctx, mappingId, type, -qty, null, note), ctx)
+            applyRollDelta(mappingId, -qty)
+            database.movementDao().insert(movement(ctx, mappingId, type, -qty, null, note))
             recheckRow(mappingId)
             MutationOutcome.Applied()
         }
@@ -109,17 +109,17 @@ class StockRepository(
             requireWriteScope(role, target.warehouseId, assignments)
             if (isReplay(idempotencyKey)) return@withAudit MutationOutcome.AlreadyApplied
             val now = wallClock()
-            val updated = database.inventoryDao().conditionalDecrement(sourceMappingId, qty, now, ctx)
+            val updated = database.inventoryDao().conditionalDecrement(sourceMappingId, qty, now)
             if (updated == 0) {
                 val available = database.inventoryDao().getByMapping(sourceMappingId)?.closing ?: 0L
                 throw ShortfallException(sourceMappingId, qty, available)
             }
-            database.inventoryDao().increment(targetMappingId, qty, now, ctx)
+            database.inventoryDao().increment(targetMappingId, qty, now)
             val pairId = UUID.randomUUID().toString()
-            database.movementDao().insert(movement(ctx, sourceMappingId, MovementType.TRANSFER_OUT, -qty, pairId, note), ctx)
-            database.movementDao().insert(movement(ctx, targetMappingId, MovementType.TRANSFER_IN, qty, pairId, note), ctx)
-            applyRollDelta(sourceMappingId, -qty, ctx)
-            applyRollDelta(targetMappingId, qty, ctx)
+            database.movementDao().insert(movement(ctx, sourceMappingId, MovementType.TRANSFER_OUT, -qty, pairId, note))
+            database.movementDao().insert(movement(ctx, targetMappingId, MovementType.TRANSFER_IN, qty, pairId, note))
+            applyRollDelta(sourceMappingId, -qty)
+            applyRollDelta(targetMappingId, qty)
             recheckRow(sourceMappingId)
             recheckRow(targetMappingId)
             MutationOutcome.Applied()
@@ -147,12 +147,12 @@ class StockRepository(
             note = note,
         )
 
-    private suspend fun applyRollDelta(mappingId: String, qtyDelta: Long, ctx: WriteContext) {
+    private suspend fun applyRollDelta(mappingId: String, qtyDelta: Long) {
         val roll = database.rollDao().getByMappingAndState(mappingId, "ACTIVE") ?: return
         val newCount = roll.count + qtyDelta
         if (newCount < 0L) {
             throw InvariantViolationException("roll_count_negative mapping=$mappingId count=$newCount")
         }
-        database.rollDao().updateCount(mappingId, "ACTIVE", newCount, ctx)
+        database.rollDao().updateCount(mappingId, "ACTIVE", newCount)
     }
 }
