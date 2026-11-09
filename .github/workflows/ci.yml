@@ -85,8 +85,28 @@ jobs:
           cmp /tmp/gen/seed.first.json seed-alazhartex.json
           cmp /tmp/gen/report.first.txt seed-report.txt
 
-      - name: ktlint (format-then-check; normalises style, enforces rule gates)
-        run: gradle --no-daemon ktlintFormat ktlintCheck
+      # Split per module so a failing step localises the offending module (CI logs are not
+      # downloadable here; step outcome is the diagnostic channel).
+      - name: ktlint :generator
+        run: gradle --no-daemon :generator:ktlintFormat :generator:ktlintCheck
+
+      - name: ktlint :domain
+        run: gradle --no-daemon :domain:ktlintFormat :domain:ktlintCheck
+
+      - name: ktlint :data (main)
+        run: gradle --no-daemon :data:ktlintMainSourceSetFormat :data:ktlintMainSourceSetCheck
+
+      - name: ktlint :data (androidTest)
+        run: gradle --no-daemon :data:ktlintAndroidTestSourceSetFormat :data:ktlintAndroidTestSourceSetCheck
+
+      - name: ktlint :app (main)
+        run: gradle --no-daemon :app:ktlintMainSourceSetFormat :app:ktlintMainSourceSetCheck
+
+      - name: ktlint :app (androidTest)
+        run: gradle --no-daemon :app:ktlintAndroidTestSourceSetFormat :app:ktlintAndroidTestSourceSetCheck
+
+      - name: ktlint (module aggregates)
+        run: gradle --no-daemon ktlintCheck
 
       # Detekt is informational until its first clean baseline exists; reports are uploaded as artifacts (logs are not downloadable otherwise).
       - name: detekt (informational — reports uploaded as artifact)
