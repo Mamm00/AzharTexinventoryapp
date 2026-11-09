@@ -1,4 +1,4 @@
-package com.alazhartex.domain.idempotency
+package com.alazhartex.stock.domain.idempotency
 
 /** Outcome contract for replay-safe gestures (spec §4.7, D7, T7). */
 sealed interface MutationOutcome {

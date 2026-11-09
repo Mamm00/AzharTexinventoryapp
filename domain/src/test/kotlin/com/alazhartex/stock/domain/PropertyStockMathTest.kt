@@ -1,6 +1,6 @@
-package com.alazhartex.domain
+package com.alazhartex.stock.domain
 
-import com.alazhartex.domain.stock.StockMath
+import com.alazhartex.stock.domain.stock.StockMath
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list

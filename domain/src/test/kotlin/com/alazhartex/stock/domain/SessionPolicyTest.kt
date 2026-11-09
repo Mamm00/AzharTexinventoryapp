@@ -1,8 +1,8 @@
-package com.alazhartex.domain
+package com.alazhartex.stock.domain
 
-import com.alazhartex.domain.session.SessionPolicy
-import com.alazhartex.domain.session.SessionPolicy.MutationResolution
-import com.alazhartex.domain.session.SessionPolicy.Verdict
+import com.alazhartex.stock.domain.session.SessionPolicy
+import com.alazhartex.stock.domain.session.SessionPolicy.MutationResolution
+import com.alazhartex.stock.domain.session.SessionPolicy.Verdict
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

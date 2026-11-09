@@ -1,6 +1,6 @@
-package com.alazhartex.domain.rbac
+package com.alazhartex.stock.domain.rbac
 
-import com.alazhartex.domain.model.Role
+import com.alazhartex.stock.domain.model.Role
 
 /**
  * RBAC truth table (spec §4.4), enforced in the data layer — never the UI.

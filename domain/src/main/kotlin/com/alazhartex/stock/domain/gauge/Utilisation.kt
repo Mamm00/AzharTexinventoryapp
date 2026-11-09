@@ -1,4 +1,4 @@
-package com.alazhartex.domain.gauge
+package com.alazhartex.stock.domain.gauge
 
 import java.math.BigDecimal
 import java.math.RoundingMode

@@ -1,4 +1,4 @@
-package com.alazhartex.domain.session
+package com.alazhartex.stock.domain.session
 
 /**
  * Session semantics pinned by spec §9.4 (T8).

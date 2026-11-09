@@ -1,7 +1,7 @@
-package com.alazhartex.domain.stock
+package com.alazhartex.stock.domain.stock
 
-import com.alazhartex.domain.model.InvariantViolationException
-import com.alazhartex.domain.model.ShortfallException
+import com.alazhartex.stock.domain.model.InvariantViolationException
+import com.alazhartex.stock.domain.model.ShortfallException
 
 /**
  * Zero-drift invariant (spec §2 D2, §4.7, §9.7): opening + Σ deltas == closing.

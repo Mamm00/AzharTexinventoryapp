@@ -1,7 +1,7 @@
-package com.alazhartex.domain
+package com.alazhartex.stock.domain
 
-import com.alazhartex.domain.model.Role
-import com.alazhartex.domain.rbac.Rbac
+import com.alazhartex.stock.domain.model.Role
+import com.alazhartex.stock.domain.rbac.Rbac
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -1,7 +1,7 @@
-package com.alazhartex.domain
+package com.alazhartex.stock.domain
 
-import com.alazhartex.domain.csv.Csv
-import com.alazhartex.domain.csv.CsvColumnSets
+import com.alazhartex.stock.domain.csv.Csv
+import com.alazhartex.stock.domain.csv.CsvColumnSets
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

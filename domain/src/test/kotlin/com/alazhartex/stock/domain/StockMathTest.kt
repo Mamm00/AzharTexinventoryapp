@@ -1,8 +1,8 @@
-package com.alazhartex.domain
+package com.alazhartex.stock.domain
 
-import com.alazhartex.domain.model.InvariantViolationException
-import com.alazhartex.domain.model.ShortfallException
-import com.alazhartex.domain.stock.StockMath
+import com.alazhartex.stock.domain.model.InvariantViolationException
+import com.alazhartex.stock.domain.model.ShortfallException
+import com.alazhartex.stock.domain.stock.StockMath
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows

@@ -1,4 +1,4 @@
-package com.alazhartex.domain.csv
+package com.alazhartex.stock.domain.csv
 
 /**
  * CSV export safety (spec §9.13, T10):

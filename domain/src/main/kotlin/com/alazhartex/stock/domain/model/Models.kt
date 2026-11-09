@@ -1,4 +1,4 @@
-package com.alazhartex.domain.model
+package com.alazhartex.stock.domain.model
 
 /** RBAC roles. SALES_MANAGER exists as a read-only label role (RES-018); no account is seeded with it. */
 enum class Role { ADMIN, KEEPER, SALES_MANAGER }

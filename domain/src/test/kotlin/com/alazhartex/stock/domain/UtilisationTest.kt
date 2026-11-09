@@ -1,7 +1,7 @@
-package com.alazhartex.domain
+package com.alazhartex.stock.domain
 
-import com.alazhartex.domain.gauge.GaugeBucket
-import com.alazhartex.domain.gauge.Utilisation
+import com.alazhartex.stock.domain.gauge.GaugeBucket
+import com.alazhartex.stock.domain.gauge.Utilisation
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
