@@ -162,7 +162,10 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run connected tests on emulator (API 34, x86_64, pixel_7)
+      - name: Assemble connected-test APKs (no emulator; localises compile failures)
+        run: gradle --no-daemon :data:assembleDebugAndroidTest :app:assembleDebugAndroidTest
+
+      - name: Data connected tests on emulator (API 34, x86_64, pixel_7)
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -171,9 +174,19 @@ jobs:
           profile: pixel_7
           disable-animations: true
           emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
-          script: |
-            gradle --no-daemon :data:connectedDebugAndroidTest
-            gradle --no-daemon :app:connectedDebugAndroidTest
+          script: gradle --no-daemon :data:connectedDebugAndroidTest
+
+      - name: App connected tests on emulator (API 34, x86_64, pixel_7)
+        if: always()
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: default
+          profile: pixel_7
+          disable-animations: true
+          emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: gradle --no-daemon :app:connectedDebugAndroidTest
 
       - name: Upload connected test reports
         if: always()
