@@ -1,0 +1,18 @@
+package com.alazhartex.stock.ui.navigation
+
+/** All twelve destinations (spec §4.5). */
+object Routes {
+    const val GUIDE = "guide"
+    const val STOCK = "stock"
+    const val INVENTORY = "inventory"
+    const val MOVEMENTS = "movements"
+    const val COLOURS = "colours"
+    const val CROSS_VIEW = "crossview"
+    const val DASHBOARD = "dashboard"
+    const val REPORTS = "reports"
+    const val MASTERS = "masters"
+    const val AUDIT = "audit"
+    const val SETTINGS = "settings"
+    const val PROFILE = "profile"
+    val ALL = listOf(GUIDE, STOCK, INVENTORY, MOVEMENTS, COLOURS, CROSS_VIEW, DASHBOARD, REPORTS, MASTERS, AUDIT, SETTINGS, PROFILE)
+}
