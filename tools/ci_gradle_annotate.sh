@@ -12,12 +12,14 @@ rc=${PIPESTATUS[0]}
 
 esc() { printf '%s' "$1" | sed 's/%/%25/g; s/\r/%0D/g'; }
 
-# Kotlin compiler diagnostics: "e: /abs/path/File.kt:12:34: message"
-grep -Eo '^e: [^ ]+:[0-9]+:[0-9]+: .+$' "$LOG" | head -25 | while IFS= read -r line; do
-  body=${line#e: }
-  file=${body%%:*}; rest=${body#*:}
-  lineno=${rest%%:*}; msg=${rest#*:}; msg=${msg#*:}
-  rel=$(printf '%s' "$file" | sed 's#.*/AzharTexinventoryapp/##')
+# Kotlin compiler diagnostics. Formats seen:
+#   Kotlin 1.9: "e: /abs/File.kt:12:34: message"
+#   Kotlin 2.x: "e: file:///abs/File.kt:12:34 message"  (no colon after column)
+grep -E '^e: [^ ]+:[0-9]+:[0-9]+(: | )' "$LOG" | head -25 | while IFS= read -r line; do
+  parsed=$(printf '%s\n' "$line" | sed -E 's#^e: ([^ ]+):([0-9]+):([0-9]+)(: )? #\1|\2|#')
+  file=${parsed%%|*}; rest=${parsed#*|}
+  lineno=${rest%%|*}; msg=${rest#*|}
+  rel=$(printf '%s' "$file" | sed 's#.*/AzharTexinventoryapp/##; s#file://##')
   printf '::error file=%s,line=%s::%s\n' "$(esc "$rel")" "$(esc "$lineno")" "$(esc "$msg")"
 done
 

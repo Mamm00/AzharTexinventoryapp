@@ -90,28 +90,28 @@ jobs:
       # localization impossible to act on; ktlintFormat is therefore the enforced gate (applies all
       # auto-correctable rules) and ktlintCheck reports only (never fails the build). See VERIFICATION.md.
       - name: ktlintFormat (auto-normalize style; enforced)
-        run: gradle --no-daemon ktlintFormat
+        run: bash tools/ci_gradle_annotate.sh ktlintFormat
 
       - name: ktlintCheck (informational — reports only, never blocks)
         continue-on-error: true
-        run: gradle --no-daemon ktlintCheck
+        run: bash tools/ci_gradle_annotate.sh ktlintCheck
 
       # Detekt is informational until its first clean baseline exists; reports are uploaded as artifacts (logs are not downloadable otherwise).
       - name: detekt (informational — reports uploaded as artifact)
         continue-on-error: true
-        run: gradle --no-daemon detekt
+        run: bash tools/ci_gradle_annotate.sh detekt
 
       - name: Domain unit tests (incl. kotest property suite, >=1000 cases)
         run: bash tools/ci_gradle_annotate.sh :domain:test
 
       - name: Assemble debug APK
-        run: gradle --no-daemon :app:assembleDebug
+        run: bash tools/ci_gradle_annotate.sh :app:assembleDebug
 
       - name: App unit tests
-        run: gradle --no-daemon :app:testDebugUnitTest
+        run: bash tools/ci_gradle_annotate.sh :app:testDebugUnitTest
 
       - name: Lint (release, warnings-as-errors)
-        run: gradle --no-daemon :app:lintRelease
+        run: bash tools/ci_gradle_annotate.sh :app:lintRelease
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -174,7 +174,7 @@ jobs:
           profile: pixel_7
           disable-animations: true
           emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
-          script: gradle --no-daemon :data:connectedDebugAndroidTest
+          script: bash tools/ci_gradle_annotate.sh :data:connectedDebugAndroidTest
 
       - name: App connected tests on emulator (API 34, x86_64, pixel_7)
         if: always()
@@ -186,7 +186,7 @@ jobs:
           profile: pixel_7
           disable-animations: true
           emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
-          script: gradle --no-daemon :app:connectedDebugAndroidTest
+          script: bash tools/ci_gradle_annotate.sh :app:connectedDebugAndroidTest
 
       - name: Upload connected test reports
         if: always()
