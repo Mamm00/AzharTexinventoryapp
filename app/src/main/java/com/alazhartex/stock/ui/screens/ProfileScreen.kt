@@ -1,6 +1,5 @@
 package com.alazhartex.stock.ui.screens
 
-import androidx.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,8 +31,6 @@ private data class ProfileState(
     val sessionExpiresAt: Long?,
 )
 
-@SuppressLint("ProduceStateDoesNotAssignValue")
-// False positive in K2/UAST: the producer below assigns `value = …` but the detector fails to resolve the MutableState setter in this toolchain.
 @Composable
 fun ProfileScreen(app: AlAzharApp) {
     val state by produceState(initialValue = null as ProfileState?, Unit) {
