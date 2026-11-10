@@ -31,8 +31,6 @@
     <string name="action_import_db">استيراد قاعدة البيانات</string>
     <string name="action_generate">توليد</string>
     <string name="action_share">مشاركة</string>
-    <string name="action_clear">مسح</string>
-    <string name="action_open_shed">فتح العنبر</string>
 
     <string name="label_capacity">السعة (لفة)</string>
     <string name="label_active_rolls">اللفات النشطة</string>
@@ -44,14 +42,12 @@
     <string name="label_drift_indicator">مؤشر الانحراف</string>
     <string name="label_drift_ok">لا يوجد انحراف — كل صف متوازن</string>
     <string name="label_drift_detected">تم رصد انحراف</string>
-    <string name="label_inactive_rows">صفوف غير نشطة</string>
     <string name="label_grade">الدرجة</string>
     <string name="label_family">الفصيلة</string>
     <string name="label_keeper_code">كود الأمين</string>
     <string name="label_colour">اللون</string>
     <string name="label_fabric">القماش</string>
     <string name="label_warehouse">المستودع</string>
-    <string name="label_shed">العنبر</string>
     <string name="label_role">الدور</string>
     <string name="label_assigned_sheds">العنابر المُعيّنة</string>
     <string name="label_session_expiry">تنتهي الجلسة خلال</string>
@@ -62,10 +58,6 @@
     <string name="label_search">بحث</string>
     <string name="label_qty">الكمية (لفة)</string>
     <string name="label_note">ملاحظة</string>
-    <string name="label_source">من</string>
-    <string name="label_target">إلى</string>
-    <string name="label_source_shed">العنبر المصدر</string>
-    <string name="label_target_shed">العنبر الوجهة</string>
     <string name="label_report_stock">تقرير المخزون</string>
     <string name="label_report_inventory">تقرير الجرد</string>
     <string name="label_report_movements">تقرير الحركات</string>
@@ -84,7 +76,6 @@
     <string name="label_tax_id">الرقم الضريبي</string>
     <string name="label_logo_uri">اسم ملف الشعار</string>
     <string name="label_wh625_scale">اختبار سعة عنبر 625</string>
-    <string name="label_screen_readonly">للقراءة فقط حسب صلاحيتك</string>
     <string name="label_report_choose">اختر تقريرًا</string>
     <string name="label_include_letterhead">تضمين الترويسة إن وُجدت</string>
     <string name="label_signed_in_as">مسجّل الدخول باسم</string>
@@ -101,9 +92,7 @@
     <string name="masters_add_colour">أضف لونًا</string>
     <string name="masters_add_fabric">أضف قماشة</string>
     <string name="masters_add_mapping">أضف ربط</string>
-    <string name="masters_regrade">تغيير الدرجة</string>
     <string name="confirm_delete_fabric">حذف هذه القماشة؟</string>
-    <string name="label_records">السجلات</string>
     <string name="label_sheds">العنابر</string>
     <string name="label_fabrics">الأقمشة</string>
     <string name="label_colours">الألوان</string>
@@ -125,10 +114,8 @@
     </plurals>
     <string name="toast_rbac_denied">غير مسموح: %1$s</string>
     <string name="toast_session_anomaly">خلل في الساعة — تم تحريك ساعة الجهاز للخلف؛ تم رفض العملية</string>
-    <string name="toast_session_expired">انتهت الجلسة</string>
     <string name="toast_export_done">التصدير جاهز: %1$s</string>
     <string name="toast_export_failed">فشل التصدير</string>
-    <string name="toast_import_ready">تم التحقق من الاستيراد (%1$s جدولاً). تأكيد الاستبدال؟</string>
     <string name="toast_import_failed">تم رفض الاستيراد عند الفحص R%1$d: %2$s</string>
     <string name="toast_import_done">اكتمل الاستيراد. يُعاد التشغيل…</string>
     <string name="toast_overwrite_confirm">تأكيد الاستبدال — ستُستبدل البيانات الحالية مع الاحتفاظ بنسخة احتياطية</string>
@@ -143,15 +130,11 @@
         <item quantity="many">تمت التسوية بمقدار %1$d لفة</item>
         <item quantity="other">تمت التسوية بمقدار %1$d لفة</item>
     </plurals>
-    <string name="toast_keeper_readonly">دورك للقراءة فقط هنا</string>
-    <string name="toast_grade_regraded">تم تحديث الدرجة</string>
     <string name="toast_fabric_added">أُضيفت القماشة</string>
     <string name="toast_colour_added">أُضيف اللون</string>
     <string name="toast_mapping_added">أُضيفت المزامنة</string>
     <string name="toast_delete_blocked">الحذف مرفوض — توجد صفوف ربط</string>
-    <string name="toast_invalid_qty">أدخل كمية لا تقل عن 1</string>
     <string name="toast_letterhead_saved">تم حفظ الترويسة</string>
-    <string name="toast_drift_clear">لا يوجد انحراف</string>
     <string name="toast_letterhead_logo_hint">يظهر الشعار في التقارير فقط عند تحديد اسم ملف</string>
 
     <string name="loading">جارٍ التحميل…</string>

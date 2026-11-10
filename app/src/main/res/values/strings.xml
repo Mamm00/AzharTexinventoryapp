@@ -31,8 +31,6 @@
     <string name="action_import_db">Import database</string>
     <string name="action_generate">Generate</string>
     <string name="action_share">Share</string>
-    <string name="action_clear">Clear</string>
-    <string name="action_open_shed">Open shed</string>
 
     <string name="label_capacity">Capacity (rolls)</string>
     <string name="label_active_rolls">Active rolls</string>
@@ -44,14 +42,12 @@
     <string name="label_drift_indicator">Drift indicator</string>
     <string name="label_drift_ok">No drift — every row balances</string>
     <string name="label_drift_detected">Drift detected</string>
-    <string name="label_inactive_rows">Inactive mapping rows</string>
     <string name="label_grade">Grade</string>
     <string name="label_family">Family</string>
     <string name="label_keeper_code">Keeper code</string>
     <string name="label_colour">Colour</string>
     <string name="label_fabric">Fabric</string>
     <string name="label_warehouse">Warehouse</string>
-    <string name="label_shed">Shed</string>
     <string name="label_role">Role</string>
     <string name="label_assigned_sheds">Assigned sheds</string>
     <string name="label_session_expiry">Session expires in</string>
@@ -62,10 +58,6 @@
     <string name="label_search">Search</string>
     <string name="label_qty">Quantity (rolls)</string>
     <string name="label_note">Note</string>
-    <string name="label_source">From</string>
-    <string name="label_target">To</string>
-    <string name="label_source_shed">Source shed</string>
-    <string name="label_target_shed">Target shed</string>
     <string name="label_report_stock">Stock report</string>
     <string name="label_report_inventory">Inventory report</string>
     <string name="label_report_movements">Movements report</string>
@@ -84,7 +76,6 @@
     <string name="label_tax_id">Tax ID</string>
     <string name="label_logo_uri">Logo file name</string>
     <string name="label_wh625_scale">wh-625 scale test</string>
-    <string name="label_screen_readonly">Read-only for your role</string>
     <string name="label_report_choose">Choose a report</string>
     <string name="label_include_letterhead">Include letterhead if set</string>
     <string name="label_signed_in_as">Signed in as</string>
@@ -101,9 +92,7 @@
     <string name="masters_add_colour">Add colour</string>
     <string name="masters_add_fabric">Add fabric</string>
     <string name="masters_add_mapping">Add mapping</string>
-    <string name="masters_regrade">Regrade</string>
     <string name="confirm_delete_fabric">Delete this fabric?</string>
-    <string name="label_records">Records</string>
     <string name="label_sheds">Sheds</string>
     <string name="label_fabrics">Fabrics</string>
     <string name="label_colours">Colours</string>
@@ -121,10 +110,8 @@
     </plurals>
     <string name="toast_rbac_denied">Not permitted: %1$s</string>
     <string name="toast_session_anomaly">Clock anomaly — wall clock moved backwards; mutation refused</string>
-    <string name="toast_session_expired">Session expired</string>
     <string name="toast_export_done">Export ready: %1$s</string>
     <string name="toast_export_failed">Export failed</string>
-    <string name="toast_import_ready">Import verified (%1$s tables). Confirm overwrite?</string>
     <string name="toast_import_failed">Import refused at check R%1$d: %2$s</string>
     <string name="toast_import_done">Import complete. Restarting…</string>
     <string name="toast_overwrite_confirm">Confirm overwrite — current data will be replaced. A safety copy will be kept.</string>
@@ -135,15 +122,11 @@
         <item quantity="one">Adjusted by %1$d roll</item>
         <item quantity="other">Adjusted by %1$d rolls</item>
     </plurals>
-    <string name="toast_keeper_readonly">Your role is read-only here</string>
-    <string name="toast_grade_regraded">Grade updated</string>
     <string name="toast_fabric_added">Fabric added</string>
     <string name="toast_colour_added">Colour added</string>
     <string name="toast_mapping_added">Mapping added</string>
     <string name="toast_delete_blocked">Delete refused — mapping rows exist</string>
-    <string name="toast_invalid_qty">Enter a quantity of at least 1</string>
     <string name="toast_letterhead_saved">Letterhead saved</string>
-    <string name="toast_drift_clear">Zero drift detected</string>
     <string name="toast_letterhead_logo_hint">Logo renders on reports only when a file name is set</string>
 
     <string name="loading">Loading…</string>
