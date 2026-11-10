@@ -240,7 +240,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                                         is MutationOutcome.AlreadyApplied -> context.getString(R.string.toast_saved)
                                         is MutationOutcome.Applied ->
                                             if (dialog.kind == MutationKind.ADJUST) {
-                                                context.getString(R.string.toast_adjustment_done, qty * sign)
+                                                context.resources.getQuantityString(R.plurals.toast_adjustment_done, kotlin.math.abs(qty * sign).toInt(), qty * sign)
                                             } else {
                                                 context.getString(R.string.toast_movement_saved)
                                             }

@@ -30,7 +30,7 @@ fun rememberRefresh(): RefreshScope = remember { RefreshScope() }
 /** Maps domain exceptions to snackbar-safe user messages (RBAC-first). Plain function — callers pass a Context (it is called from coroutines, not composition). */
 fun snackbarFor(context: android.content.Context, error: Throwable): String {
     return when (error) {
-        is ShortfallException -> context.getString(R.string.toast_shortfall, error.shortfall)
+        is ShortfallException -> context.resources.getQuantityString(R.plurals.toast_shortfall, error.shortfall.toInt(), error.shortfall)
         is RbacDeniedException -> context.getString(R.string.toast_rbac_denied, error.reasonKey)
         is SessionClockAnomalyException -> context.getString(R.string.toast_session_anomaly)
         else -> context.getString(R.string.error_generic)

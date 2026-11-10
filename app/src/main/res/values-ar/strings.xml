@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">الأزهر تكستيل</string>
-    <string name="brand_short">الأزهر تكستيل</string>
     <string name="nav_guide">الدليل</string>
     <string name="nav_stock">المخزون</string>
     <string name="nav_inventory">الجرد</string>
@@ -15,7 +14,6 @@
     <string name="nav_settings">الإعدادات</string>
     <string name="nav_profile">ملفي الشخصي</string>
 
-    <string name="guide_title">الدليل</string>
     <string name="guide_p1">الأزهر تكستيل هو دفتر مخزون بلا اتصال خاص بالأقمشة — كل لفة قماش وكل لون وكل عنبر وكل حركة تُخزَّن على هذا الجهاز. لا إنترنت، ولا خادم حسابات، ولا تغادر أي بيانات الهاتف.</string>
     <string name="guide_p2">المدير يدير كل العنابر وفهرس البيانات الأساسية والإعدادات والنسخ الاحتياطية. الأمناء يديرون العنابر المُعيّنة لهم ويطّلعون على الباقي للقراءة. مدير المبيعات يقرأ كل شيء ولا يغيّر شيئًا.</string>
     <string name="guide_p3">كل شيء يعمل دون أي اتصال. النسخ الاحتياطي مسؤوليتك: صدّر قاعدة البيانات من الإعدادات واحتفظ بالملف ومعه ملف sha256 في مكان آمن.</string>
@@ -25,7 +23,6 @@
 
     <string name="action_add_roll">أضف لفات</string>
     <string name="action_remove_roll">اسحب لفات</string>
-    <string name="action_transfer">تحويل</string>
     <string name="action_adjustment">تسوية</string>
     <string name="action_save">حفظ</string>
     <string name="action_cancel">إلغاء</string>
@@ -118,7 +115,14 @@
     <string name="bucket_over_capacity">فوق السعة</string>
 
     <string name="toast_saved">تم الحفظ</string>
-    <string name="toast_shortfall">الإغلاق سيكون -%1$d؛ العجز %1$d لفة</string>
+    <plurals name="toast_shortfall">
+        <item quantity="zero">الإغلاق سيكون -%1$d؛ لا يوجد عجز</item>
+        <item quantity="one">الإغلاق سيكون -%1$d؛ العجز لفة واحدة</item>
+        <item quantity="two">الإغلاق سيكون -%1$d؛ العجز لفتان</item>
+        <item quantity="few">الإغلاق سيكون -%1$d؛ العجز %1$d لفات</item>
+        <item quantity="many">الإغلاق سيكون -%1$d؛ العجز %1$d لفة</item>
+        <item quantity="other">الإغلاق سيكون -%1$d؛ العجز %1$d لفة</item>
+    </plurals>
     <string name="toast_rbac_denied">غير مسموح: %1$s</string>
     <string name="toast_session_anomaly">خلل في الساعة — تم تحريك ساعة الجهاز للخلف؛ تم رفض العملية</string>
     <string name="toast_session_expired">انتهت الجلسة</string>
@@ -131,8 +135,14 @@
     <string name="toast_overwrite_body">ستُستبدل قاعدة البيانات بالملف المستورد. تُنسخ بياناتك الحالية إلى نسخة احتياطية أولًا. لا يمكن التراجع داخل التطبيق.</string>
     <string name="toast_setting_saved">تم حفظ الإعداد</string>
     <string name="toast_movement_saved">تم تسجيل الحركة</string>
-    <string name="toast_transfer_done">تم تحويل %1$d لفة</string>
-    <string name="toast_adjustment_done">تمت التسوية بمقدار %1$d لفة</string>
+    <plurals name="toast_adjustment_done">
+        <item quantity="zero">تمت التسوية بمقدار %1$d لفة</item>
+        <item quantity="one">تمت التسوية بمقدار لفة واحدة</item>
+        <item quantity="two">تمت التسوية بمقدار لفتين</item>
+        <item quantity="few">تمت التسوية بمقدار %1$d لفات</item>
+        <item quantity="many">تمت التسوية بمقدار %1$d لفة</item>
+        <item quantity="other">تمت التسوية بمقدار %1$d لفة</item>
+    </plurals>
     <string name="toast_keeper_readonly">دورك للقراءة فقط هنا</string>
     <string name="toast_grade_regraded">تم تحديث الدرجة</string>
     <string name="toast_fabric_added">أُضيفت القماشة</string>
@@ -142,7 +152,6 @@
     <string name="toast_invalid_qty">أدخل كمية لا تقل عن 1</string>
     <string name="toast_letterhead_saved">تم حفظ الترويسة</string>
     <string name="toast_drift_clear">لا يوجد انحراف</string>
-    <string name="toast_drift_found">انحراف في %1$d صفًا — تم كسر الثبات</string>
     <string name="toast_letterhead_logo_hint">يظهر الشعار في التقارير فقط عند تحديد اسم ملف</string>
 
     <string name="loading">جارٍ التحميل…</string>

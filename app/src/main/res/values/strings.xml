@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AlAzharTex</string>
-    <string name="brand_short">AlAzharTex</string>
     <string name="nav_guide">Guide</string>
     <string name="nav_stock">Stock</string>
     <string name="nav_inventory">Inventory</string>
@@ -15,7 +14,6 @@
     <string name="nav_settings">Settings</string>
     <string name="nav_profile">My Profile</string>
 
-    <string name="guide_title">Guide</string>
     <string name="guide_p1">AlAzharTex is the offline stock book of AlAzhar Textiles — every fabric roll, colour, shed and movement is stored on this device. No internet, no account server, no data leaves the phone.</string>
     <string name="guide_p2">The admin manages every shed, the masters catalogue, settings and backups. Keepers manage the sheds assigned to them and may read the others. The sales manager reads everything and changes nothing.</string>
     <string name="guide_p3">Everything works with zero connectivity. Backups are your responsibility: export the database from Settings and keep the file plus its sha256 sidecar somewhere safe.</string>
@@ -25,7 +23,6 @@
 
     <string name="action_add_roll">Add roll(s)</string>
     <string name="action_remove_roll">Remove roll(s)</string>
-    <string name="action_transfer">Transfer</string>
     <string name="action_adjustment">Adjustment</string>
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>
@@ -118,7 +115,10 @@
     <string name="bucket_over_capacity">Over capacity</string>
 
     <string name="toast_saved">Saved</string>
-    <string name="toast_shortfall">Closing would be -%1$d; shortfall %1$d roll(s)</string>
+    <plurals name="toast_shortfall">
+        <item quantity="one">Closing would be -%1$d; shortfall %1$d roll</item>
+        <item quantity="other">Closing would be -%1$d; shortfall %1$d rolls</item>
+    </plurals>
     <string name="toast_rbac_denied">Not permitted: %1$s</string>
     <string name="toast_session_anomaly">Clock anomaly — wall clock moved backwards; mutation refused</string>
     <string name="toast_session_expired">Session expired</string>
@@ -131,8 +131,10 @@
     <string name="toast_overwrite_body">The database will be replaced with the imported file. Your current data is copied to a safety backup first. This cannot be undone inside the app.</string>
     <string name="toast_setting_saved">Setting saved</string>
     <string name="toast_movement_saved">Movement recorded</string>
-    <string name="toast_transfer_done">Transferred %1$d rolls</string>
-    <string name="toast_adjustment_done">Adjusted by %1$d rolls</string>
+    <plurals name="toast_adjustment_done">
+        <item quantity="one">Adjusted by %1$d roll</item>
+        <item quantity="other">Adjusted by %1$d rolls</item>
+    </plurals>
     <string name="toast_keeper_readonly">Your role is read-only here</string>
     <string name="toast_grade_regraded">Grade updated</string>
     <string name="toast_fabric_added">Fabric added</string>
@@ -142,7 +144,6 @@
     <string name="toast_invalid_qty">Enter a quantity of at least 1</string>
     <string name="toast_letterhead_saved">Letterhead saved</string>
     <string name="toast_drift_clear">Zero drift detected</string>
-    <string name="toast_drift_found">%1$d row(s) drift — invariant violated</string>
     <string name="toast_letterhead_logo_hint">Logo renders on reports only when a file name is set</string>
 
     <string name="loading">Loading…</string>

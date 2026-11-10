@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
  * foreign-key RESTRICT, unique idempotency key, and the zero-delta movement ban.
  */
 @RunWith(AndroidJUnit4::class)
-class DatabaseTest {
+class RoomConstraintsTest {
 
     private lateinit var database: AppDatabase
 
