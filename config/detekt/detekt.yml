@@ -1,0 +1,49 @@
+# detekt configuration — AlAzharTex (spec §9 alignment; strictness tuned so only errors fail CI).
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+processors:
+  active: false
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: true
+    max: 6
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+  NewLineAtEndOfFile:
+    active: true
+  WildcardImport:
+    active: true
+  UnusedPrivateMember:
+    active: true
+  ForbiddenComment:
+    active: true
+    comments: ['TODO:', 'FIXME:', 'XXX:']
+
+complexity:
+  LongMethod:
+    active: true
+    threshold: 120
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 12
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 40
+    thresholdInClasses: 40
+
+naming:
+  active: true
+  FunctionNaming:
+    functionPattern: '[a-z][a-zA-Z0-9]*'
+

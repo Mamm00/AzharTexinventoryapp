@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider scope: exports and import staging ONLY (spec §9.9, T17). -->
+<paths>
+    <files-path name="exports" path="exports/" />
+    <files-path name="imports" path="import-staging/" />
+</paths>

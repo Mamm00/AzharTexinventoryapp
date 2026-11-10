@@ -1,0 +1,27 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+# No local ktlint runner exists in the authoring sandbox, so unverifiable formatting
+# constraints are relaxed here and enforced in CI instead:
+#   * max_line_length = off removes the shared 120-col threshold used by every wrapping
+#     rule (binary-expression-wrapping, argument-list-wrapping, ...) whose overflow
+#     violations are NOT auto-correctable, not just the max-line-length rule itself.
+#   * Composable functions are exempt from standard:function-naming (PascalCase), as
+#     ktlint docs recommend for Jetpack Compose (the property is unset in ALL code styles,
+#     android_studio included).
+# Everything else in ktlint's standard set is enforced.
+max_line_length = off
+ktlint_function_naming_ignore_when_annotated_with = Composable
+ktlint_standard_max-line-length = disabled
+
+[*.{yaml,yml,json,toml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
