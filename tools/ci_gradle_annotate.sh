@@ -23,6 +23,17 @@ grep -E '^e: [^ ]+:[0-9]+:[0-9]+(: | )' "$LOG" | head -25 | while IFS= read -r l
   printf '::error file=%s,line=%s::%s\n' "$(esc "$rel")" "$(esc "$lineno")" "$(esc "$msg")"
 done
 
+# Lint text reports: "/path/file.kt:12: Error: message [IssueType]"
+find . -path '*/build/*' -name 'lint-results-*.txt' -print 2>/dev/null | while IFS= read -r report; do
+  grep -E '^[^ ]+:[0-9]+: Error: ' "$report" | head -60 | while IFS= read -r line; do
+    parsed=$(printf '%s\n' "$line" | sed -E 's#^([^ ]+):([0-9]+): Error: #\1|\2|#')
+    file=${parsed%%|*}; rest=${parsed#*|}
+    lineno=${rest%%|*}; msg=${rest#*|}
+    rel=$(printf '%s' "$file" | sed 's#.*/AzharTexinventoryapp/##')
+    printf '::error file=%s,line=%s::%s\n' "$(esc "$rel")" "$(esc "$lineno")" "$(esc "$msg")"
+  done
+done
+
 # Test-runner style failures: "ClassName > testName FAILED"
 grep -E '> .*(FAILED|failed)$|AssertionError|Condition not met|ComparisonFailure' "$LOG" | head -15 | while IFS= read -r line; do
   printf '::error title=test::%s\n' "$(esc "$line")"
