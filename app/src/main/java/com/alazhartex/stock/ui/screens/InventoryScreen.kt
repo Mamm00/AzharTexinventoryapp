@@ -1,5 +1,6 @@
 package com.alazhartex.stock.ui.screens
 
+import androidx.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,8 @@ import com.alazhartex.stock.ui.LocalArabicIndicDigits
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.integerString
 
+@SuppressLint("ProduceStateDoesNotAssignValue")
+// False positive in K2/UAST: the producer below assigns `value = …` but the detector fails to resolve the MutableState setter in this toolchain.
 @Composable
 fun InventoryScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current

@@ -116,8 +116,15 @@ class StockRepository(
             }
             database.inventoryDao().increment(targetMappingId, qty, now)
             val pairId = UUID.randomUUID().toString()
-            database.movementDao().insert(movement(ctx, sourceMappingId, MovementType.TRANSFER_OUT, -qty, pairId, note))
-            database.movementDao().insert(movement(ctx, targetMappingId, MovementType.TRANSFER_IN, qty, pairId, note))
+            // One mutation idempotency key per MUTATION (audit_log stores the raw key and
+            // detects replays). movements.idempotency_key is UNIQUE (spec §4.5), so each leg
+            // of the transfer gets its own derived key.
+            database.movementDao().insert(
+                movement(ctx, sourceMappingId, MovementType.TRANSFER_OUT, -qty, pairId, note, idempotencyKey = ctx.idempotencyKey + "#out"),
+            )
+            database.movementDao().insert(
+                movement(ctx, targetMappingId, MovementType.TRANSFER_IN, qty, pairId, note, idempotencyKey = ctx.idempotencyKey + "#in"),
+            )
             applyRollDelta(sourceMappingId, -qty)
             applyRollDelta(targetMappingId, qty)
             recheckRow(sourceMappingId)
@@ -134,14 +141,22 @@ class StockRepository(
         database.movementDao().countByIdempotency(idempotencyKey) > 0L ||
             database.auditDao().countByIdempotency(idempotencyKey) > 0L
 
-    private fun movement(ctx: WriteContext, mappingId: String, type: MovementType, qtyDelta: Long, transferPairId: String?, note: String) =
+    private fun movement(
+        ctx: WriteContext,
+        mappingId: String,
+        type: MovementType,
+        qtyDelta: Long,
+        transferPairId: String?,
+        note: String,
+        idempotencyKey: String = ctx.idempotencyKey,
+    ) =
         MovementEntity(
             id = UUID.randomUUID().toString(),
             type = type.name,
             mappingId = mappingId,
             qtyDelta = qtyDelta,
             transferPairId = transferPairId,
-            idempotencyKey = ctx.idempotencyKey,
+            idempotencyKey = idempotencyKey,
             actorAccountId = ctx.actorId,
             at = wallClock(),
             note = note,

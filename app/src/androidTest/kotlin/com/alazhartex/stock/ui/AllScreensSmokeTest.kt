@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.waitUntilAtLeastOneExists
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.alazhartex.stock.MainActivity
+import com.alazhartex.stock.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,8 +19,10 @@ import org.junit.runner.RunWith
 /**
  * D10 smoke: launch, open drawer, visit every one of the 12 routes, expect no crash
  * and a visible content node on each. Runs on the CI emulator (API 34, x86_64).
- * Route labels use the EN bundle (test device locale can be either; assertions use
- * locale-agnostic content descriptions where possible).
+ *
+ * Locale-agnostic: the app defaults to Arabic (SharedPreferences "language" = "ar"),
+ * so assertions resolve strings through the ACTIVITY's wrapped resources instead of
+ * hardcoding English labels.
  */
 @OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -28,30 +31,46 @@ class AllScreensSmokeTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    private fun res(id: Int): String = composeTestRule.activity.getString(id)
+
+    private fun appName(): String = res(R.string.app_name)
+
+    private fun openDrawer() {
+        composeTestRule.onNodeWithContentDescription(appName(), useUnmergedTree = true).performClick()
+    }
+
     @Test
     fun appLaunchesAndBootstraps() {
-        composeTestRule.waitUntilAtLeastOneExists(hasText("AlAzharTex"), timeoutMillis = 60_000)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
         // Drawer is openable (menu button carries the app name as content description).
-        composeTestRule.onNodeWithContentDescription("AlAzharTex", useUnmergedTree = true)
+        composeTestRule.onNodeWithContentDescription(appName(), useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
     @Test
     fun allTwelveRoutesAreReachable() {
-        composeTestRule.waitUntilAtLeastOneExists(hasText("AlAzharTex"), timeoutMillis = 60_000)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
         // Open the drawer once; it stays open for the whole traversal.
-        composeTestRule.onNodeWithContentDescription("AlAzharTex", useUnmergedTree = true).performClick()
+        openDrawer()
         val labels = listOf(
-            "Guide", "Stock", "Inventory", "Movements", "Colours", "Cross-View",
-            "Dashboard", "Reports", "Masters", "Audit Log", "Settings", "My Profile",
-        )
+            R.string.nav_guide,
+            R.string.nav_stock,
+            R.string.nav_inventory,
+            R.string.nav_movements,
+            R.string.nav_colours,
+            R.string.nav_crossview,
+            R.string.nav_dashboard,
+            R.string.nav_reports,
+            R.string.nav_masters,
+            R.string.nav_audit,
+            R.string.nav_settings,
+            R.string.nav_profile,
+        ).map(::res)
         for (label in labels) {
-            // Drawer entries are EN because the test asserts against the fallback bundle;
-            // if the device is ar-EG the node lookup simply fails fast and loud (better than silent skip).
             composeTestRule.onNodeWithText(label).performScrollTo().performClick()
             composeTestRule.waitForIdle()
             // Re-open the drawer for the next destination.
-            composeTestRule.onNodeWithContentDescription("AlAzharTex", useUnmergedTree = true).performClick()
+            openDrawer()
         }
     }
 }
