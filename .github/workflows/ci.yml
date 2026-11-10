@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [main, arena/6dcc36ce-azhartexinventoryapp]
+    branches: [main, arena/1d7df7db-azhartexinventoryapp]
+    tags: ['v*']
   pull_request:
 
 concurrency:
@@ -50,6 +51,8 @@ jobs:
   build-and-test:
     name: Build, unit tests, lint, detekt, ktlint
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -112,6 +115,64 @@ jobs:
 
       - name: Lint (release, warnings-as-errors)
         run: bash tools/ci_gradle_annotate.sh :app:lintRelease
+      - name: Decode release keystore (if secrets are set)
+        env:
+          KS_B64: ${{ secrets.ALAZHARTEX_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ALAZHARTEX_KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.ALAZHARTEX_KEY_ALIAS }}
+          KS_KEY_PASS: ${{ secrets.ALAZHARTEX_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            {
+              echo "ALAZHARTEX_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore"
+              echo "ALAZHARTEX_KEYSTORE_PASSWORD=$KS_PASS"
+              echo "ALAZHARTEX_KEY_ALIAS=$KS_ALIAS"
+              echo "ALAZHARTEX_KEY_PASSWORD=$KS_KEY_PASS"
+              echo "RELEASE_KEYSTORE_PRESENT=true"
+            } >> "$GITHUB_ENV"
+            echo "release keystore decoded from secrets"
+          else
+            echo "RELEASE_KEYSTORE_PRESENT=false" >> "$GITHUB_ENV"
+            echo "no keystore secrets — release APK will be debug-signed (NOT for distribution)"
+          fi
+
+      - name: Assemble release APK
+        run: bash tools/ci_gradle_annotate.sh :app:assembleRelease
+
+      - name: Verify release APK signature (fails on debug cert)
+        if: env.RELEASE_KEYSTORE_PRESENT == 'true'
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          echo "verifying: $APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK" | tee /tmp/apksigner.out
+          if grep -qi 'Android Debug' /tmp/apksigner.out; then
+            echo "::error::release APK is signed with the DEBUG certificate"
+            exit 1
+          fi
+          echo "release APK signature verified against the release keystore"
+
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: alazhartex-release-apk
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: Publish GitHub Release (tags only, signed APK only)
+        if: startsWith(github.ref, 'refs/tags/') && env.RELEASE_KEYSTORE_PRESENT == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          cp "$APK" "alazhartex-${TAG}.apk"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "alazhartex-${TAG}.apk" --clobber
+          else
+            gh release create "$TAG" "alazhartex-${TAG}.apk" --title "AlAzhar Textiles $TAG" --generate-notes
+          fi
+          echo "published: $(gh release view "$TAG" --json url --jq .url)"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

@@ -33,6 +33,9 @@ android {
         create("release") {
             val ksPath = System.getenv("ALAZHARTEX_KEYSTORE_PATH")
             if (ksPath != null) {
+                // PKCS12 is the default (our v1.0.0 keystore is PKCS12); override with
+                // ALAZHARTEX_KEYSTORE_TYPE=JKS for legacy Java keystores.
+                storeType = System.getenv("ALAZHARTEX_KEYSTORE_TYPE") ?: "PKCS12"
                 storeFile = file(ksPath)
                 storePassword = System.getenv("ALAZHARTEX_KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("ALAZHARTEX_KEY_ALIAS")

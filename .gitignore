@@ -30,3 +30,6 @@ out/
 *.log
 .capture/
 snapshot-repo/
+
+# Release keystore backup (never commit)
+release-backup/

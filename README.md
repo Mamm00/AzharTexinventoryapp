@@ -20,6 +20,12 @@ sync, **no INTERNET permission**. Backups are explicit exports you keep.
 generator six times and requires byte-identical output, re-derives every §4.2 number via
 two independent Python oracles, and builds + tests the app on an API 34 emulator.
 
+## Install (release APK)
+Signed release APKs are published under **[Releases](https://github.com/Mamm00/AzharTexinventoryapp/releases)**
+(tag `v*` → CI builds `:app:assembleRelease`, verifies the signature against the release
+keystore, and attaches `alazhartex-vX.Y.Z.apk`). Sideload the APK to your Android device
+(API 26+); the app requests **no INTERNET permission** and stores data on-device.
+
 ## Build
 See **SETUP.md**. Short version (CI only — no local Android toolchain required):
 `gradle :app:assembleDebug` → APK in `app/build/outputs/apk/debug/`.
