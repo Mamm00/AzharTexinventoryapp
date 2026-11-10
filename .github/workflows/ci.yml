@@ -173,7 +173,8 @@ jobs:
           target: default
           profile: pixel_7
           disable-animations: true
-          emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-boot-timeout: 1200
           script: bash tools/ci_gradle_annotate.sh :data:connectedDebugAndroidTest
 
       - name: App connected tests on emulator (API 34, x86_64, pixel_7)
@@ -185,7 +186,8 @@ jobs:
           target: default
           profile: pixel_7
           disable-animations: true
-          emulator-options: -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-boot-timeout: 1200
           script: bash tools/ci_gradle_annotate.sh :app:connectedDebugAndroidTest
 
       - name: Upload connected test reports

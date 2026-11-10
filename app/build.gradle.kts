@@ -70,6 +70,13 @@ android {
         abortOnError = true
         checkReleaseBuilds = true
         checkGeneratedSources = false
+        // Informational/packaging nags that must not gate CI; correctness checks stay on.
+        disable += setOf(
+            "GradleDependency",          // "newer library available" nags — dependency upgrades are a deliberate, reviewed task
+            "AndroidGradlePluginVersion",// AGP 9.x nag — toolchain upgrade is out of scope and must be deliberate
+            "OldTargetApi",              // targetSdk is pinned at 34 by product decision (edge-to-edge/behavior changes)
+            "AppBundleLocaleChanges",    // sideloaded enterprise app; dynamic locale is intentional, AAB splitting N/A
+        )
     }
 }
 

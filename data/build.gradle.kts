@@ -24,6 +24,14 @@ android {
     }
     buildFeatures { buildConfig = true }
     testOptions { unitTests { isIncludeAndroidResources = true } }
+    lint {
+        // Informational/packaging nags only; correctness lint checks stay enabled.
+        disable += setOf(
+            "GradleDependency",
+            "AndroidGradlePluginVersion",
+            "OldTargetApi",
+        )
+    }
 }
 
 dependencies {

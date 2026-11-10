@@ -1,5 +1,6 @@
 package com.alazhartex.stock.ui
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith
  * Route labels use the EN bundle (test device locale can be either; assertions use
  * locale-agnostic content descriptions where possible).
  */
+@OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 class AllScreensSmokeTest {
 
