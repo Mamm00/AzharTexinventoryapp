@@ -102,7 +102,7 @@ jobs:
         run: gradle --no-daemon detekt
 
       - name: Domain unit tests (incl. kotest property suite, >=1000 cases)
-        run: gradle --no-daemon :domain:test
+        run: bash tools/ci_gradle_annotate.sh :domain:test
 
       - name: Assemble debug APK
         run: gradle --no-daemon :app:assembleDebug
@@ -163,7 +163,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Assemble connected-test APKs (no emulator; localises compile failures)
-        run: gradle --no-daemon :data:assembleDebugAndroidTest :app:assembleDebugAndroidTest
+        run: bash tools/ci_gradle_annotate.sh :data:assembleDebugAndroidTest :app:assembleDebugAndroidTest
 
       - name: Data connected tests on emulator (API 34, x86_64, pixel_7)
         uses: reactivecircus/android-emulator-runner@v2
