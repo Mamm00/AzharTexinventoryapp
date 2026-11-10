@@ -14,7 +14,16 @@ class CsvTest {
     fun escapes_formula_injection_vectors() {
         for (v in triggers) {
             val escaped = Csv.escapeCell(v)
-            assertTrue("cell '$v' must be prefixed or safe", escaped == v || escaped.startsWith("'"))
+            // The escaped cell must be safe once structural RFC-4180 quotes are stripped:
+            // either it parses back to the original literal, or it starts with the
+            // apostrophe literal-text marker. (Cells containing CR/LF are additionally
+            // quote-wrapped, so the raw escaped output may start with '"' not '\''.)
+            val parsed = if (escaped.length >= 2 && escaped.startsWith("\"") && escaped.endsWith("\"")) {
+                escaped.substring(1, escaped.length - 1).replace("\"\"", "\"")
+            } else {
+                escaped
+            }
+            assertTrue("cell '$v' must be prefixed or safe (got '$escaped')", parsed == v || parsed.startsWith("'"))
         }
         assertEquals("'=1+1", Csv.escapeCell("=1+1"))
         assertEquals("'-3", Csv.escapeCell("-3"))
