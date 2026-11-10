@@ -103,7 +103,7 @@ fun ReportsScreen(app: AlAzharApp) {
                                 try {
                                     preview = spec.key to buildCsv(app, spec.key)
                                 } catch (t: Throwable) {
-                                    snackbar.showSnackbar(snackbarFor(t))
+                                    snackbar.showSnackbar(snackbarFor(context, t))
                                 } finally {
                                     busy = null
                                 }

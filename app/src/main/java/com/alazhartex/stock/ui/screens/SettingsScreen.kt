@@ -187,7 +187,7 @@ fun SettingsScreen(app: AlAzharApp) {
                                 }
                                 snackbar.showSnackbar(context.getString(R.string.toast_letterhead_saved))
                             } catch (t: Throwable) {
-                                snackbar.showSnackbar(snackbarFor(t))
+                                snackbar.showSnackbar(snackbarFor(context, t))
                             }
                         }
                     }) { Text(stringResource(R.string.action_save)) }

@@ -70,8 +70,8 @@ fun ColoursScreen(app: AlAzharApp) {
                                 Text("${colour.family}", style = MaterialTheme.typography.bodySmall)
                             }
                             AssistChip(onClick = {}, label = { Text(colour.grade) }, enabled = false)
-                            if (colour.keeperCode != null) {
-                                AssistChip(onClick = {}, label = { Text(colour.keeperCode) }, enabled = false)
+                            colour.keeperCode?.let { keeper ->
+                                AssistChip(onClick = {}, label = { Text(keeper) }, enabled = false)
                             }
                         }
                     }

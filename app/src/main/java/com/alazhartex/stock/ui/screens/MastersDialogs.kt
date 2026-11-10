@@ -11,7 +11,7 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenu
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,7 +81,7 @@ fun AddFabricDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
                 )
                 context.getString(R.string.toast_fabric_added)
             } catch (t: Throwable) {
-                snackbarFor(t)
+                snackbarFor(context, t)
             }
             snackbar.showSnackbar(message)
             onClose()
@@ -121,7 +121,7 @@ fun AddColourDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
                 )
                 context.getString(R.string.toast_colour_added)
             } catch (t: Throwable) {
-                snackbarFor(t)
+                snackbarFor(context, t)
             }
             snackbar.showSnackbar(message)
             onClose()
@@ -142,7 +142,7 @@ fun AddColourDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = gradeExpanded) },
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
             )
-            ExposedDropdownMenu(expanded = gradeExpanded, onDismissRequest = { gradeExpanded = false }) {
+            DropdownMenu(expanded = gradeExpanded, onDismissRequest = { gradeExpanded = false }) {
                 listOf("A", "B", "C", "D").forEach { g ->
                     DropdownMenuItem(text = { Text(g) }, onClick = { grade = g; gradeExpanded = false })
                 }
@@ -173,7 +173,7 @@ fun AddMappingDialog(app: AlAzharApp, snackbar: SnackbarHostState, snapshot: Mas
                 )
                 context.getString(R.string.toast_mapping_added)
             } catch (t: Throwable) {
-                snackbarFor(t)
+                snackbarFor(context, t)
             }
             snackbar.showSnackbar(message)
             onClose()
@@ -201,7 +201,7 @@ private fun DropdownField(label: String, selectedId: String, options: List<Pair<
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
         )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEach { (id, optionLabel) ->
                 DropdownMenuItem(text = { Text(optionLabel) }, onClick = { onSelect(id); expanded = false })
             }

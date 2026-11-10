@@ -169,7 +169,7 @@ fun MastersScreen(app: AlAzharApp) {
                         } catch (e: InvariantViolationException) {
                             context.getString(R.string.toast_delete_blocked)
                         } catch (t: Throwable) {
-                            snackbarFor(t)
+                            snackbarFor(context, t)
                         }
                         snackbar.showSnackbar(message)
                         deleteTarget = null

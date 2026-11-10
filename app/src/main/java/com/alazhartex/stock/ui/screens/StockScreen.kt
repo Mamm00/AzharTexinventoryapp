@@ -14,7 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenu
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MenuAnchorType
@@ -168,7 +168,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
                     )
-                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         lines.forEach { line ->
                             DropdownMenuItem(
                                 text = { Text("${line.fabricNameEn} · ${line.colourCode} · ${line.grade} — ${line.closing}") },
@@ -246,7 +246,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                                             }
                                     }
                                 } catch (t: Throwable) {
-                                    snackbarFor(t)
+                                    snackbarFor(context, t)
                                 }
                                 snackbar.showSnackbar(message)
                                 onClose()
