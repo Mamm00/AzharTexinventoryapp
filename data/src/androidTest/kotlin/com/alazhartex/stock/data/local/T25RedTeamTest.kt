@@ -200,7 +200,7 @@ class T25RedTeamTest {
     }
 
     @Test
-    fun movementTriggerRejectsZeroDelta() = runBlocking {
+    fun movementTriggerRejectsZeroDelta() = runBlocking<Unit> {
         seedBase()
         assertThrows(Exception::class.java) {
             runBlocking {
@@ -216,7 +216,7 @@ class T25RedTeamTest {
     }
 
     @Test
-    fun colourTriggerRejectsGradeOutsideAD() = runBlocking {
+    fun colourTriggerRejectsGradeOutsideAD() = runBlocking<Unit> {
         seedBase()
         assertThrows(Exception::class.java) {
             runBlocking {
@@ -228,7 +228,7 @@ class T25RedTeamTest {
     }
 
     @Test
-    fun movementIdempotencyKeyIsUnique() = runBlocking {
+    fun movementIdempotencyKeyIsUnique() = runBlocking<Unit> {
         seedBase()
         val movement = MovementEntity(
             id = "mv-1", type = "IN", mappingId = "mapping-1", qtyDelta = 5L,
@@ -244,7 +244,7 @@ class T25RedTeamTest {
     }
 
     @Test
-    fun mappingDeleteRestrictedWhenInventoryExists() = runBlocking {
+    fun mappingDeleteRestrictedWhenInventoryExists() = runBlocking<Unit> {
         seedBase()
         // RESTRICT FK: deleting the mapping must fail while an inventory row references it.
         assertThrows(Exception::class.java) {
