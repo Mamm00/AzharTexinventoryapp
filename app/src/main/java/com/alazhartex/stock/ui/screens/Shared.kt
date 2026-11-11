@@ -49,6 +49,3 @@ fun snackbarFor(context: android.content.Context, error: Throwable): String {
 }
 
 suspend fun AlAzharApp.snack(host: SnackbarHostState, message: String) = host.showSnackbar(message)
-
-/** Cross-screen navigation hook provided by AppRoot (screens must not hold the NavController). */
-val LocalNavigate = androidx.compose.runtime.compositionLocalOf<(String) -> Unit> { { } }

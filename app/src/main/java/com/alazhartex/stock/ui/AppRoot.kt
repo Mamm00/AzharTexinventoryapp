@@ -70,7 +70,6 @@ import com.alazhartex.stock.ui.screens.DashboardScreen
 import com.alazhartex.stock.ui.screens.FabricsEditScreen
 import com.alazhartex.stock.ui.screens.GuideScreen
 import com.alazhartex.stock.ui.screens.InventoryScreen
-import com.alazhartex.stock.ui.screens.LocalNavigate
 import com.alazhartex.stock.ui.screens.MastersScreen
 import com.alazhartex.stock.ui.screens.MovementsScreen
 import com.alazhartex.stock.ui.screens.ProfileScreen
