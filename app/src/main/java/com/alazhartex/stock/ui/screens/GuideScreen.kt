@@ -25,7 +25,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.GuideContent
 
 @Composable
@@ -46,7 +45,7 @@ fun GuideScreen() {
                 ) {
                     Image(
                         painter = painterResource(R.drawable.alazhartex_logo),
-                        contentDescription = stringResource(R.string.brand_company),
+                        contentDescription = null, // decorative brand banner
                         modifier = Modifier.height(72.dp),
                         contentScale = ContentScale.Fit,
                     )

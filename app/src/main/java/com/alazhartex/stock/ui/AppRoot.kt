@@ -127,7 +127,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                         ) {
                             Image(
                                 painter = painterResource(R.drawable.alazhartex_logo),
-                                contentDescription = stringResource(R.string.brand_company),
+                                contentDescription = null, // decorative — app name text sits beside it
                                 modifier = Modifier.height(40.dp),
                                 contentScale = ContentScale.Fit,
                             )
