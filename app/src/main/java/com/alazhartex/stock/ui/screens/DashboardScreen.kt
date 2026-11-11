@@ -21,10 +21,14 @@ import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LabeledRow
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.UtilisationGauge
 import com.alazhartex.stock.ui.components.bucketLabelFor
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberSwatch
 import com.alazhartex.stock.ui.integerString
 import com.alazhartex.stock.ui.percentDisplay
 
@@ -72,6 +76,31 @@ fun DashboardScreen(app: AlAzharApp) {
                         )
                         LabeledRow(stringResource(R.string.label_inactive_rolls), integerString(data.inactiveRolls, arabicIndic))
                         LabeledRow(stringResource(R.string.label_raw_rolls), integerString(data.rawRolls, arabicIndic))
+                    }
+                }
+            }
+            item {
+                Card(colors = CardDefaults.cardColors()) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(stringResource(R.string.label_top_colours), style = MaterialTheme.typography.titleMedium)
+                        data.topColours.forEach { tc ->
+                            val tcSw = rememberSwatch(tc.family, tc.grade, tc.colourCode)
+                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                ColourSwatch(
+                                    value = tcSw.argb,
+                                    onColour = tcSw.onColour,
+                                    contentDescription = paletteContentDescription(tc.colourCode, tc.colourNameEn, tc.colourNameAr, tc.grade),
+                                    size = SwatchSize.Small,
+                                    grade = tc.grade,
+                                )
+                                Text(
+                                    "${tc.colourCode} — ${tc.colourNameEn}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                Text(integerString(tc.rolls, arabicIndic), style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
                     }
                 }
             }

@@ -154,4 +154,13 @@
     <string name="about_version">الإصدار %1$s</string>
     <string name="about_offline">يعمل دون اتصال تمامًا — بلا صلاحية إنترنت، وكل بايت يبقى على هذا الجهاز.</string>
     <string name="about_copyright">© الأزهر تكستيل. جميع الحقوق محفوظة.</string>
+    <string name="palette_swatch_cd">لون %1$s — %2$s — الدرجة %3$s</string>
+    <string name="palette_grade_badge_a">A</string>
+    <string name="palette_grade_badge_b">B</string>
+    <string name="palette_grade_badge_c">C</string>
+    <string name="palette_grade_badge_d">D</string>
+    <string name="palette_family_strip_more">+%1$d</string>
+    <string name="palette_family_strip_cd">لوحة الأسرة: %1$d لونًا</string>
+    <string name="palette_footer_selected">المحدد: %1$s — %2$s</string>
+    <string name="label_top_colours">أكثر الألوان استخدامًا</string>
 </resources>

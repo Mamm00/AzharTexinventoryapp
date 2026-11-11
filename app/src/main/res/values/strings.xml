@@ -146,4 +146,13 @@
     <string name="about_version">Version %1$s</string>
     <string name="about_offline">Works fully offline — no internet permission, every byte stays on this device.</string>
     <string name="about_copyright">© AlAzhar Textiles. All rights reserved.</string>
+    <string name="palette_swatch_cd">Colour %1$s — %2$s — grade %3$s</string>
+    <string name="palette_grade_badge_a">A</string>
+    <string name="palette_grade_badge_b">B</string>
+    <string name="palette_grade_badge_c">C</string>
+    <string name="palette_grade_badge_d">D</string>
+    <string name="palette_family_strip_more">+%1$d</string>
+    <string name="palette_family_strip_cd">Family palette: %1$d colours</string>
+    <string name="palette_footer_selected">Selected: %1$s — %2$s</string>
+    <string name="label_top_colours">Top colours</string>
 </resources>

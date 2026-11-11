@@ -32,10 +32,14 @@ import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.domain.model.InvariantViolationException
 import com.alazhartex.stock.ui.LocalSnackbar
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LabeledRow
 import com.alazhartex.stock.ui.components.LoadingBox
-import kotlinx.coroutines.launch
+import com.alazhartex.stock.ui.components.SwatchSize
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberSwatch
 import java.util.UUID
+import kotlinx.coroutines.launch
 
 private enum class MastersTab { WAREHOUSES, FABRICS, COLOURS, MAPPINGS }
 
@@ -125,7 +129,15 @@ fun MastersScreen(app: AlAzharApp) {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         items(items = data.colours, key = { it.id }, contentType = { "colour" }) { colour ->
                             Card(colors = CardDefaults.cardColors()) {
-                                Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                    val mSw = rememberSwatch(colour.family, colour.grade, colour.code)
+                                    ColourSwatch(
+                                        value = mSw.argb,
+                                        onColour = mSw.onColour,
+                                        contentDescription = paletteContentDescription(colour.code, colour.nameEn, colour.nameAr, colour.grade),
+                                        size = SwatchSize.Small,
+                                        grade = colour.grade,
+                                    )
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text("${colour.code} — ${colour.nameEn}", style = MaterialTheme.typography.titleMedium)
                                         Text("${colour.nameAr} · ${colour.family}", style = MaterialTheme.typography.bodyMedium)

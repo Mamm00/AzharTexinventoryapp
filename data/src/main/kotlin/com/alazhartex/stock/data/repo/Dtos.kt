@@ -39,6 +39,11 @@ data class MovementRowDto(
     val atMillis: Long,
     val transferPairId: String?,
     val note: String,
+    val colourCode: String,
+    val colourNameEn: String,
+    val colourNameAr: String,
+    val grade: String,
+    val family: String,
 )
 
 data class ColourRowDto(
@@ -62,6 +67,15 @@ data class AuditRowDto(
     val reason: String?,
 )
 
+data class TopColourDto(
+    val colourCode: String,
+    val colourNameEn: String,
+    val colourNameAr: String,
+    val grade: String,
+    val family: String,
+    val rolls: Long,
+)
+
 data class DashboardDto(
     val totalActiveRolls: Long,
     val totalCapacity: Long,
@@ -71,6 +85,7 @@ data class DashboardDto(
     val driftViolations: Int,
     val inactiveRolls: Long,
     val rawRolls: Long,
+    val topColours: List<TopColourDto>,
 )
 
 data class DriftRowDto(

@@ -13,12 +13,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -43,9 +43,13 @@ import com.alazhartex.stock.domain.idempotency.MutationOutcome
 import com.alazhartex.stock.domain.model.MovementType
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
 import com.alazhartex.stock.ui.LocalSnackbar
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.UtilisationGauge
 import com.alazhartex.stock.ui.components.bucketLabelFor
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberSwatch
 import com.alazhartex.stock.ui.integerString
 import com.alazhartex.stock.ui.percentDisplay
 import java.util.UUID
@@ -172,6 +176,15 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                         lines.forEach { line ->
                             DropdownMenuItem(
                                 text = { Text("${line.fabricNameEn} · ${line.colourCode} · ${line.grade} — ${line.closing}") },
+                                leadingIcon = {
+                                    val itemSw = rememberSwatch(line.family, line.grade, line.colourCode)
+                                    ColourSwatch(
+                                        value = itemSw.argb,
+                                        onColour = itemSw.onColour,
+                                        contentDescription = paletteContentDescription(line.colourCode, line.colourNameEn, line.colourNameAr, line.grade),
+                                        size = SwatchSize.Small,
+                                    )
+                                },
                                 onClick = {
                                     selected = line
                                     expanded = false

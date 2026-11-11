@@ -67,10 +67,20 @@ class ReadRepository(private val database: AppDatabase) {
     }
 
     suspend fun movements(limit: Int = 200): List<MovementRowDto> {
-        val shedByMapping = database.mappingDao().getActive().associate { it.id to it.warehouseId } +
-            database.mappingDao().getInactive().associate { it.id to it.warehouseId }
+        val mappings = database.mappingDao().getActive() + database.mappingDao().getInactive()
+        val mappingById = mappings.associateBy { it.id }
+        val colours = database.colourDao().getAll().associateBy { it.id }
         return database.movementDao().getAll().sortedByDescending { it.at }.take(limit).map { mv ->
-            MovementRowDto(mv.id, mv.type, shedByMapping[mv.mappingId] ?: "", mv.mappingId, mv.qtyDelta, mv.at, mv.transferPairId, mv.note)
+            val mapping = mappingById[mv.mappingId]
+            val colour = mapping?.let { colours[it.colourId] }
+            MovementRowDto(
+                mv.id, mv.type, mapping?.warehouseId ?: "", mv.mappingId, mv.qtyDelta, mv.at, mv.transferPairId, mv.note,
+                colourCode = colour?.code ?: "?",
+                colourNameEn = colour?.nameEn ?: "",
+                colourNameAr = colour?.nameAr ?: "",
+                grade = colour?.grade ?: "?",
+                family = colour?.family ?: "unknown",
+            )
         }
     }
 
@@ -83,6 +93,7 @@ class ReadRepository(private val database: AppDatabase) {
     }
 
     suspend fun dashboard(): DashboardDto {
+        val topColours = rankTopColours(5)
         val cards = shedCards()
         val totalActive = cards.sumOf { it.activeRolls }
         val totalCapacity = cards.sumOf { it.capacityRolls }
@@ -98,8 +109,18 @@ class ReadRepository(private val database: AppDatabase) {
             driftViolations = drift,
             inactiveRolls = inactive,
             rawRolls = totalActive + inactive,
+            topColours = topColours,
         )
     }
+
+    /** v1.1 (delta §10.2): top colours by active closing rolls, stable tie-break by code. */
+    suspend fun rankTopColours(limit: Int): List<TopColourDto> =
+        inventoryLines()
+            .filter { it.isActive }
+            .groupBy { it.colourCode }
+            .map { (code, lines) -> TopColourDto(code, lines.first().colourNameEn, lines.first().colourNameAr, lines.first().grade, lines.first().family, lines.sumOf { it.closing }) }
+            .sortedWith(compareByDescending<TopColourDto> { it.rolls }.thenBy { it.colourCode })
+            .take(limit)
 
     suspend fun driftRows(): List<DriftRowDto> {
         val out = ArrayList<DriftRowDto>()
