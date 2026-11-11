@@ -65,6 +65,7 @@ fun SettingsScreen(app: AlAzharApp) {
     val context = LocalContext.current
     val snackbar = LocalSnackbar.current
     val scope = rememberCoroutineScope()
+    val navigate = LocalNavigate.current
     val prefs = context.getSharedPreferences(MainActivity.LOCALE_PREFS, Context.MODE_PRIVATE)
     var language by remember { mutableStateOf(prefs.getString(MainActivity.KEY_LANGUAGE, "ar") ?: "ar") }
     var digits by remember { mutableStateOf(app.container.digitsFlow.value) }
@@ -184,7 +185,7 @@ fun SettingsScreen(app: AlAzharApp) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(stringResource(R.string.settings_masters_entry), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    Button(onClick = { LocalNavigate(com.alazhartex.stock.ui.navigation.Routes.FABRICS_EDIT) }) {
+                    Button(onClick = { navigate(com.alazhartex.stock.ui.navigation.Routes.FABRICS_EDIT) }) {
                         Text(stringResource(R.string.nav_fabrics_edit))
                     }
                 }

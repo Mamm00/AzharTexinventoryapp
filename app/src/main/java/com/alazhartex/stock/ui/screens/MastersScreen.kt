@@ -53,6 +53,7 @@ fun MastersScreen(app: AlAzharApp) {
     val context = LocalContext.current
     val snackbar = LocalSnackbar.current
     val scope = rememberCoroutineScope()
+    val navigate = LocalNavigate.current
     val refresh = rememberRefresh()
     val tick = refresh.tick.intValue
     var tab by remember { mutableStateOf(MastersTab.WAREHOUSES) }
@@ -72,7 +73,7 @@ fun MastersScreen(app: AlAzharApp) {
         }
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
             OutlinedButton(
-                onClick = { LocalNavigate(Routes.FABRICS_EDIT) },
+                onClick = { navigate(Routes.FABRICS_EDIT) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             ) { Text(stringResource(R.string.masters_edit_entry)) }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 8.dp)) {
