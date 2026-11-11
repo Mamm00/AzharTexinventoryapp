@@ -99,7 +99,8 @@ fun GradeBadge(grade: String, modifier: Modifier = Modifier) {
 /** Row of up to [cap] swatches + "+N" overflow label (Fabrics tab / family strip). */
 @Composable
 fun ColourSwatchStrip(
-    entries: List<Triple<Int, Int, String>>, // value, onColour, contentDescription
+    // Triple per entry: value, onColour, contentDescription
+    entries: List<Triple<Int, Int, String>>,
     moreLabel: String,
     modifier: Modifier = Modifier,
     cap: Int = 12,
