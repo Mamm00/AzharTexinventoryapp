@@ -264,7 +264,8 @@ fun SettingsScreen(app: AlAzharApp) {
                     ) {
                         Image(
                             painter = painterResource(R.drawable.alazhartex_logo),
-                            contentDescription = null, // decorative — company name text sits below it
+                            // decorative — the company name text sits below it
+                            contentDescription = null,
                             modifier = Modifier.height(88.dp),
                             contentScale = ContentScale.Fit,
                         )
