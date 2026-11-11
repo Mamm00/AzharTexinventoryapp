@@ -155,11 +155,6 @@
     <string name="about_offline">يعمل دون اتصال تمامًا — بلا صلاحية إنترنت، وكل بايت يبقى على هذا الجهاز.</string>
     <string name="about_copyright">© الأزهر تكستيل. جميع الحقوق محفوظة.</string>
     <string name="palette_swatch_cd">لون %1$s — %2$s — الدرجة %3$s</string>
-    <string name="palette_grade_badge_a">A</string>
-    <string name="palette_grade_badge_b">B</string>
-    <string name="palette_grade_badge_c">C</string>
-    <string name="palette_grade_badge_d">D</string>
-    <string name="palette_family_strip_more">+%1$d</string>
     <string name="palette_family_strip_cd">لوحة الأسرة: %1$d لونًا</string>
     <string name="palette_footer_selected">المحدد: %1$s — %2$s</string>
     <string name="label_top_colours">أكثر الألوان استخدامًا</string>
@@ -176,7 +171,7 @@
     <string name="label_inactive">غير نشط</string>
     <string name="label_samples">عينات</string>
     <string name="label_family_pinned">مثبتة</string>
-    <string name="family_fabric_count">%1$d خامة</string>
+    <string name="family_fabric_count">خامات: %1$d</string>
     <string name="fabrics_edit_empty">لا يوجد شيء هنا بعد</string>
     <string name="dialog_edit_fabric">تعديل الخامة</string>
     <string name="dialog_edit_colour">تعديل اللون</string>
@@ -193,9 +188,9 @@
     <string name="keeper_masters_readonly_tip">الأمناء يضيفون فقط؛ التعديل والحذف للمدير</string>
     <string name="assign_to_fabric">إسناد إلى خامة…</string>
     <string name="assign_fabric_placeholder">اختر الخامة</string>
-    <string name="assign_selected_count">تم تحديد %1$d لون</string>
+    <string name="assign_selected_count">الألوان المحددة: %1$d</string>
     <string name="assign_create">إنشاء الربطات</string>
-    <string name="bulk_assign_done">تم إنشاء %1$d ربطة</string>
+    <string name="bulk_assign_done">الربطات المنشأة: %1$d</string>
     <string name="bulk_assign_nothing">لا يوجد شيء لإنشائه — كل شيء مربوط بالفعل</string>
     <string name="clear_selection">مسح التحديد</string>
     <string name="confirm_type_delete_title">اكتب DELETE للتأكيد</string>
@@ -226,7 +221,7 @@
     <string name="family_lycra">لايكرا / سباندكس</string>
     <string name="family_oxford">أكسفورد</string>
     <string name="family_poplin">بوبلين</string>
-    <string name="family_members_count">%1$d خامات · %2$d ألوان</string>
+    <string name="family_members_count">خامات: %1$d · ألوان: %2$d</string>
     <string name="custom_family_label">مخصصة</string>
     <string name="label_code">الكود</string>
 </resources>

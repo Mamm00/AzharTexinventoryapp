@@ -72,7 +72,7 @@ fun CrossViewScreen(app: AlAzharApp) {
             }
             HorizontalDivider()
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(count = d.rows.size, key = { d.rows[it].first }) { index ->
+                items(count = d.rows.size, key = { d.rows[it].first.colourCode }) { index ->
                     val (colourMeta, perShed) = d.rows[index]
                     val cw = rememberAnySwatch(colourMeta.family, colourMeta.grade, colourMeta.colourCode)
                     val cwCd = paletteContentDescription(colourMeta.colourCode, colourMeta.colourNameEn, colourMeta.colourNameAr, colourMeta.grade)
