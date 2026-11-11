@@ -29,7 +29,7 @@ import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.paletteContentDescription
-import com.alazhartex.stock.ui.components.rememberSwatch
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.dateTimeString
 import com.alazhartex.stock.ui.integerString
 
@@ -60,7 +60,7 @@ fun MovementsScreen(app: AlAzharApp) {
                 items(items = filtered, key = { it.id }, contentType = { "movement" }) { mv ->
                     Card(colors = CardDefaults.cardColors()) {
                         Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            val mvSw = rememberSwatch(mv.family, mv.grade, mv.colourCode)
+                            val mvSw = rememberAnySwatch(mv.family, mv.grade, mv.colourCode)
                             ColourSwatch(
                                 value = mvSw.argb,
                                 onColour = mvSw.onColour,

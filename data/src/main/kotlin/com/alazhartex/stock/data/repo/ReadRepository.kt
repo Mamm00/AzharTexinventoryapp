@@ -143,8 +143,24 @@ class ReadRepository(private val database: AppDatabase) {
         mappingCount = database.mappingDao().countAll(),
     )
 
+    /** v1.1: grouped mapping counts per fabric/colour (delta contract §12). */
+    suspend fun mappingCountsByFabric(): Map<String, Long> =
+        database.mappingDao().mappingCountsByFabric().associate { it.fabric_id to it.count }
+
+    suspend fun mappingCountsByColour(): Map<String, Long> =
+        database.mappingDao().mappingCountsByColour().associate { it.colour_id to it.count }
+
+    /** v1.1: mappings + movements + rolls referencing a colour (delta contract §12 colour delete guard). */
+    suspend fun colourUsage(colourId: String): Triple<Long, Long, Long> {
+        val mappings = database.colourDao().mappingCountForColour(colourId)
+        val movements = database.movementDao().countForColour(colourId)
+        val rolls = database.rollDao().sumForColour(colourId, "ACTIVE") + database.rollDao().sumForColour(colourId, "INACTIVE")
+        return Triple(mappings, movements, rolls)
+    }
+
     suspend fun accountById(id: String) = database.accountDao().getById(id)
     suspend fun shedAssignments(accountId: String) = database.shedAssignmentDao().shedsFor(accountId)
     suspend fun settingsAll() = database.appSettingsDao().getAll()
     suspend fun setting(key: String) = database.appSettingsDao().get(key)
 }
+

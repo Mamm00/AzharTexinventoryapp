@@ -14,8 +14,8 @@ import com.alazhartex.stock.data.local.ShedAssignmentEntity
 import com.alazhartex.stock.data.local.WarehouseEntity
 import com.alazhartex.stock.data.repo.TransactionRunner
 import com.alazhartex.stock.domain.idempotency.MutationOutcome
-import org.json.JSONObject
 import java.time.Instant
+import org.json.JSONObject
 
 /**
  * Applies the committed seed (seed-alazhartex.json, copied into app assets at build time) on first

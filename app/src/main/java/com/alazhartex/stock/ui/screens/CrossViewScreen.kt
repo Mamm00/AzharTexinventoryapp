@@ -25,7 +25,7 @@ import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.paletteContentDescription
-import com.alazhartex.stock.ui.components.rememberSwatch
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 
 @Composable
@@ -73,7 +73,7 @@ fun CrossViewScreen(app: AlAzharApp) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(count = d.rows.size, key = { d.rows[it].first }) { index ->
                     val (colourMeta, perShed) = d.rows[index]
-                    val cw = rememberSwatch(colourMeta.family, colourMeta.grade, colourMeta.colourCode)
+                    val cw = rememberAnySwatch(colourMeta.family, colourMeta.grade, colourMeta.colourCode)
                     val cwCd = paletteContentDescription(colourMeta.colourCode, colourMeta.colourNameEn, colourMeta.colourNameAr, colourMeta.grade)
                     Row(modifier = Modifier.horizontalScroll(hScroll).padding(vertical = 2.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Row(modifier = Modifier.width(120.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {

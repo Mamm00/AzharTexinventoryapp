@@ -175,6 +175,20 @@ fun SettingsScreen(app: AlAzharApp) {
                 }
             }
 
+            // ---- masters catalogue shortcut (v1.1) ----
+            Card(colors = CardDefaults.cardColors()) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(stringResource(R.string.settings_masters_entry), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    Button(onClick = { LocalNavigate(com.alazhartex.stock.ui.navigation.Routes.FABRICS_EDIT) }) {
+                        Text(stringResource(R.string.nav_fabrics_edit))
+                    }
+                }
+            }
+
             // ---- letterhead ----
             Card(colors = CardDefaults.cardColors()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

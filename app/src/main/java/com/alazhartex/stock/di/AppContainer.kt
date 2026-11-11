@@ -3,6 +3,7 @@ package com.alazhartex.stock.di
 import android.content.Context
 import androidx.room.Room
 import com.alazhartex.stock.data.local.AppDatabase
+import com.alazhartex.stock.data.local.MIGRATION_1_2
 import com.alazhartex.stock.data.repo.MastersSettingsRepository
 import com.alazhartex.stock.data.repo.ReadRepository
 import com.alazhartex.stock.data.repo.StockRepository
@@ -30,6 +31,7 @@ class AppContainer(private val context: Context) {
     val database: AppDatabase by lazy {
         Room.databaseBuilder(context, AppDatabase::class.java, "alazhartex.db")
             .addCallback(AppDatabase.TriggersCallback())
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
 

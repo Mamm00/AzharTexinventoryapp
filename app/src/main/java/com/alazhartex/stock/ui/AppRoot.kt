@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.FactCheck
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.ListAlt
@@ -66,8 +67,10 @@ import com.alazhartex.stock.ui.screens.AuditScreen
 import com.alazhartex.stock.ui.screens.ColoursScreen
 import com.alazhartex.stock.ui.screens.CrossViewScreen
 import com.alazhartex.stock.ui.screens.DashboardScreen
+import com.alazhartex.stock.ui.screens.FabricsEditScreen
 import com.alazhartex.stock.ui.screens.GuideScreen
 import com.alazhartex.stock.ui.screens.InventoryScreen
+import com.alazhartex.stock.ui.screens.LocalNavigate
 import com.alazhartex.stock.ui.screens.MastersScreen
 import com.alazhartex.stock.ui.screens.MovementsScreen
 import com.alazhartex.stock.ui.screens.ProfileScreen
@@ -90,6 +93,7 @@ private val DESTINATIONS = listOf(
     DrawerDestination(Routes.DASHBOARD, R.string.nav_dashboard, Icons.Filled.Dashboard),
     DrawerDestination(Routes.REPORTS, R.string.nav_reports, Icons.Filled.Assessment),
     DrawerDestination(Routes.MASTERS, R.string.nav_masters, Icons.Filled.Storage),
+    DrawerDestination(Routes.FABRICS_EDIT, R.string.nav_fabrics_edit, Icons.Filled.Edit),
     DrawerDestination(Routes.AUDIT, R.string.nav_audit, Icons.Filled.FactCheck),
     DrawerDestination(Routes.SETTINGS, R.string.nav_settings, Icons.Filled.Settings),
     DrawerDestination(Routes.PROFILE, R.string.nav_profile, Icons.Filled.Person),
@@ -108,6 +112,12 @@ fun AlAzharRoot(app: AlAzharApp) {
     androidx.compose.runtime.CompositionLocalProvider(
         LocalArabicIndicDigits provides arabicIndic,
         LocalSnackbar provides snackbarHostState,
+        LocalNavigate provides { route ->
+            navController.navigate(route) {
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
     ) {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -196,6 +206,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                         composable(Routes.DASHBOARD) { DashboardScreen(app) }
                         composable(Routes.REPORTS) { ReportsScreen(app) }
                         composable(Routes.MASTERS) { MastersScreen(app) }
+                        composable(Routes.FABRICS_EDIT) { FabricsEditScreen(app) }
                         composable(Routes.AUDIT) { AuditScreen(app) }
                         composable(Routes.SETTINGS) { SettingsScreen(app) }
                         composable(Routes.PROFILE) { ProfileScreen(app) }

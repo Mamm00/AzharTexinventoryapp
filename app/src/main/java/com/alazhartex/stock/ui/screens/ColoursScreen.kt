@@ -29,7 +29,7 @@ import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.paletteContentDescription
-import com.alazhartex.stock.ui.components.rememberSwatch
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 
 @Composable
 fun ColoursScreen(app: AlAzharApp) {
@@ -68,7 +68,7 @@ fun ColoursScreen(app: AlAzharApp) {
                 items(items = filtered, key = { it.id }, contentType = { "colour" }) { colour ->
                     Card(colors = CardDefaults.cardColors()) {
                         Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            val sw = rememberSwatch(colour.family, colour.grade, colour.code)
+                            val sw = rememberAnySwatch(colour.family, colour.grade, colour.code)
                             ColourSwatch(
                                 value = sw.argb,
                                 onColour = sw.onColour,

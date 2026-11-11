@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +15,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,7 +39,8 @@ import com.alazhartex.stock.ui.components.LabeledRow
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.paletteContentDescription
-import com.alazhartex.stock.ui.components.rememberSwatch
+import com.alazhartex.stock.ui.components.rememberAnySwatch
+import com.alazhartex.stock.ui.navigation.Routes
 import java.util.UUID
 import kotlinx.coroutines.launch
 
@@ -67,6 +70,10 @@ fun MastersScreen(app: AlAzharApp) {
             return@Scaffold
         }
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
+            OutlinedButton(
+                onClick = { LocalNavigate(Routes.FABRICS_EDIT) },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            ) { Text(stringResource(R.string.masters_edit_entry)) }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 8.dp)) {
                 Text("${stringResource(R.string.label_sheds)}: ${data.warehouses.size}", style = MaterialTheme.typography.labelLarge)
                 Text("${stringResource(R.string.label_fabrics)}: ${data.fabrics.size}", style = MaterialTheme.typography.labelLarge)
@@ -130,7 +137,7 @@ fun MastersScreen(app: AlAzharApp) {
                         items(items = data.colours, key = { it.id }, contentType = { "colour" }) { colour ->
                             Card(colors = CardDefaults.cardColors()) {
                                 Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                                    val mSw = rememberSwatch(colour.family, colour.grade, colour.code)
+                                    val mSw = rememberAnySwatch(colour.family, colour.grade, colour.code)
                                     ColourSwatch(
                                         value = mSw.argb,
                                         onColour = mSw.onColour,

@@ -25,3 +25,9 @@ class RbacDeniedException(val role: Role, val action: String, val target: String
 class SessionClockAnomalyException(message: String) : IllegalStateException(message)
 
 class InvariantViolationException(message: String) : IllegalStateException(message)
+
+/** Raised when a masters write would persist a duplicate of a unique pair (v1.1, delta contract §12). */
+class DuplicateValueException(message: String, val reasonKey: String) : IllegalStateException(message)
+
+/** Raised when a delete is refused because child rows reference the target (FK RESTRICT / app guard). */
+class ReferencedByException(message: String, val reasonKey: String) : IllegalStateException(message)

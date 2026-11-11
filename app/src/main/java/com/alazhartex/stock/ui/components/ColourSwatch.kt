@@ -116,11 +116,29 @@ fun ColourSwatchStrip(
     }
 }
 
+private val PINNED_FAMILY_KEYS = setOf(
+    "cotton", "linen", "wool", "silk", "polyester", "viscose", "denim", "velvet", "lycra", "oxford", "poplin",
+)
+
 /** Resolves the swatch for (family, grade, code), memoized per code for list render paths. */
 @androidx.compose.runtime.Composable
 fun rememberSwatch(family: String, grade: String, code: String): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
     androidx.compose.runtime.remember(family, grade, code) {
         com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
+    }
+
+/**
+ * Pinned families go through [com.alazhartex.stock.domain.palette.PaletteResolver]; anything else
+ * (v1.1 custom families) goes through the deterministic [com.alazhartex.stock.domain.palette.PaletteFallback].
+ */
+@androidx.compose.runtime.Composable
+fun rememberAnySwatch(family: String, grade: String, code: String): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
+    androidx.compose.runtime.remember(family, grade, code) {
+        if (family in PINNED_FAMILY_KEYS) {
+            com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
+        } else {
+            com.alazhartex.stock.domain.palette.PaletteFallback.resolve(family, grade, code)
+        }
     }
 
 /** "Colour {code} — {name} — grade {grade}" with the AR name under RTL and the EN name otherwise. */

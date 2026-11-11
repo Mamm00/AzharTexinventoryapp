@@ -28,7 +28,7 @@ import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.UtilisationGauge
 import com.alazhartex.stock.ui.components.bucketLabelFor
 import com.alazhartex.stock.ui.components.paletteContentDescription
-import com.alazhartex.stock.ui.components.rememberSwatch
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 import com.alazhartex.stock.ui.percentDisplay
 
@@ -84,7 +84,7 @@ fun DashboardScreen(app: AlAzharApp) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(stringResource(R.string.label_top_colours), style = MaterialTheme.typography.titleMedium)
                         data.topColours.forEach { tc ->
-                            val tcSw = rememberSwatch(tc.family, tc.grade, tc.colourCode)
+                            val tcSw = rememberAnySwatch(tc.family, tc.grade, tc.colourCode)
                             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 ColourSwatch(
                                     value = tcSw.argb,

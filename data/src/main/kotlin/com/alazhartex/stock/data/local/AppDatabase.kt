@@ -6,7 +6,8 @@ import androidx.room.RoomDatabase.Callback
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 /**
- * Room database (spec §4.3/§4.7, RES-007). Version 1; schema exported via KSP (G5 in CI).
+ * Room database (spec §4.3/§4.7, RES-007). Version 2; schema exported via KSP (G5 in CI).
+ * v2 (v1.1, delta contract): UNIQUE index on fabrics(name_ar, name_en) via MIGRATION_1_2 (+ onCreate).
  * No fallbackToDestructiveMigration — EVER. Triggers carry the CHECK constraints Room cannot
  * express in annotations (qty_delta <> 0, grade IN ('A','B','C','D')).
  */
@@ -26,7 +27,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         AppSettingEntity::class,
         ManifestEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -72,6 +73,11 @@ abstract class AppDatabase : RoomDatabase() {
                    BEFORE UPDATE OF grade ON colours
                    FOR EACH ROW WHEN NEW.grade NOT IN ('A','B','C','D')
                    BEGIN SELECT RAISE(ABORT, 'grade_must_be_A_B_C_D'); END""",
+            )
+            // UNIQUE fabric (name_ar, name_en) for fresh installs; upgrades get it via MIGRATION_1_2.
+            db.execSQL(
+                """CREATE UNIQUE INDEX IF NOT EXISTS fabrics_name_ar_name_en_unique
+                   ON fabrics(name_ar, name_en)""",
             )
             // application_id pins the file to this app for import R4 ('AZTH' = 0x415A5448).
             db.execSQL("PRAGMA application_id = 1096438856")

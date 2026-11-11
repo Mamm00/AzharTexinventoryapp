@@ -11,8 +11,9 @@ object Routes {
     const val DASHBOARD = "dashboard"
     const val REPORTS = "reports"
     const val MASTERS = "masters"
+    const val FABRICS_EDIT = "fabrics_edit"
     const val AUDIT = "audit"
     const val SETTINGS = "settings"
     const val PROFILE = "profile"
-    val ALL = listOf(GUIDE, STOCK, INVENTORY, MOVEMENTS, COLOURS, CROSS_VIEW, DASHBOARD, REPORTS, MASTERS, AUDIT, SETTINGS, PROFILE)
+    val ALL = listOf(GUIDE, STOCK, INVENTORY, MOVEMENTS, COLOURS, CROSS_VIEW, DASHBOARD, REPORTS, MASTERS, FABRICS_EDIT, AUDIT, SETTINGS, PROFILE)
 }
