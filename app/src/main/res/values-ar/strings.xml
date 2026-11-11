@@ -228,4 +228,5 @@
     <string name="family_poplin">بوبلين</string>
     <string name="family_members_count">%1$d خامات · %2$d ألوان</string>
     <string name="custom_family_label">مخصصة</string>
+    <string name="label_code">الكود</string>
 </resources>

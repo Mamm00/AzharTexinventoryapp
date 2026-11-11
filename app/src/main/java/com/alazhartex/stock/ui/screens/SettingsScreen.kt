@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.alazhartex.stock.AlAzharApp
+import com.alazhartex.stock.ui.screens.LocalNavigate
 import com.alazhartex.stock.BuildConfig
 import com.alazhartex.stock.MainActivity
 import com.alazhartex.stock.R

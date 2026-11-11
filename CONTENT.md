@@ -63,3 +63,13 @@ admin / admin123 (ADMIN, all 10) · keeper1 / mostafa123 (KEEPER, 5 sheds above)
 
 ## 10. Brand
 App name: AlAzharTex — الأزهر تكستيل. Brand colour accent: Azhar green #0F5132 with sand #D4A017 accent (decorative only; never sole meaning carrier).
+
+## 11. v1.1 pins — tiny palette & Fabrics Edit (2026-11-11)
+- PaletteResolver (domain, pure Kotlin): family→hue anchor pinned — cotton 0, linen 20, wool 45, silk 90, polyester 150, viscose 190, denim 220, velvet 270, lycra 300, oxford 330, poplin 15. Grade→CIELAB L*: A 72, B 62, C 52, D 42. Hue jitter = (hash mod 17) − 8 (range −8..+8); chroma = 0.42 + ((hash ushr 8) mod 11)/100 (range 0.42–0.52). Hash = FNV-1a-32 (offset 2166136261 / prime 16777619) over UTF-8 of the colour code. LCH→Lab→XYZ (D65)→sRGB; clamp [0,255]; **floor(v*255 + 0.5)** half-up rounding, bit-identical to the Python twin (`tools/independent_checks/palette_report.py`). On-colour: WCAG relative luminance; BLACK if on-black contrast ≥ on-white, else WHITE.
+- `palette-report.txt` is a committed artefact (header `alazhartex-palette-report v1`, generator `alazhartex-generator/1.0.0`, 208 rows, byte-compared in CI incl. ×6 generator determinism). Min on-colour contrast across the 208: **5.008** (all ≥ 4.5 → D21 holds by construction).
+- Picker order pinned: **grade ASC, code ASC**. Picker session state is in-memory only (nothing persisted).
+- Grade badge hues: A #1E7B3C, B #2563EB, C #D97706, D #6B7280 (AA-on-white text).
+- Swatch sizes: Tiny 12dp/r4, Small 20dp/r4, Medium 28dp/r6, Large 40dp/r6; ≥48dp touch target when interactive; content description interpolated (AR+EN `palette_swatch_cd`); never colour-only.
+- Custom families: stored in `app_settings` key `custom_families` as JSON `[{id,name_ar,name_en,hue_anchor}]`, NOT Room; excluded from seed-report parity. Hue anchor rule: **(max(existing anchors) + 25) mod 360 → nearest 5°**. Swatches for custom families use a deterministic HSL preview (`PaletteFallback`); the pinned pipeline is untouched. Fabrics/colours referencing custom families store a stable slug key (`custom-<hue>-<id8>`); display names come from settings.
+- Code format pinned: `^[A-Z0-9-]{1,16}$`, uppercase; KEEPER-created colours get a `K-` prefix on `keeper_code` automatically (code column unchanged). Seeded codes immutable.
+- UNIQUE pair fabrics(name_ar, name_en): Room v1→v2 migration (`MIGRATION_1_2`, raw SQL so the Room identity hash is stable) + same index ensured on fresh installs; enforced again inside the same transaction on add/edit.

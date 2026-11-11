@@ -32,13 +32,13 @@ class MastersSettingsRepository(
     }
 
     // ---------- v1.1 validation helpers (delta contract §12) ----------
-    private val CONTROL_CHARS = Regex("[\u0000-\u001F\u007F]")
+    private val controlChars = Regex("[\u0000-\u001F\u007F]")
 
     private fun requireName(value: String, field: String): String {
         val trimmed = value.trim()
         require(trimmed.isNotEmpty()) { "$field must not be empty" }
         require(trimmed.length <= 80) { "$field must be at most 80 characters" }
-        require(!CONTROL_CHARS.containsMatchIn(trimmed)) { "$field must not contain control characters" }
+        require(!controlChars.containsMatchIn(trimmed)) { "$field must not contain control characters" }
         return trimmed
     }
 

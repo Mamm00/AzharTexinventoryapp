@@ -1,6 +1,7 @@
 # AGENTS.md — AlAzharTex agent contract (IDE-independent, survives chat resets)
 
 ## Project identity
+(v1.1.0 note, 2026-11: app version is 1.1.0 / Room schema v2; destination count is 13 — screen #13 "Fabrics Edit" (`fabrics_edit`) is additive; all v1.0.0 routes, gates and tests are unchanged; v1.1 ships the non-destructive delta only, Factory Reset lands in v1.2.0. Palette pins live in CONTENT.md §11; v1.1 rationale in ADR-013..017.)
 AlAzharTex — offline-first native Android fabric-roll stock manager for an Egyptian fabric merchant (Cairo, Egypt). Cairo timezone (Africa/Cairo) governs "today". Default locale ar-EG with full RTL; en fallback. No cloud sync; all data lives in an on-device Room (SQLite) store.
 
 ## Module map

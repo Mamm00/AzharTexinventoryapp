@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.AlAzharApp
+import com.alazhartex.stock.ui.screens.LocalNavigate
 import com.alazhartex.stock.R
 import com.alazhartex.stock.domain.model.InvariantViolationException
 import com.alazhartex.stock.ui.LocalSnackbar

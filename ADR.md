@@ -80,3 +80,40 @@ process. Zero code generation beyond Room/KSP; the dependency graph is auditable
 `_manifest` (table_name, row_count, schema_version, app_version, exported_at) is rewritten
 inside the export transaction and checked at import R5. Safety backups keep 3; pruned names
 are logged to `files/backups/prune.log` (never inside the DB being replaced).
+
+## ADR-013 — v1.1 swatches are derived, never stored (§10)
+Colour appearance is a pure function of (family, grade, code) via `PaletteResolver`
+(FNV-1a-32 → LCH(D65) → sRGB, pinned). Nothing colour-related is persisted in Room; lists
+re-derive swatches at render time (memoized by the caller). Reports (CSV) carry codes only.
+Rationale: no stored bytes to drift from the pinned algorithm; zero migration risk for colours;
+the seed/report parity surface is unchanged.
+
+## ADR-014 — Custom families live in app_settings, not Room (§12)
+The 11 pinned families are immutable constants in code. ADMIN-created custom families are stored
+in `app_settings.custom_families` as JSON (`[{id,name_ar,name_en,hue_anchor}]`), hue anchor =
+((max(anchors)+25) mod 360) snapped to the nearest 5°. Room stays at the 13-table, 2-version
+schema; custom families never enter the seed parity path. Their swatches use the deterministic
+`PaletteFallback` HSL preview (anchored variant for the Types tab); the pinned pipeline is untouched.
+Trade-off: Room FKs can't reference custom families; the `family` column stores a stable slug
+(`custom-<hue>-<id8>`) and display names resolve from settings. Accepted and documented.
+
+## ADR-015 — Room v2: raw UNIQUE index instead of @Index (§17.10)
+UNIQUE fabric (name_ar, name_en) is enforced by `MIGRATION_1_2` (`CREATE UNIQUE INDEX IF NOT
+EXISTS`) plus the same statement in `TriggersCallback.onCreate`. Entity classes are unchanged so
+the Room identity hash is stable and no open-time TableInfo validation can fail on installs we
+cannot inspect. Uniqueness is belt-and-braces: repository re-checks duplicates inside the same
+transaction (throwing `DuplicateValueException` → BLOCKED audit). Rejected alternative: @Index
+on the entity — changes the schema identity hash for zero runtime benefit.
+
+## ADR-016 — Factory Reset deferred to v1.2.0 (§13)
+The audited FactoryResetCoordinator (R1–R10, VACUUM INTO safety backup, 5-step confirmation,
+mutex vs TransactionRunner) is fully specified in the delta contract but NOT implemented in
+v1.1.0. Reason: an unverified destructive path violates "ship only green"; the emulator cannot
+prove process-death convergence (C5–C7) here. v1.1.0 ships the non-destructive delta only;
+Settings keeps no reset affordance. Tracked in RES-023/RES-024 and VERIFICATION.md.
+
+## ADR-017 — v1.1 picker is session-only and mapped-pair scoped (§11)
+`PalettePickerSheet` holds search/filter/selection in `remember` (never persisted). It is invoked
+in the context of one shed × fabric; cells outside the shed's mapped lines render disabled. This
+preserves v1 write semantics (rolls can only move through mapped pairs) while delivering the
+pinned picker UX. Zero-stock mapped lines stay selectable for IN. See RES-027.

@@ -607,7 +607,7 @@ private fun TypesTabContent(
 }
 
 /** Stable Room-safe key for a custom family (§12: custom families are stored on-device, never in seed). */
-internal fun customFamilyKey(family: CustomFamily): String = "custom-" + family.hueAnchor + "-" + family.id.substringAfter("custom_")
+private fun customFamilyKey(family: CustomFamily): String = "custom-" + family.hueAnchor + "-" + family.id.substringAfter("custom_")
 
 @Composable
 private fun FamilyRow(
@@ -778,6 +778,7 @@ private fun FamilyDropdownField(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FabricFormDialog(
     title: String,
@@ -807,6 +808,7 @@ private fun FabricFormDialog(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ColourFormDialog(
     title: String,
@@ -834,7 +836,7 @@ private fun ColourFormDialog(
                 OutlinedTextField(
                     value = codeUpper,
                     onValueChange = { code = it.uppercase().take(16) },
-                    label = { Text("Code") },
+                    label = { Text(stringResource(R.string.label_code)) },
                     singleLine = true,
                     enabled = !isEdit,
                     supportingText = {
@@ -872,6 +874,7 @@ private fun ColourFormDialog(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddCustomFamilyDialog(
     existingAnchors: List<Int>,
@@ -907,6 +910,7 @@ private fun AddCustomFamilyDialog(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AssignToFabricDialog(
     app: AlAzharApp,
