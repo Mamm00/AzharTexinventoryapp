@@ -1,8 +1,0 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- woven bars -->
-    <path android:fillColor="#1B6B47" android:pathData="M14,34h80v5h-80zM14,69h80v5h-80z"/>
-    <path android:fillColor="#D4A017" android:pathData="M14,37.5h80v2h-80zM14,72.5h80v2h-80z"/>
-    <!-- monogram A (Azhar) -->
-    <path android:fillColor="#F3E3B3" android:pathData="M54,26 L78,84 L67,84 L61.5,69 L46.5,69 L41,84 L30,84 Z M54,46.5 L48.2,60.5 L59.8,60.5 Z"/>
-</vector>

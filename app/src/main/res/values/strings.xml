@@ -140,4 +140,10 @@
     <string name="guide_s6_title">FAQ</string>
     <string name="label_utilisation_for">Utilisation for %1$s</string>
     <string name="action_delete">Delete</string>
+    <string name="brand_company">AlAzhar Textiles</string>
+    <string name="brand_tagline">Fine Fabrics</string>
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_offline">Works fully offline — no internet permission, every byte stays on this device.</string>
+    <string name="about_copyright">© AlAzhar Textiles. All rights reserved.</string>
 </resources>

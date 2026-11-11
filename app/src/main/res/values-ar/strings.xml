@@ -148,4 +148,10 @@
     <string name="guide_s6_title">أسئلة شائعة</string>
     <string name="label_utilisation_for">نسبة الاستغلال في %1$s</string>
     <string name="action_delete">حذف</string>
+    <string name="brand_company">الأزهر تكستيل</string>
+    <string name="brand_tagline">أقمشة فاخرة</string>
+    <string name="about_title">حول التطبيق</string>
+    <string name="about_version">الإصدار %1$s</string>
+    <string name="about_offline">يعمل دون اتصال تمامًا — بلا صلاحية إنترنت، وكل بايت يبقى على هذا الجهاز.</string>
+    <string name="about_copyright">© الأزهر تكستيل. جميع الحقوق محفوظة.</string>
 </resources>

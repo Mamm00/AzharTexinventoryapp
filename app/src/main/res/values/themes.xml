@@ -2,4 +2,12 @@
 <resources>
     <style name="Theme.AlAzharTex" parent="android:Theme.Material.Light.NoActionBar">
     </style>
+
+    <!-- Compose splash (API 26+): centered brand mark on white, then hands off to Theme.AlAzharTex. -->
+    <style name="Theme.AlAzharTex.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenAnimationDuration">0</item>
+        <item name="postSplashScreenTheme">@style/Theme.AlAzharTex</item>
+    </style>
 </resources>
