@@ -155,7 +155,6 @@
     <string name="about_offline">يعمل دون اتصال تمامًا — بلا صلاحية إنترنت، وكل بايت يبقى على هذا الجهاز.</string>
     <string name="about_copyright">© الأزهر تكستيل. جميع الحقوق محفوظة.</string>
     <string name="palette_swatch_cd">لون %1$s — %2$s — الدرجة %3$s</string>
-    <string name="palette_family_strip_cd">لوحة الأسرة: %1$d لونًا</string>
     <string name="palette_footer_selected">المحدد: %1$s — %2$s</string>
     <string name="label_top_colours">أكثر الألوان استخدامًا</string>
     <string name="nav_fabrics_edit">تعديل الخامات</string>
@@ -163,16 +162,12 @@
     <string name="settings_masters_entry">الماسترز والكتالوج</string>
     <string name="tab_types">الأنواع</string>
     <string name="action_edit">تعديل</string>
-    <string name="action_add">إضافة</string>
-    <string name="action_delete_fabric">حذف الخامة</string>
     <string name="label_name_en">الاسم (الإنجليزية)</string>
     <string name="label_name_ar">الاسم (العربية)</string>
     <string name="label_active">نشط</string>
     <string name="label_inactive">غير نشط</string>
     <string name="label_samples">عينات</string>
     <string name="label_family_pinned">مثبتة</string>
-    <string name="family_fabric_count">خامات: %1$d</string>
-    <string name="fabrics_edit_empty">لا يوجد شيء هنا بعد</string>
     <string name="dialog_edit_fabric">تعديل الخامة</string>
     <string name="dialog_edit_colour">تعديل اللون</string>
     <string name="dialog_add_family">إضافة عائلة مخصصة</string>
@@ -194,7 +189,6 @@
     <string name="bulk_assign_nothing">لا يوجد شيء لإنشائه — كل شيء مربوط بالفعل</string>
     <string name="clear_selection">مسح التحديد</string>
     <string name="confirm_type_delete_title">اكتب DELETE للتأكيد</string>
-    <string name="confirm_type_delete_hint">DELETE</string>
     <string name="fabric_delete_counts">الربطات التي تحيل إلى هذه الخامة: %1$d</string>
     <string name="colour_delete_counts">ربطات: %1$d · حركات: %2$d · لفات: %3$d</string>
     <string name="code_format_hint">الكود: 1–16 حرفًا من A–Z 0–9 والشرطة</string>
@@ -208,7 +202,6 @@
     <string name="picker_clear_filters">مسح المرشحات</string>
     <string name="picker_available">المتاح: %1$d</string>
     <string name="picker_confirm">تأكيد</string>
-    <string name="picker_min_qty">الكمية يجب ألا تقل عن 1</string>
     <string name="picker_footer_none">اختر لونًا للمتابعة</string>
     <string name="family_cotton">قطن</string>
     <string name="family_linen">كتان</string>

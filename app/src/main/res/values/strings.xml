@@ -147,7 +147,6 @@
     <string name="about_offline">Works fully offline — no internet permission, every byte stays on this device.</string>
     <string name="about_copyright">© AlAzhar Textiles. All rights reserved.</string>
     <string name="palette_swatch_cd">Colour %1$s — %2$s — grade %3$s</string>
-    <string name="palette_family_strip_cd">Family palette: %1$d colours</string>
     <string name="palette_footer_selected">Selected: %1$s — %2$s</string>
     <string name="label_top_colours">Top colours</string>
     <string name="nav_fabrics_edit">Fabrics Edit</string>
@@ -155,16 +154,12 @@
     <string name="settings_masters_entry">Masters &amp; catalogue</string>
     <string name="tab_types">Types</string>
     <string name="action_edit">Edit</string>
-    <string name="action_add">Add</string>
-    <string name="action_delete_fabric">Delete fabric</string>
     <string name="label_name_en">Name (EN)</string>
     <string name="label_name_ar">Name (AR)</string>
     <string name="label_active">Active</string>
     <string name="label_inactive">Inactive</string>
     <string name="label_samples">Samples</string>
     <string name="label_family_pinned">Pinned</string>
-    <string name="family_fabric_count">Fabrics: %1$d</string>
-    <string name="fabrics_edit_empty">Nothing here yet</string>
     <string name="dialog_edit_fabric">Edit fabric</string>
     <string name="dialog_edit_colour">Edit colour</string>
     <string name="dialog_add_family">Add custom family</string>
@@ -186,7 +181,6 @@
     <string name="bulk_assign_nothing">Nothing to create — already mapped in every shed</string>
     <string name="clear_selection">Clear selection</string>
     <string name="confirm_type_delete_title">Type DELETE to confirm</string>
-    <string name="confirm_type_delete_hint">DELETE</string>
     <string name="fabric_delete_counts">Mappings referencing this fabric: %1$d</string>
     <string name="colour_delete_counts">Mappings: %1$d · Movements: %2$d · Rolls: %3$d</string>
     <string name="code_format_hint">Code: 1–16 chars, A–Z 0–9 -</string>
@@ -200,7 +194,6 @@
     <string name="picker_clear_filters">Clear filters</string>
     <string name="picker_available">Available: %1$d</string>
     <string name="picker_confirm">Confirm</string>
-    <string name="picker_min_qty">Quantity must be at least 1</string>
     <string name="picker_footer_none">Select a colour to continue</string>
     <string name="family_cotton">Cotton</string>
     <string name="family_linen">Linen</string>
