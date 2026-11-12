@@ -157,6 +157,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
     val fabrics = remember(lines) { lines.map { it.fabricNameEn }.distinct().sorted() }
     val fabricLines = remember(lines, fabricName) { lines.filter { it.fabricNameEn == fabricName } }
     val fabricFamily = fabricLines.firstOrNull()?.family
+    val fabricId = fabricLines.firstOrNull()?.fabricId
 
     Dialog(onDismissRequest = onClose) {
         Card(modifier = Modifier.fillMaxSize()) {
@@ -249,6 +250,28 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                         onConfirm = { colour ->
                             selected = fabricLines.firstOrNull { it.colourCode == colour.code }
                             showPicker = false
+                        },
+                        onAssignColours = { toAssign ->
+                            val targetFabricId = fabricId
+                            if (targetFabricId != null && toAssign.isNotEmpty()) {
+                                app.container.applicationScope.launch {
+                                val message = try {
+                                    val created = app.container.mastersSettingsRepository.assignColoursToMapping(
+                                        ACTOR_ADMIN,
+                                        dialog.shedId,
+                                        targetFabricId,
+                                        toAssign.map { it.id },
+                                        UUID.randomUUID().toString(),
+                                    )
+                                    android.util.Log.i("PalettePicker", "assigned $created mappings for fabric=$targetFabricId in shed=${dialog.shedId}")
+                                    lines = app.container.readRepository.inventoryLines(dialog.shedId).filter { it.isActive }
+                                    context.getString(R.string.picker_assigned_ok, integerString(created.toLong(), arabicIndic))
+                                } catch (t: Throwable) {
+                                    snackbarFor(context, t)
+                                }
+                                snackbar.showSnackbar(message)
+                                }
+                            }
                         },
                     )
                 }

@@ -200,6 +200,9 @@
     <string name="picker_family_all">كل العائلات</string>
     <string name="picker_empty">لا توجد ألوان مطابقة</string>
     <string name="picker_clear_filters">مسح المرشحات</string>
+    <string name="picker_not_mapped">غير مضاف لهذا القماش</string>
+    <string name="picker_assign_selected">أضف الألوان المحددة لهذا القماش هنا (%1$s)</string>
+    <string name="picker_assigned_ok">تمت إضافة %1$s لونًا لهذا القماش</string>
     <string name="picker_available">المتاح: %1$s</string>
     <string name="picker_confirm">تأكيد</string>
     <string name="picker_footer_none">اختر لونًا للمتابعة</string>

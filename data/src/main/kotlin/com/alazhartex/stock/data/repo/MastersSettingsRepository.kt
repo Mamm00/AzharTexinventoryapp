@@ -272,6 +272,57 @@ class MastersSettingsRepository(
     }
 
     /**
+     * "Assign explicit colours to this fabric" (v1.3.2): warehouse-scoped variant of bulkAssignMapping /
+     * loadFamilyPalette — create ONE mapping (+ zeroed inventory + zeroed INACTIVE roll row) per requested
+     * colour id, in this warehouse only, for exactly [colourIds]. ONE transaction, ONE idempotency key,
+     * ONE audit row (reuses masters.mapping.bulk_assign RBAC: ADMIN + KEEPER). Pairs that already have a
+     * mapping are skipped, so re-assigning is idempotent by pair. Returns the number of mappings created.
+     */
+    suspend fun assignColoursToMapping(actorId: String, warehouseId: String, fabricId: String, colourIds: List<String>, idempotencyKey: String): Int {
+        require(colourIds.isNotEmpty()) { "select at least one colour" }
+        val uniqueIds = colourIds.distinct()
+        var createdCount = 0
+        runner.withAudit(actorId, Rbac.ACTION_MASTERS_BULK_ASSIGN, idempotencyKey, "mapping:$warehouseId|fabric:$fabricId colours:${uniqueIds.size}") { _ ->
+            val role = actorRole(actorId)
+            verdictOrThrow(role, Rbac.canBulkAssign(role), Rbac.ACTION_MASTERS_BULK_ASSIGN, "mapping:$warehouseId|fabric:$fabricId")
+            if (database.warehouseDao().getById(warehouseId) == null) {
+                throw InvariantViolationException("warehouse_missing warehouse=$warehouseId")
+            }
+            if (database.fabricDao().getById(fabricId) == null) {
+                throw InvariantViolationException("fabric_missing fabric=$fabricId")
+            }
+            val created = mutableListOf<com.alazhartex.stock.data.local.MappingEntity>()
+            for (colourId in uniqueIds) {
+                if (database.mappingDao().findIds(warehouseId, fabricId, colourId).isNotEmpty()) continue
+                if (database.colourDao().getById(colourId) == null) {
+                    throw InvariantViolationException("colour_missing colour=$colourId")
+                }
+                created += com.alazhartex.stock.data.local.MappingEntity(
+                    id = UUID.randomUUID().toString(),
+                    warehouseId = warehouseId,
+                    fabricId = fabricId,
+                    colourId = colourId,
+                    isActive = true,
+                )
+            }
+            if (created.isEmpty()) {
+                // Everything selected was already mapped — not an error.
+                return@withAudit MutationOutcome.Applied()
+            }
+            database.mappingDao().insertAll(created)
+            database.inventoryDao().insertAll(
+                created.map { com.alazhartex.stock.data.local.InventoryEntity(UUID.randomUUID().toString(), it.id, 0L, 0L, null) },
+            )
+            database.rollDao().insertAll(
+                created.map { com.alazhartex.stock.data.local.RollEntity(UUID.randomUUID().toString(), it.id, "INACTIVE", 0L) },
+            )
+            createdCount = created.size
+            MutationOutcome.Applied()
+        }
+        return createdCount
+    }
+
+    /**
      * "Load full palette" (v1.3, Swatch Book): map ONE fabric to EVERY active colour of the fabric's
      * family in ONE warehouse — the in-app analogue of loading a physical sample card. Creates one
      * mapping (+ zeroed inventory + zeroed INACTIVE roll row) per missing pair, in ONE transaction,
