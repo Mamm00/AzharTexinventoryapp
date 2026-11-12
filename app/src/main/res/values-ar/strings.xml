@@ -200,7 +200,7 @@
     <string name="picker_family_all">كل العائلات</string>
     <string name="picker_empty">لا توجد ألوان مطابقة</string>
     <string name="picker_clear_filters">مسح المرشحات</string>
-    <string name="picker_available">المتاح: %1$d</string>
+    <string name="picker_available">المتاح: %1$s</string>
     <string name="picker_confirm">تأكيد</string>
     <string name="picker_footer_none">اختر لونًا للمتابعة</string>
     <string name="family_cotton">قطن</string>
