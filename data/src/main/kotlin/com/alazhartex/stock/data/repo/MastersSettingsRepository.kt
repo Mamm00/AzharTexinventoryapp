@@ -270,7 +270,6 @@ class MastersSettingsRepository(
         }
         return createdCount
     }
-}
 
     /**
      * "Load full palette" (v1.3, Swatch Book): map ONE fabric to EVERY active colour of the fabric's
@@ -319,3 +318,4 @@ class MastersSettingsRepository(
         }
         return createdCount
     }
+}
