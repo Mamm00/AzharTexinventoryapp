@@ -50,6 +50,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -290,6 +292,9 @@ private fun HsvWheel(
     val ring = remember { renderHueRing(280) }
     val hueInt = ((hue % 360f) + 360f) % 360f
     val triangle = remember(hueInt.roundToInt()) { renderSvTriangle(hueInt.roundToInt().toFloat(), 200) }
+    // Single Canvas draws both the hue ring and the SV triangle — one combined description.
+    val wheelDesc = "${stringResource(R.string.color_hue_ring)} — ${stringResource(R.string.color_sv_triangle)}"
+
     // Fresh copies for the gesture lambdas — pointerInput(Unit) never relaunches mid-drag.
     val liveHue by androidx.compose.runtime.rememberUpdatedState(hue)
     val liveSat by androidx.compose.runtime.rememberUpdatedState(saturation)
@@ -298,6 +303,7 @@ private fun HsvWheel(
     androidx.compose.foundation.Canvas(
         modifier = Modifier
             .size(280.dp)
+            .semantics { contentDescription = wheelDesc }
             .pointerInput(Unit) {
                 awaitEachGesture {
                     val down = awaitPointerEvent().changes.firstOrNull() ?: return@awaitEachGesture

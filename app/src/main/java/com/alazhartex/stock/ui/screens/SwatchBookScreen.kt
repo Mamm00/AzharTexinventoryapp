@@ -304,7 +304,7 @@ private fun FabricSampleCard(
                 AssistChip(
                     onClick = {},
                     enabled = false,
-                    label = { Text(fabric.family) },
+                    label = { Text(stringResource(R.string.swatchbook_family, fabric.family)) },
                     colors = AssistChipDefaults.assistChipColors(),
                 )
             }
