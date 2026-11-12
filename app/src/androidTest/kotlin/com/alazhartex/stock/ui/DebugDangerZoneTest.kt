@@ -182,8 +182,10 @@ class DebugDangerZoneTest {
         composeTestRule.onNodeWithTag("debug_field_id").performTextClearance()
         composeTestRule.onNodeWithTag("debug_field_id").performTextInput("WH 01!!")
         // Sanitizer lowercases and strips everything except [a-z0-9_-].
-        // The label text merges into the field's semantics node, so assert on a substring match.
-        composeTestRule.onNodeWithTag("debug_field_id").assert(hasText("wh01", substring = true))
+        // Read the EditableText property directly — the field's merged label makes text-list matchers brittle.
+        val editable = composeTestRule.onNodeWithTag("debug_field_id")
+            .fetchSemanticsNode().config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.EditableText)?.text
+        assertEquals("wh01", editable)
         composeTestRule.onNodeWithTag("debug_field_id").performTextClearance()
         composeTestRule.onNodeWithTag("debug_field_id").performTextInput("!!")
         composeTestRule.onNodeWithTag("debug_form_save").assertIsNotEnabled()
