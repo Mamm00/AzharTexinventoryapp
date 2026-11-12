@@ -76,14 +76,14 @@ fun DebugDangerZoneCard(app: AlAzharApp, actorId: String) {
     }
     var reloadOpen by remember { mutableStateOf(false) }
 
-    fun runAction(action: suspend () -> Unit, toast: String, onDone: (Boolean) -> Unit = {}) {
+    fun runAction(action: suspend () -> Unit, toastResId: Int, onDone: (Boolean) -> Unit = {}) {
         scope.launch {
             busy = true
             var ok = false
             try {
                 withContext(Dispatchers.IO) { action() }
                 ok = true
-                snackbar.showSnackbar(context.getString(toast))
+                snackbar.showSnackbar(context.getString(toastResId))
             } catch (t: Throwable) {
                 snackbar.showSnackbar("Error: ${t.message ?: t.javaClass.simpleName}")
             }
