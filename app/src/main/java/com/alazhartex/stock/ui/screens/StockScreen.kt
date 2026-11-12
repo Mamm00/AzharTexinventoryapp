@@ -16,10 +16,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -35,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -107,7 +106,10 @@ fun StockScreen(app: AlAzharApp) {
                             contentDescriptionPrefix = stringResource(R.string.label_utilisation_for, card.shedId),
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(onClick = { activeDialog = MutationDialog(card.shedId, MutationKind.ADD) }) {
+                            Button(
+                                onClick = { activeDialog = MutationDialog(card.shedId, MutationKind.ADD) },
+                                modifier = Modifier.testTag("stock_add_${card.shedId}"),
+                            ) {
                                 Text(stringResource(R.string.action_add_roll))
                             }
                             OutlinedButton(onClick = { activeDialog = MutationDialog(card.shedId, MutationKind.REMOVE) }) {
@@ -169,15 +171,22 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                 }
                 Text("$title — ${dialog.shedId}", style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
 
-                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                    OutlinedTextField(
-                        readOnly = true,
-                        value = fabricName ?: "",
-                        onValueChange = {},
-                        label = { Text(stringResource(R.string.label_fabric)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true).fillMaxWidth(),
-                    )
+                // Plain button + menu: the ExposedDropdownMenuBox anchor click is unreliable for both
+                // instrumentation and some devices; a Button fires reliably for everyone.
+                androidx.compose.foundation.layout.Box {
+                    OutlinedButton(
+                        onClick = { expanded = !expanded },
+                        modifier = Modifier.fillMaxWidth().testTag("stock_fabric_field"),
+                    ) {
+                        androidx.compose.foundation.layout.Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            Text(fabricName ?: stringResource(R.string.label_fabric))
+                            androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        }
+                    }
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         fabrics.forEach { name ->
                             DropdownMenuItem(

@@ -192,7 +192,7 @@
     <string name="picker_family_all">All families</string>
     <string name="picker_empty">No colours match these filters</string>
     <string name="picker_clear_filters">Clear filters</string>
-    <string name="picker_available">Available: %1$d</string>
+    <string name="picker_available">Available: %1$s</string>
     <string name="picker_confirm">Confirm</string>
     <string name="picker_footer_none">Select a colour to continue</string>
     <string name="family_cotton">Cotton</string>

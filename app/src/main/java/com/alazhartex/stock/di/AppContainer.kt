@@ -92,7 +92,7 @@ class AppContainer(private val context: Context) {
         sessionPrefs.getString(KEY_BOOT_ID, null) ?: UUID.randomUUID().toString().also { rotateProcessBootId() }
 
     companion object {
-        const val APP_VERSION = "1.3.0"
+        const val APP_VERSION = "1.3.1"
         private const val KEY_BOOT_ID = "process_boot_id"
     }
 }
