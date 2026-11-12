@@ -34,6 +34,7 @@ import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.data.repo.MastersSnapshot
 import com.alazhartex.stock.ui.LocalSnackbar
+import com.alazhartex.stock.ui.components.CustomHexRow
 import java.util.UUID
 import kotlinx.coroutines.launch
 
@@ -66,6 +67,7 @@ fun AddFabricDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
     var nameEn by remember { mutableStateOf("") }
     var nameAr by remember { mutableStateOf("") }
     var family by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
 
     DialogScaffold(
@@ -77,7 +79,7 @@ fun AddFabricDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
             busy = true
             val message = try {
                 app.container.mastersSettingsRepository.addFabric(
-                    ACTOR_ADMIN, nameEn.trim(), nameAr.trim(), family.trim(), UUID.randomUUID().toString(),
+                    ACTOR_ADMIN, nameEn.trim(), nameAr.trim(), family.trim(), UUID.randomUUID().toString(), notes.trim().ifBlank { null },
                 )
                 context.getString(R.string.toast_fabric_added)
             } catch (t: Throwable) {
@@ -92,6 +94,7 @@ fun AddFabricDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
         OutlinedTextField(value = nameEn, onValueChange = { nameEn = it.take(120) }, label = { Text("Name (EN)") }, singleLine = true)
         OutlinedTextField(value = nameAr, onValueChange = { nameAr = it.take(120) }, label = { Text("Name (AR)") }, singleLine = true)
         OutlinedTextField(value = family, onValueChange = { family = it.take(60) }, label = { Text(stringResource(R.string.label_family)) }, singleLine = true)
+        OutlinedTextField(value = notes, onValueChange = { notes = it.take(500) }, label = { Text(stringResource(R.string.fabric_notes_label)) }, minLines = 2, maxLines = 4)
     }
 }
 
@@ -107,6 +110,7 @@ fun AddColourDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
     var keeperCode by remember { mutableStateOf("") }
     var gradeExpanded by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
+    var customHex by remember { mutableStateOf<String?>(null) }
 
     DialogScaffold(
         title = stringResource(R.string.masters_add_colour),
@@ -117,7 +121,7 @@ fun AddColourDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
             val message = try {
                 app.container.mastersSettingsRepository.addColour(
                     ACTOR_ADMIN, code.trim(), nameEn.trim(), nameAr.trim(), grade, family.trim(),
-                    keeperCode.trim().ifBlank { null }, UUID.randomUUID().toString(),
+                    keeperCode.trim().ifBlank { null }, UUID.randomUUID().toString(), customHex,
                 )
                 context.getString(R.string.toast_colour_added)
             } catch (t: Throwable) {
@@ -149,6 +153,7 @@ fun AddColourDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
             }
         }
         OutlinedTextField(value = keeperCode, onValueChange = { keeperCode = it.take(20) }, label = { Text(stringResource(R.string.label_keeper_code)) }, singleLine = true)
+        CustomHexRow(customHex = customHex, onCustomHexChange = { customHex = it })
     }
 }
 

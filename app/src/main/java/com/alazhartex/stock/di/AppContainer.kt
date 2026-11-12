@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.alazhartex.stock.data.local.AppDatabase
 import com.alazhartex.stock.data.local.MIGRATION_1_2
+import com.alazhartex.stock.data.local.MIGRATION_2_3
 import com.alazhartex.stock.data.repo.DebugRepository
 import com.alazhartex.stock.data.repo.MastersSettingsRepository
 import com.alazhartex.stock.data.repo.ReadRepository
@@ -32,7 +33,7 @@ class AppContainer(private val context: Context) {
     val database: AppDatabase by lazy {
         Room.databaseBuilder(context, AppDatabase::class.java, "alazhartex.db")
             .addCallback(AppDatabase.TriggersCallback())
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 
@@ -91,7 +92,7 @@ class AppContainer(private val context: Context) {
         sessionPrefs.getString(KEY_BOOT_ID, null) ?: UUID.randomUUID().toString().also { rotateProcessBootId() }
 
     companion object {
-        const val APP_VERSION = "1.2.0"
+        const val APP_VERSION = "1.3.0"
         private const val KEY_BOOT_ID = "process_boot_id"
     }
 }

@@ -236,4 +236,33 @@
     <string name="action_reload_demo">Reload demo data</string>
     <string name="debug_row_stats">closing %1$d · active rolls %2$d</string>
     <string name="debug_row_meta">id: %1$s · capacity %2$d · keeper %3$s</string>
+    <!-- v1.3: swatch book (sample cards) + color wheel -->
+    <string name="nav_swatch_book">Swatch Book</string>
+    <string name="swatchbook_title">Fabric sample cards</string>
+    <string name="swatchbook_warehouse">Warehouse</string>
+    <string name="swatchbook_show_all_fabrics">Show all fabrics</string>
+    <string name="swatchbook_mapped_only">Mapped only</string>
+    <string name="swatchbook_no_warehouses">No warehouses yet — add one from Masters first.</string>
+    <string name="swatchbook_empty_no_mappings">No fabrics mapped in this warehouse yet. Toggle &quot;Show all fabrics&quot; and load a full palette.</string>
+    <string name="swatchbook_family">Family: %1$s</string>
+    <string name="swatchbook_notes">Notes</string>
+    <string name="swatchbook_total_rolls">Total rolls: %1$s</string>
+    <string name="swatchbook_mapped_count">Mapped %1$s of %2$s family colours</string>
+    <string name="swatchbook_unmapped">—</string>
+    <string name="swatchbook_load_palette">Load full palette (%1$s colours)</string>
+    <string name="swatchbook_load_confirm_title">Load the full palette?</string>
+    <string name="swatchbook_load_confirm_body">Create %1$s mappings for %2$s in %3$s with zero quantity, one per missing family colour? Pairs that already exist are skipped.</string>
+    <string name="swatchbook_load_done">Palette loaded: %1$s mappings</string>
+    <string name="swatchbook_load_nothing">Palette already complete</string>
+    <string name="color_hex_label">Hex (#RRGGBB)</string>
+    <string name="color_presets">Preset colours</string>
+    <string name="color_favourites">Favourites</string>
+    <string name="color_save_favourite">Save current</string>
+    <string name="color_hue_ring">Hue wheel</string>
+    <string name="color_sv_triangle">Saturation and value area</string>
+    <string name="color_pick">Pick colour</string>
+    <string name="action_clear">Clear</string>
+    <string name="color_custom_auto">Auto (derived from family)</string>
+    <string name="color_custom_auto_short">auto</string>
+    <string name="fabric_notes_label">Notes</string>
 </resources>

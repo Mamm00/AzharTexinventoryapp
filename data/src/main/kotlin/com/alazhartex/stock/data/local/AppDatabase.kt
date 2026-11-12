@@ -6,8 +6,9 @@ import androidx.room.RoomDatabase.Callback
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 /**
- * Room database (spec §4.3/§4.7, RES-007). Version 2; schema exported via KSP (G5 in CI).
+ * Room database (spec §4.3/§4.7, RES-007). Version 3; schema exported via KSP (G5 in CI).
  * v2 (v1.1, delta contract): UNIQUE index on fabrics(name_ar, name_en) via MIGRATION_1_2 (+ onCreate).
+ * v3 (v1.3): nullable colours.custom_hex + fabrics.notes via MIGRATION_2_3 (+ onCreate from entities).
  * No fallbackToDestructiveMigration — EVER. Triggers carry the CHECK constraints Room cannot
  * express in annotations (qty_delta <> 0, grade IN ('A','B','C','D')).
  */
@@ -27,7 +28,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         AppSettingEntity::class,
         ManifestEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {

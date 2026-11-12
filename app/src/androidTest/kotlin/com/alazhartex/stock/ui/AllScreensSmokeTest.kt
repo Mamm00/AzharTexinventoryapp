@@ -17,7 +17,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * D10 smoke: launch, open drawer, visit every one of the 12 routes, expect no crash
+ * D10 smoke: launch, open drawer, visit every one of the routes, expect no crash
  * and a visible content node on each. Runs on the CI emulator (API 34, x86_64).
  *
  * Locale-agnostic: the app defaults to Arabic (SharedPreferences "language" = "ar"),
@@ -48,7 +48,7 @@ class AllScreensSmokeTest {
     }
 
     @Test
-    fun allTwelveRoutesAreReachable() {
+    fun allRoutesAreReachable() {
         composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
         // Open the drawer once; it stays open for the whole traversal.
         openDrawer()
@@ -59,6 +59,7 @@ class AllScreensSmokeTest {
             R.string.nav_movements,
             R.string.nav_colours,
             R.string.nav_crossview,
+            R.string.nav_swatch_book,
             R.string.nav_dashboard,
             R.string.nav_reports,
             R.string.nav_masters,

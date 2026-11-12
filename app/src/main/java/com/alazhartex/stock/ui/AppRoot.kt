@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.FactCheck
 import androidx.compose.material.icons.filled.Edit
@@ -76,6 +77,7 @@ import com.alazhartex.stock.ui.screens.ProfileScreen
 import com.alazhartex.stock.ui.screens.ReportsScreen
 import com.alazhartex.stock.ui.screens.SettingsScreen
 import com.alazhartex.stock.ui.screens.StockScreen
+import com.alazhartex.stock.ui.screens.SwatchBookScreen
 import kotlinx.coroutines.launch
 
 val LocalSnackbar = androidx.compose.runtime.compositionLocalOf<SnackbarHostState> { error("snackbar host not provided") }
@@ -89,6 +91,7 @@ private val DESTINATIONS = listOf(
     DrawerDestination(Routes.MOVEMENTS, R.string.nav_movements, Icons.Filled.SwapHoriz),
     DrawerDestination(Routes.COLOURS, R.string.nav_colours, Icons.Filled.Palette),
     DrawerDestination(Routes.CROSS_VIEW, R.string.nav_crossview, Icons.Filled.GridView),
+    DrawerDestination(Routes.SWATCH_BOOK, R.string.nav_swatch_book, Icons.Filled.ContentCut),
     DrawerDestination(Routes.DASHBOARD, R.string.nav_dashboard, Icons.Filled.Dashboard),
     DrawerDestination(Routes.REPORTS, R.string.nav_reports, Icons.Filled.Assessment),
     DrawerDestination(Routes.MASTERS, R.string.nav_masters, Icons.Filled.Storage),
@@ -202,6 +205,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                         composable(Routes.MOVEMENTS) { MovementsScreen(app) }
                         composable(Routes.COLOURS) { ColoursScreen(app) }
                         composable(Routes.CROSS_VIEW) { CrossViewScreen(app) }
+                        composable(Routes.SWATCH_BOOK) { SwatchBookScreen(app) }
                         composable(Routes.DASHBOARD) { DashboardScreen(app) }
                         composable(Routes.REPORTS) { ReportsScreen(app) }
                         composable(Routes.MASTERS) { MastersScreen(app) }

@@ -56,13 +56,15 @@ class MastersSettingsRepository(
         }
 
     // ---------- masters: add (ADMIN + KEEPER) ----------
-    suspend fun addColour(actorId: String, code: String, nameEn: String, nameAr: String, grade: String, family: String, keeperCode: String?, idempotencyKey: String): MutationOutcome {
+    suspend fun addColour(actorId: String, code: String, nameEn: String, nameAr: String, grade: String, family: String, keeperCode: String?, idempotencyKey: String, customHex: String? = null): MutationOutcome {
         require(grade in setOf("A", "B", "C", "D")) { "grade must be A, B, C or D" }
         val cleanCode = code.trim().uppercase()
         val cleanEn = requireName(nameEn, "name_en")
         val cleanAr = requireName(nameAr, "name_ar")
         val cleanFamily = requireFamily(family)
         require(cleanCode.matches(Regex("[A-Z0-9-]{1,16}"))) { "code must match [A-Z0-9-]{1,16}" }
+        val cleanHex = com.alazhartex.stock.domain.palette.CustomSwatch.normalizeHex(customHex)
+        require(customHex == null || cleanHex != null) { "custom_hex must match #RRGGBB" }
         return runner.withAudit(actorId, Rbac.ACTION_MASTERS_COLOUR_ADD, idempotencyKey, "colour:$cleanCode") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersAdd(role), Rbac.ACTION_MASTERS_COLOUR_ADD, cleanCode)
@@ -80,16 +82,18 @@ class MastersSettingsRepository(
                 com.alazhartex.stock.data.local.ColourEntity(
                     id = UUID.randomUUID().toString(), code = cleanCode, nameEn = cleanEn, nameAr = cleanAr,
                     grade = grade, family = cleanFamily, keeperCode = finalKeeperCode, isActive = true,
+                    customHex = cleanHex,
                 ),
             )
             MutationOutcome.Applied()
         }
     }
 
-    suspend fun addFabric(actorId: String, nameEn: String, nameAr: String, family: String, idempotencyKey: String): MutationOutcome {
+    suspend fun addFabric(actorId: String, nameEn: String, nameAr: String, family: String, idempotencyKey: String, notes: String? = null): MutationOutcome {
         val cleanEn = requireName(nameEn, "name_en")
         val cleanAr = requireName(nameAr, "name_ar")
         val cleanFamily = requireFamily(family)
+        val cleanNotes = notes?.trim()?.takeIf { it.isNotEmpty() }?.take(500)
         return runner.withAudit(actorId, Rbac.ACTION_MASTERS_FABRIC_ADD, idempotencyKey, "fabric:$cleanEn") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersAdd(role), Rbac.ACTION_MASTERS_FABRIC_ADD, cleanEn)
@@ -97,17 +101,18 @@ class MastersSettingsRepository(
                 throw DuplicateValueException("fabric_duplicate ar=$cleanAr en=$cleanEn", "fabric_duplicate_error")
             }
             database.fabricDao().insert(
-                com.alazhartex.stock.data.local.FabricEntity(UUID.randomUUID().toString(), nameEn = cleanEn, nameAr = cleanAr, family = cleanFamily),
+                com.alazhartex.stock.data.local.FabricEntity(UUID.randomUUID().toString(), nameEn = cleanEn, nameAr = cleanAr, family = cleanFamily, notes = cleanNotes),
             )
             MutationOutcome.Applied()
         }
     }
 
     /** v1.1: ADMIN-only fabric edit (seeded ids pinned). Names validated like add. */
-    suspend fun editFabric(actorId: String, fabricId: String, nameEn: String, nameAr: String, family: String, idempotencyKey: String): MutationOutcome {
+    suspend fun editFabric(actorId: String, fabricId: String, nameEn: String, nameAr: String, family: String, idempotencyKey: String, notes: String? = null): MutationOutcome {
         val cleanEn = requireName(nameEn, "name_en")
         val cleanAr = requireName(nameAr, "name_ar")
         val cleanFamily = requireFamily(family)
+        val cleanNotes = notes?.trim()?.takeIf { it.isNotEmpty() }?.take(500)
         return runner.withAudit(actorId, Rbac.ACTION_MASTERS_FABRIC_EDIT, idempotencyKey, "fabric:$fabricId") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersEdit(role), Rbac.ACTION_MASTERS_FABRIC_EDIT, fabricId)
@@ -115,6 +120,7 @@ class MastersSettingsRepository(
                 throw DuplicateValueException("fabric_duplicate ar=$cleanAr en=$cleanEn", "fabric_duplicate_error")
             }
             database.fabricDao().update(fabricId, cleanAr, cleanEn, cleanFamily)
+            database.fabricDao().updateNotes(fabricId, cleanNotes)
             MutationOutcome.Applied()
         }
     }
@@ -182,15 +188,17 @@ class MastersSettingsRepository(
     // ---------- v1.1 Fabrics Edit operations (delta contract §12) ----------
 
     /** Edit colour: code is IMMUTABLE (seeded ids pinned); grade/family/active/names mutable by ADMIN. */
-    suspend fun editColour(actorId: String, colourId: String, nameEn: String, nameAr: String, grade: String, family: String, isActive: Boolean, idempotencyKey: String): MutationOutcome {
+    suspend fun editColour(actorId: String, colourId: String, nameEn: String, nameAr: String, grade: String, family: String, isActive: Boolean, idempotencyKey: String, customHex: String? = null): MutationOutcome {
         require(grade in setOf("A", "B", "C", "D")) { "grade must be A, B, C or D" }
         val cleanEn = requireName(nameEn, "name_en")
         val cleanAr = requireName(nameAr, "name_ar")
         val cleanFamily = requireFamily(family)
+        val cleanHex = com.alazhartex.stock.domain.palette.CustomSwatch.normalizeHex(customHex)
+        require(customHex == null || cleanHex != null) { "custom_hex must match #RRGGBB" }
         return runner.withAudit(actorId, Rbac.ACTION_MASTERS_COLOUR_EDIT, idempotencyKey, "colour:$colourId") { _ ->
             val role = actorRole(actorId)
             verdictOrThrow(role, Rbac.canMastersEdit(role), Rbac.ACTION_MASTERS_COLOUR_EDIT, colourId)
-            database.colourDao().updateDetails(colourId, cleanAr, cleanEn, grade, cleanFamily, isActive)
+            database.colourDao().updateDetails(colourId, cleanAr, cleanEn, grade, cleanFamily, isActive, cleanHex)
             MutationOutcome.Applied()
         }
     }
@@ -249,6 +257,54 @@ class MastersSettingsRepository(
             }
             if (created.isEmpty()) {
                 throw InvariantViolationException("bulk_assign_nothing_to_create")
+            }
+            database.mappingDao().insertAll(created)
+            database.inventoryDao().insertAll(
+                created.map { com.alazhartex.stock.data.local.InventoryEntity(UUID.randomUUID().toString(), it.id, 0L, 0L, null) },
+            )
+            database.rollDao().insertAll(
+                created.map { com.alazhartex.stock.data.local.RollEntity(UUID.randomUUID().toString(), it.id, "INACTIVE", 0L) },
+            )
+            createdCount = created.size
+            MutationOutcome.Applied()
+        }
+        return createdCount
+    }
+
+    /**
+     * "Load full palette" (v1.3, Swatch Book): map ONE fabric to EVERY active colour of the fabric's
+     * family in ONE warehouse — the in-app analogue of loading a physical sample card. Creates one
+     * mapping (+ zeroed inventory + zeroed INACTIVE roll row) per missing pair, in ONE transaction,
+     * ONE idempotency key, ONE audit row (reuses masters.mapping.bulk_assign RBAC: ADMIN + KEEPER).
+     * Pairs that already have a mapping are skipped, so the action is idempotent by pair.
+     * Returns the number of mappings created (0 when the palette was already complete).
+     */
+    suspend fun loadFamilyPalette(actorId: String, warehouseId: String, fabricId: String, idempotencyKey: String): Int {
+        var createdCount = 0
+        runner.withAudit(actorId, Rbac.ACTION_MASTERS_BULK_ASSIGN, idempotencyKey, "palette:$warehouseId|fabric:$fabricId") { _ ->
+            val role = actorRole(actorId)
+            verdictOrThrow(role, Rbac.canBulkAssign(role), Rbac.ACTION_MASTERS_BULK_ASSIGN, "palette:$warehouseId|fabric:$fabricId")
+            val fabric = database.fabricDao().getById(fabricId)
+                ?: throw InvariantViolationException("fabric_missing fabric=$fabricId")
+            if (database.warehouseDao().getById(warehouseId) == null) {
+                throw InvariantViolationException("warehouse_missing warehouse=$warehouseId")
+            }
+            val familyColours = database.colourDao().getAll()
+                .filter { it.isActive && it.family.equals(fabric.family, ignoreCase = true) }
+            val created = mutableListOf<com.alazhartex.stock.data.local.MappingEntity>()
+            for (colour in familyColours) {
+                if (database.mappingDao().findIds(warehouseId, fabricId, colour.id).isNotEmpty()) continue
+                created += com.alazhartex.stock.data.local.MappingEntity(
+                    id = UUID.randomUUID().toString(),
+                    warehouseId = warehouseId,
+                    fabricId = fabricId,
+                    colourId = colour.id,
+                    isActive = true,
+                )
+            }
+            if (created.isEmpty()) {
+                // Complete palette is not an error — the swatch book just reports 0 created.
+                return@withAudit MutationOutcome.Applied()
             }
             database.mappingDao().insertAll(created)
             database.inventoryDao().insertAll(

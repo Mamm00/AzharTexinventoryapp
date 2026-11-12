@@ -68,6 +68,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.LocalSnackbar
+import com.alazhartex.stock.ui.components.CustomHexRow
 import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.components.SwatchSize
@@ -257,10 +258,10 @@ fun FabricsEditScreen(app: AlAzharApp) {
             initial = null,
             customFamilies = customFamilies,
             onDismiss = { showAddFabric = false },
-            onSave = { nameEn, nameAr, family ->
+            onSave = { nameEn, nameAr, family, notes ->
                 scope.launch {
                     val message = try {
-                        app.container.mastersSettingsRepository.addFabric(ACTOR_ADMIN, nameEn, nameAr, family, UUID.randomUUID().toString())
+                        app.container.mastersSettingsRepository.addFabric(ACTOR_ADMIN, nameEn, nameAr, family, UUID.randomUUID().toString(), notes)
                         context.getString(R.string.toast_fabric_added)
                     } catch (t: Throwable) {
                         snackbarFor(context, t)
@@ -278,10 +279,10 @@ fun FabricsEditScreen(app: AlAzharApp) {
             initial = target,
             customFamilies = customFamilies,
             onDismiss = { editFabric = null },
-            onSave = { nameEn, nameAr, family ->
+            onSave = { nameEn, nameAr, family, notes ->
                 scope.launch {
                     val message = try {
-                        app.container.mastersSettingsRepository.editFabric(ACTOR_ADMIN, target.id, nameEn, nameAr, family, UUID.randomUUID().toString())
+                        app.container.mastersSettingsRepository.editFabric(ACTOR_ADMIN, target.id, nameEn, nameAr, family, UUID.randomUUID().toString(), notes)
                         context.getString(R.string.toast_saved)
                     } catch (t: Throwable) {
                         snackbarFor(context, t)
@@ -344,11 +345,11 @@ fun FabricsEditScreen(app: AlAzharApp) {
             initial = null,
             customFamilies = customFamilies,
             onDismiss = { showAddColour = false },
-            onSave = { code, nameEn, nameAr, grade, family, keeperCode, isActive ->
+            onSave = { code, nameEn, nameAr, grade, family, keeperCode, isActive, customHex ->
                 scope.launch {
                     val message = try {
                         app.container.mastersSettingsRepository.addColour(
-                            ACTOR_ADMIN, code, nameEn, nameAr, grade, family, keeperCode, UUID.randomUUID().toString(),
+                            ACTOR_ADMIN, code, nameEn, nameAr, grade, family, keeperCode, UUID.randomUUID().toString(), customHex,
                         )
                         context.getString(R.string.toast_colour_added)
                     } catch (t: Throwable) {
@@ -367,11 +368,11 @@ fun FabricsEditScreen(app: AlAzharApp) {
             initial = target,
             customFamilies = customFamilies,
             onDismiss = { editColour = null },
-            onSave = { _, nameEn, nameAr, grade, family, _, isActive ->
+            onSave = { _, nameEn, nameAr, grade, family, _, isActive, customHex ->
                 scope.launch {
                     val message = try {
                         app.container.mastersSettingsRepository.editColour(
-                            ACTOR_ADMIN, target.id, nameEn, nameAr, grade, family, isActive, UUID.randomUUID().toString(),
+                            ACTOR_ADMIN, target.id, nameEn, nameAr, grade, family, isActive, UUID.randomUUID().toString(), customHex,
                         )
                         context.getString(R.string.toast_saved)
                     } catch (t: Throwable) {
@@ -703,7 +704,7 @@ private fun ColoursTabContent(
         }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             items(items = data.colours, key = { it.id }, contentType = { "colour_row" }) { colour ->
-                val swatch = rememberAnySwatch(colour.family, colour.grade, colour.code)
+                val swatch = rememberAnySwatch(colour.family, colour.grade, colour.code, colour.customHex)
                 Card(colors = CardDefaults.cardColors()) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -783,11 +784,12 @@ private fun FabricFormDialog(
     initial: com.alazhartex.stock.data.local.FabricEntity?,
     customFamilies: List<CustomFamily>,
     onDismiss: () -> Unit,
-    onSave: (nameEn: String, nameAr: String, family: String) -> Unit,
+    onSave: (nameEn: String, nameAr: String, family: String, notes: String?) -> Unit,
 ) {
     var nameEn by remember { mutableStateOf(initial?.nameEn ?: "") }
     var nameAr by remember { mutableStateOf(initial?.nameAr ?: "") }
     var family by remember { mutableStateOf(initial?.family ?: "cotton") }
+    var notes by remember { mutableStateOf(initial?.notes ?: "") }
     val valid = nameEn.trim().isNotEmpty() && nameAr.trim().isNotEmpty()
 
     Dialog(onDismissRequest = onDismiss) {
@@ -797,8 +799,9 @@ private fun FabricFormDialog(
                 OutlinedTextField(value = nameEn, onValueChange = { nameEn = it.take(80) }, label = { Text(stringResource(R.string.label_name_en)) }, singleLine = true)
                 OutlinedTextField(value = nameAr, onValueChange = { nameAr = it.take(80) }, label = { Text(stringResource(R.string.label_name_ar)) }, singleLine = true)
                 FamilyDropdownField(stringResource(R.string.label_family), family, customFamilies) { family = it }
+                OutlinedTextField(value = notes, onValueChange = { notes = it.take(500) }, label = { Text(stringResource(R.string.fabric_notes_label)) }, minLines = 2, maxLines = 4)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(enabled = valid, onClick = { onSave(nameEn.trim(), nameAr.trim(), family) }) { Text(stringResource(R.string.action_save)) }
+                    Button(enabled = valid, onClick = { onSave(nameEn.trim(), nameAr.trim(), family, notes.trim().ifBlank { null }) }) { Text(stringResource(R.string.action_save)) }
                     TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
                 }
             }
@@ -813,7 +816,7 @@ private fun ColourFormDialog(
     initial: com.alazhartex.stock.data.local.ColourEntity?,
     customFamilies: List<CustomFamily>,
     onDismiss: () -> Unit,
-    onSave: (code: String, nameEn: String, nameAr: String, grade: String, family: String, keeperCode: String?, isActive: Boolean) -> Unit,
+    onSave: (code: String, nameEn: String, nameAr: String, grade: String, family: String, keeperCode: String?, isActive: Boolean, customHex: String?) -> Unit,
 ) {
     val isEdit = initial != null
     var code by remember { mutableStateOf(initial?.code ?: "") }
@@ -823,6 +826,7 @@ private fun ColourFormDialog(
     var family by remember { mutableStateOf(initial?.family ?: "cotton") }
     var keeperCode by remember { mutableStateOf(initial?.keeperCode ?: "") }
     var isActive by remember { mutableStateOf(initial?.isActive ?: true) }
+    var customHex by remember { mutableStateOf(initial?.customHex) }
     val codeUpper = code.trim().uppercase()
     val codeValid = codeUpper.matches(Regex("[A-Z0-9-]{1,16}"))
     val valid = codeValid && nameEn.trim().isNotEmpty() && nameAr.trim().isNotEmpty()
@@ -857,6 +861,7 @@ private fun ColourFormDialog(
                     enabled = !isEdit,
                     supportingText = { Text(stringResource(R.string.keeper_code_keeper_only)) },
                 )
+                CustomHexRow(customHex = customHex, onCustomHexChange = { customHex = it })
                 if (isEdit) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(R.string.label_active))
@@ -864,7 +869,7 @@ private fun ColourFormDialog(
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(enabled = valid, onClick = { onSave(codeUpper, nameEn.trim(), nameAr.trim(), grade, family, keeperCode.trim().ifEmpty { null }, isActive) }) { Text(stringResource(R.string.action_save)) }
+                    Button(enabled = valid, onClick = { onSave(codeUpper, nameEn.trim(), nameAr.trim(), grade, family, keeperCode.trim().ifEmpty { null }, isActive, customHex) }) { Text(stringResource(R.string.action_save)) }
                     TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
                 }
             }
@@ -974,7 +979,7 @@ private fun AssignToFabricDialog(
                     }
                     LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         items(items = filtered, key = { it.id }, contentType = { "assign_row" }) { colour ->
-                            val swatch = rememberAnySwatch(colour.family, colour.grade, colour.code)
+                            val swatch = rememberAnySwatch(colour.family, colour.grade, colour.code, colour.customHex)
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Checkbox(checked = colour.id in selectedIds, onCheckedChange = { checked ->
                                     selectedIds = if (checked) selectedIds + colour.id else selectedIds - colour.id

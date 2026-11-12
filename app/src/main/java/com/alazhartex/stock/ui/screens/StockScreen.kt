@@ -202,7 +202,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                             Text(stringResource(R.string.picker_title))
                         } else {
                             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                val itemSw = rememberAnySwatch(chosenLine.family, chosenLine.grade, chosenLine.colourCode)
+                                val itemSw = rememberAnySwatch(chosenLine.family, chosenLine.grade, chosenLine.colourCode, chosenLine.customHex)
                                 ColourSwatch(
                                     value = itemSw.argb,
                                     onColour = itemSw.onColour,

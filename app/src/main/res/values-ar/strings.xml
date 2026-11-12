@@ -244,4 +244,33 @@
     <string name="action_reload_demo">إعادة تحميل بيانات العرض</string>
     <string name="debug_row_stats">المتبقي %1$d · لفائف نشطة %2$d</string>
     <string name="debug_row_meta">المعرّف: %1$s · السعة %2$d · الأمين %3$s</string>
+    <!-- v1.3: swatch book (sample cards) + color wheel -->
+    <string name="nav_swatch_book">بطاقة العينات</string>
+    <string name="swatchbook_title">بطاقة عينات الأقمشة</string>
+    <string name="swatchbook_warehouse">المخزن</string>
+    <string name="swatchbook_show_all_fabrics">إظهار كل الأقمشة</string>
+    <string name="swatchbook_mapped_only">المقترنة فقط</string>
+    <string name="swatchbook_no_warehouses">لا توجد مخازن بعد — أضف مخزنًا من شاشة الماسترز أولًا.</string>
+    <string name="swatchbook_empty_no_mappings">لا توجد أقمشة مقترنة في هذا المخزن بعد. افعّل «إظهار كل الأقمشة» وحمّل لوحة ألوان كاملة.</string>
+    <string name="swatchbook_family">العائلة: %1$s</string>
+    <string name="swatchbook_notes">ملاحظات</string>
+    <string name="swatchbook_total_rolls">إجمالي اللفائف: %1$s</string>
+    <string name="swatchbook_mapped_count">مقترن %1$s من %2$s من ألوان العائلة</string>
+    <string name="swatchbook_unmapped">—</string>
+    <string name="swatchbook_load_palette">تحميل اللوحة كاملة (%1$s لونًا)</string>
+    <string name="swatchbook_load_confirm_title">تحميل اللوحة كاملة؟</string>
+    <string name="swatchbook_load_confirm_body">إنشاء %1$s اقترانًا لقماش %2$s في %3$s بكمية صفر، واحد لكل لون مفقود من العائلة؟ يتم تخطي الأزواج الموجودة.</string>
+    <string name="swatchbook_load_done">تم تحميل اللوحة: %1$s اقترانًا</string>
+    <string name="swatchbook_load_nothing">اللوحة مكتملة بالفعل</string>
+    <string name="color_hex_label">الرمز اللوني (#RRGGBB)</string>
+    <string name="color_presets">ألوان جاهزة</string>
+    <string name="color_favourites">المفضلة</string>
+    <string name="color_save_favourite">احفظ اللون الحالي</string>
+    <string name="color_hue_ring">عجلة درجة اللون</string>
+    <string name="color_sv_triangle">منطقة التشبع والسطوع</string>
+    <string name="color_pick">اختيار اللون</string>
+    <string name="action_clear">مسح</string>
+    <string name="color_custom_auto">تلقائي (مشتق من العائلة)</string>
+    <string name="color_custom_auto_short">تلقائي</string>
+    <string name="fabric_notes_label">ملاحظات</string>
 </resources>

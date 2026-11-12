@@ -84,7 +84,7 @@ fun DashboardScreen(app: AlAzharApp) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(stringResource(R.string.label_top_colours), style = MaterialTheme.typography.titleMedium)
                         data.topColours.forEach { tc ->
-                            val tcSw = rememberAnySwatch(tc.family, tc.grade, tc.colourCode)
+                            val tcSw = rememberAnySwatch(tc.family, tc.grade, tc.colourCode, tc.customHex)
                             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 ColourSwatch(
                                     value = tcSw.argb,

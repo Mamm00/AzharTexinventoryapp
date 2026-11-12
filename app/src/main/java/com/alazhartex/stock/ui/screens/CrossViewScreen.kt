@@ -46,6 +46,7 @@ fun CrossViewScreen(app: AlAzharApp) {
                 grade = first.grade,
                 family = first.family,
                 rolls = 0L,
+                customHex = first.customHex,
             ) to lines.filter { it.colourCode == colour }.associate { it.warehouseId to it.closing }
         }
         value = CrossData(sheds, rows)
@@ -74,7 +75,7 @@ fun CrossViewScreen(app: AlAzharApp) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(count = d.rows.size, key = { d.rows[it].first.colourCode }) { index ->
                     val (colourMeta, perShed) = d.rows[index]
-                    val cw = rememberAnySwatch(colourMeta.family, colourMeta.grade, colourMeta.colourCode)
+                    val cw = rememberAnySwatch(colourMeta.family, colourMeta.grade, colourMeta.colourCode, colourMeta.customHex)
                     val cwCd = paletteContentDescription(colourMeta.colourCode, colourMeta.colourNameEn, colourMeta.colourNameAr, colourMeta.grade)
                     Row(modifier = Modifier.horizontalScroll(hScroll).padding(vertical = 2.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Row(modifier = Modifier.width(120.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
