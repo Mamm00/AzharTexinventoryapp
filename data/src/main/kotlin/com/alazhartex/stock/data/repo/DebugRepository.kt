@@ -103,8 +103,12 @@ class DebugRepository(
                     dbPath, null, android.database.sqlite.SQLiteDatabase.OPEN_READWRITE,
                 )
                 try {
-                    conn.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
-                    conn.execSQL("VACUUM INTO '$escaped'")
+                    // PRAGMA wal_checkpoint RETURNS a row, so it cannot go through execSQL
+                    // ("Queries can be performed using SQLiteDatabase query or rawQuery methods only").
+                    conn.rawQuery("PRAGMA wal_checkpoint(TRUNCATE)", null).use { cursor ->
+                        while (cursor.moveToNext()) { /* drain the result row */ }
+                    }
+                    conn.execSQL("VACUUM INTO '$escaped'") // returns no rows — execSQL is legal here
                 } finally {
                     conn.close()
                 }
