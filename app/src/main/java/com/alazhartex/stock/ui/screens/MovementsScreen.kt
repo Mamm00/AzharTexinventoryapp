@@ -66,7 +66,6 @@ fun MovementsScreen(app: AlAzharApp) {
                                 onColour = mvSw.onColour,
                                 contentDescription = paletteContentDescription(mv.colourCode, mv.colourNameEn, mv.colourNameAr, mv.grade),
                                 size = SwatchSize.Small,
-                                grade = mv.grade,
                             )
                             Text(
                                 text = mv.type,

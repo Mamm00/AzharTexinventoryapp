@@ -91,7 +91,6 @@ fun DashboardScreen(app: AlAzharApp) {
                                     onColour = tcSw.onColour,
                                     contentDescription = paletteContentDescription(tc.colourCode, tc.colourNameEn, tc.colourNameAr, tc.grade),
                                     size = SwatchSize.Small,
-                                    grade = tc.grade,
                                 )
                                 Text(
                                     "${tc.colourCode} — ${tc.colourNameEn}",

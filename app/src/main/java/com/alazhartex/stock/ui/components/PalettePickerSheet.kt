@@ -228,7 +228,7 @@ private fun PickerCell(
     ) {
         Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                ColourSwatch(value = swatch.argb, onColour = swatch.onColour, contentDescription = cd, size = SwatchSize.Small, grade = colour.grade)
+                ColourSwatch(value = swatch.argb, onColour = swatch.onColour, contentDescription = cd, size = SwatchSize.Small)
                 Text(colour.code, style = MaterialTheme.typography.titleSmall, maxLines = 1)
             }
             Text(

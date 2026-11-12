@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,7 +17,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 /**
  * Tiny palette primitive (v1.1, delta §10.2).
@@ -27,19 +25,13 @@ import androidx.compose.ui.unit.sp
  * meaning carrier — every list/chip/picker/report also shows a text label next to it.
  * When [interactive] is true the touch target is padded to >= 48dp even at [SwatchSize.Tiny].
  */
+// v1.2.0: swatch icon size doubled (was 12/20/28/40dp); corner radius scales with it.
 enum class SwatchSize(val dp: Dp, val corner: Dp) {
-    Tiny(12.dp, 4.dp),
-    Small(20.dp, 4.dp),
-    Medium(28.dp, 6.dp),
-    Large(40.dp, 6.dp),
+    Tiny(24.dp, 8.dp),
+    Small(40.dp, 8.dp),
+    Medium(56.dp, 12.dp),
+    Large(80.dp, 12.dp),
 }
-
-private val GRADE_BADGE_COLORS = mapOf(
-    "A" to androidx.compose.ui.graphics.Color(0xFF1E7B3C),
-    "B" to androidx.compose.ui.graphics.Color(0xFF2563EB),
-    "C" to androidx.compose.ui.graphics.Color(0xFFD97706),
-    "D" to androidx.compose.ui.graphics.Color(0xFF6B7280),
-)
 
 @Composable
 fun ColourSwatch(
@@ -48,7 +40,6 @@ fun ColourSwatch(
     contentDescription: String,
     modifier: Modifier = Modifier,
     size: SwatchSize = SwatchSize.Tiny,
-    grade: String? = null,
     interactive: Boolean = false,
 ) {
     val inner: @Composable () -> Unit = {
@@ -58,11 +49,7 @@ fun ColourSwatch(
                 .height(size.dp)
                 .clip(RoundedCornerShape(size.corner))
                 .background(androidx.compose.ui.graphics.Color(value)),
-        ) {
-            if (grade != null) {
-                GradeBadge(grade = grade, modifier = Modifier.align(Alignment.TopEnd))
-            }
-        }
+        )
     }
     val outerSize = if (interactive) 48.dp else size.dp
     Box(
@@ -76,25 +63,6 @@ fun ColourSwatch(
     }
 }
 
-@Composable
-fun GradeBadge(grade: String, modifier: Modifier = Modifier) {
-    val badge = GRADE_BADGE_COLORS[grade] ?: MaterialTheme.colorScheme.outline
-    Box(
-        modifier = modifier
-            .clip(CircleShape)
-            .background(badge)
-            .width(14.dp)
-            .height(14.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = grade.take(1),
-            color = androidx.compose.ui.graphics.Color.White,
-            fontSize = 9.sp,
-            lineHeight = 9.sp,
-        )
-    }
-}
 
 /** Row of up to [cap] swatches + "+N" overflow label (Fabrics tab / family strip). */
 @Composable

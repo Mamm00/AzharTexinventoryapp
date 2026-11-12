@@ -78,7 +78,6 @@ fun InventoryScreen(app: AlAzharApp) {
                                 onColour = lineSw.onColour,
                                 contentDescription = paletteContentDescription(line.colourCode, line.colourNameEn, line.colourNameAr, line.grade),
                                 size = SwatchSize.Small,
-                                grade = line.grade,
                             )
                             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(

@@ -145,7 +145,6 @@ fun MastersScreen(app: AlAzharApp) {
                                         onColour = mSw.onColour,
                                         contentDescription = paletteContentDescription(colour.code, colour.nameEn, colour.nameAr, colour.grade),
                                         size = SwatchSize.Small,
-                                        grade = colour.grade,
                                     )
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text("${colour.code} — ${colour.nameEn}", style = MaterialTheme.typography.titleMedium)

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.alazhartex.stock.data.local.AppDatabase
 import com.alazhartex.stock.data.local.MIGRATION_1_2
+import com.alazhartex.stock.data.repo.DebugRepository
 import com.alazhartex.stock.data.repo.MastersSettingsRepository
 import com.alazhartex.stock.data.repo.ReadRepository
 import com.alazhartex.stock.data.repo.StockRepository
@@ -66,6 +67,7 @@ class AppContainer(private val context: Context) {
         }
     }
     val mastersSettingsRepository by lazy { MastersSettingsRepository(database, clock::wallMillis) }
+    val debugRepository by lazy { DebugRepository(context, database, clock::wallMillis, seedLoader) }
     val exportImportManager by lazy { ExportImportManager(context, database, clock::wallMillis, APP_VERSION) }
     val passwordHasher = PasswordHasher // exposed for tooling/tests; UI never sees it
 
@@ -89,7 +91,7 @@ class AppContainer(private val context: Context) {
         sessionPrefs.getString(KEY_BOOT_ID, null) ?: UUID.randomUUID().toString().also { rotateProcessBootId() }
 
     companion object {
-        const val APP_VERSION = "1.0.0"
+        const val APP_VERSION = "1.2.0"
         private const val KEY_BOOT_ID = "process_boot_id"
     }
 }

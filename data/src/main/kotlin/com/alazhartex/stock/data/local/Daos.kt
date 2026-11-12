@@ -42,6 +42,18 @@ interface WarehouseDao {
 
     @Query("UPDATE warehouses SET capacity_rolls = :capacity WHERE id = :id")
     suspend fun updateCapacity(id: String, capacity: Long): Int
+
+    @Query("UPDATE warehouses SET name_ar = :nameAr, name_en = :nameEn, capacity_rolls = :capacity, keeper_account_id = :keeperAccountId WHERE id = :id")
+    suspend fun updateDetails(id: String, nameAr: String, nameEn: String, capacity: Long, keeperAccountId: String): Int
+
+    @Query("DELETE FROM warehouses WHERE id = :id")
+    suspend fun delete(id: String): Int
+
+    @Query("DELETE FROM warehouses")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM warehouses")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -51,6 +63,18 @@ interface ShedAssignmentDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<ShedAssignmentEntity>)
+
+    @Query("DELETE FROM shed_assignments WHERE warehouse_id = :warehouseId")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("SELECT COUNT(*) FROM shed_assignments WHERE warehouse_id = :warehouseId")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("DELETE FROM shed_assignments")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM shed_assignments")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -165,6 +189,15 @@ interface MappingDao {
 
     @Query("SELECT id FROM mappings WHERE warehouse_id = :warehouseId AND fabric_id = :fabricId AND colour_id = :colourId")
     suspend fun findIds(warehouseId: String, fabricId: String, colourId: String): List<String>
+
+    @Query("DELETE FROM mappings WHERE warehouse_id = :warehouseId")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM mappings")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM mappings WHERE warehouse_id = :warehouseId")
+    suspend fun countForWarehouse(warehouseId: String): Long
 }
 
 /** Grouped-count row for the Fabrics Edit delete confirmation (delta §12). */
@@ -199,6 +232,18 @@ interface InventoryDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<InventoryEntity>)
+
+    @Query("DELETE FROM inventory WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM inventory")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM inventory WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("SELECT COUNT(*) FROM inventory")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -223,6 +268,18 @@ interface MovementDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<MovementEntity>)
+
+    @Query("DELETE FROM movements WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM movements")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM movements WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("SELECT COUNT(*) FROM movements")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -247,6 +304,18 @@ interface RollDao {
 
     @Query("UPDATE rolls SET count = :count WHERE mapping_id = :mappingId AND state = :state")
     suspend fun updateCount(mappingId: String, state: String, count: Long): Int
+
+    @Query("DELETE FROM rolls WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM rolls")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM rolls WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("SELECT COUNT(*) FROM rolls")
+    suspend fun countAll(): Long
 }
 
 @Dao

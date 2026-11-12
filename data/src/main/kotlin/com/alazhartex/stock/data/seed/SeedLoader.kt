@@ -21,6 +21,13 @@ import org.json.JSONObject
  * Applies the committed seed (seed-alazhartex.json, copied into app assets at build time) on first
  * launch. Idempotent via the seed-apply-v1 idempotency key + atomic Room transaction (§4.7/§9.6).
  * No numbers are typed here — every row comes from the seed artifact verified by the oracles.
+ *
+ * v1.2.0: fresh installs are BLANK — sign-in accounts and app-settings defaults are always
+ * applied, but the business dataset (warehouses, fabrics, colours, mappings, inventory,
+ * movements, rolls, shed assignments) is NOT seeded unless the debug flag
+ * [KEY_DEBUG_FULL_SEED] is set in [SEED_PREFS] (used by instrumentation tests and the debug
+ * danger-zone "reload demo data" action, which wipes operational data first). The pinned seed
+ * artifact + sha256 stay untouched; existing installs keep their data (opt-in wipe only).
  */
 class SeedLoader(
     private val context: Context,
@@ -28,27 +35,50 @@ class SeedLoader(
     private val wallClock: () -> Long,
 ) {
     private val runner = TransactionRunner(database) { wallClock() }
+    private val prefs = context.getSharedPreferences(SEED_PREFS, Context.MODE_PRIVATE)
+
     suspend fun seedIfNeeded(): MutationOutcome {
         if (database.appSettingsDao().get("seed_applied") == "true") {
             return MutationOutcome.AlreadyApplied
         }
-        val json = context.assets.open("seed-alazhartex.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
-        return runner.withAudit("system", "seed.apply", SEED_KEY, "seed") { _ ->
-            applySeed(JSONObject(json))
+        val json = readSeedJson()
+        val full = prefs.getBoolean(KEY_DEBUG_FULL_SEED, false)
+        return runner.withAudit("system", "seed.apply", SEED_KEY, if (full) "seed:full" else "seed:blank") { _ ->
+            val root = JSONObject(json)
+            applyCommon(root)
+            if (full) {
+                applyBusiness(root)
+            }
             database.appSettingsDao().upsert(AppSettingEntity("seed_applied", "true"))
             database.appSettingsDao().upsert(AppSettingEntity("app_version", APP_VERSION))
             MutationOutcome.Applied()
         }
     }
 
-    private suspend fun applySeed(root: JSONObject) {
-        val accounts = root.getJSONArray("accounts").let { arr ->
-            (0 until arr.length()).map { i ->
-                val o = arr.getJSONObject(i)
-                AccountEntity(o.getString("id"), o.getString("username"), o.getString("password_pbkdf2_sha256"), o.getString("role"), o.getString("display_name"))
-            }
+    /**
+     * Debug danger-zone action: re-applies ONLY the business dataset (warehouses .. movements +
+     * seed settings). Callers must wipe operational tables first (DebugRepository does), otherwise
+     * the insert conflicts abort the transaction. Accounts and markers are left untouched.
+     */
+    suspend fun applyDemoBusinessSeed(): MutationOutcome {
+        val json = readSeedJson()
+        return runner.withAudit("system", "debug.demo_reload", java.util.UUID.randomUUID().toString(), "seed:business") { _ ->
+            applyBusiness(JSONObject(json))
+            MutationOutcome.Applied()
         }
-        database.accountDao().insertAll(accounts)
+    }
+
+    private fun readSeedJson(): String =
+        context.assets.open("seed-alazhartex.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
+
+    /** Accounts + app-settings defaults — always applied, even on blank fresh installs. */
+    private suspend fun applyCommon(root: JSONObject) {
+        applyAccounts(root)
+        applySettings(root)
+    }
+
+    /** Warehouses, assignments, fabrics, colours, mappings, rolls, inventory, movements. */
+    private suspend fun applyBusiness(root: JSONObject) {
 
         val warehouses = root.getJSONArray("warehouses").let { arr ->
             (0 until arr.length()).map { i ->
@@ -133,6 +163,9 @@ class SeedLoader(
         }
         database.movementDao().insertAll(movements)
 
+    }
+
+    private suspend fun applySettings(root: JSONObject) {
         val settings = root.getJSONArray("settings").let { arr ->
             (0 until arr.length()).map { i ->
                 val o = arr.getJSONObject(i)
@@ -144,8 +177,20 @@ class SeedLoader(
         }
     }
 
+    private suspend fun applyAccounts(root: JSONObject) {
+        val accounts = root.getJSONArray("accounts").let { arr ->
+            (0 until arr.length()).map { i ->
+                val o = arr.getJSONObject(i)
+                AccountEntity(o.getString("id"), o.getString("username"), o.getString("password_pbkdf2_sha256"), o.getString("role"), o.getString("display_name"))
+            }
+        }
+        database.accountDao().insertAll(accounts)
+    }
+
     companion object {
         const val SEED_KEY = "seed-apply-v1"
-        const val APP_VERSION = "1.0.0"
+        const val APP_VERSION = "1.2.0"
+        const val SEED_PREFS = "alazhartex.debug"
+        const val KEY_DEBUG_FULL_SEED = "debug_full_seed_v1"
     }
 }

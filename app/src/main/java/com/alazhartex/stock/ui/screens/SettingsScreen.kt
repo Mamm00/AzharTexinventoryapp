@@ -250,6 +250,9 @@ fun SettingsScreen(app: AlAzharApp) {
                 }
             }
 
+            // ---- v1.2.0 debug danger zone (no restrictions) ----
+            DebugDangerZoneCard(app = app, actorId = ACTOR_ADMIN)
+
             // ---- import ----
             Card(colors = CardDefaults.cardColors()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

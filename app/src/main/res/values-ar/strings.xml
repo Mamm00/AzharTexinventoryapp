@@ -218,3 +218,30 @@
     <string name="custom_family_label">مخصصة</string>
     <string name="label_code">الكود</string>
 </resources>
+    <!-- v1.2.0 debug danger zone -->
+    <string name="debug_zone_title">⚠️ التحكم الكامل — بدون قيود</string>
+    <string name="debug_zone_summary">يمكن لأي حساب مسجل استخدام هذا القسم: إدارة المخازن (إضافة وتعديل وحذف — والحذف يحذف حركات المخزن المرتبطة)، أو مسح كل البيانات التشغيلية (المخازن والتعيينات والأصناف والمخزون والحركات واللفائف — مع الاحتفاظ بكتالوج الأقمشة والألوان)، أو إعادة تحميل بيانات العرض. يتم حفظ نسخة احتياطية تلقائيًا قبل أي حذف، ويُسجَّل كل إجراء في سجل التدقيق.</string>
+    <string name="debug_warehouses_title">المخازن</string>
+    <string name="debug_warehouses_empty">لا توجد مخازن. أضف مخزنًا، أو اضغط «إعادة تحميل بيانات العرض».</string>
+    <string name="action_debug_add_warehouse">إضافة مخزن</string>
+    <string name="debug_field_id">معرّف المخزن</string>
+    <string name="debug_field_name_ar">الاسم (بالعربية)</string>
+    <string name="debug_field_name_en">الاسم (بالإنجليزية)</string>
+    <string name="debug_field_keeper">أمين المخزن</string>
+    <string name="toast_warehouse_added">تمت إضافة المخزن</string>
+    <string name="toast_warehouse_updated">تم تحديث المخزن</string>
+    <string name="toast_warehouse_deleted">تم حذف المخزن</string>
+    <string name="toast_operational_wiped">تم حذف كل البيانات التشغيلية — مع الاحتفاظ بالكتالوج</string>
+    <string name="toast_demo_reloaded">تمت إعادة تحميل بيانات العرض</string>
+    <string name="dialog_delete_warehouse_title">حذف هذا المخزن؟</string>
+    <string name="dialog_delete_warehouse_body">سيتم حذف نهائيًا: %1$d صنف ربط، %2$d صف مخزون، %3$d حركة، %4$d لفة و%5$d تعيين — بالإضافة إلى المخزن نفسه. يتم الاحتفاظ بالأقمشة والألوان. تُحفظ نسخة احتياطية أولًا.</string>
+    <string name="dialog_wipe_all_title">حذف كل البيانات التشغيلية؟</string>
+    <string name="dialog_wipe_all_body">سيتم الحذف النهائي: %1$d مخزنًا، %2$d تعيينًا، %3$d صنف ربط، %4$d صف مخزون، %5$d حركة و%6$d لفة. يُحتفظ بالأقمشة والألوان (%7$d / %8$d) والحسابات والإعدادات. تُحفظ نسخة احتياطية أولًا.</string>
+    <string name="dialog_wipe_all_confirm">حذف كل شيء</string>
+    <string name="action_wipe_all">حذف كل البيانات التشغيلية</string>
+    <string name="action_keep_masters_note">يتم الاحتفاظ بالأقمشة والألوان</string>
+    <string name="dialog_reload_demo_title">إعادة تحميل بيانات العرض؟</string>
+    <string name="dialog_reload_demo_body">سيتم حذف كل البيانات التشغيلية الحالية (مثل «حذف كل البيانات التشغيلية») ثم إعادة إنشاء مخازن وأصناف ومخزون وحركات العرض من البذرة المدمجة. يُحتفظ بالحسابات والكتالوج والإعدادات.</string>
+    <string name="action_reload_demo">إعادة تحميل بيانات العرض</string>
+    <string name="debug_row_stats">المتبقي %1$d · لفائف نشطة %2$d</string>
+    <string name="debug_row_meta">المعرّف: %1$s · السعة %2$d · الأمين %3$s</string>

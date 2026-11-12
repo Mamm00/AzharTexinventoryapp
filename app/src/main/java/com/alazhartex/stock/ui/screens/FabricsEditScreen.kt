@@ -671,7 +671,6 @@ private fun FamilyRow(
                         onColour = swatch.onColour,
                         contentDescription = paletteContentDescription(sampleCode, displayName, displayName, grade),
                         size = SwatchSize.Small,
-                        grade = grade,
                     )
                 }
             }
@@ -716,7 +715,6 @@ private fun ColoursTabContent(
                             onColour = swatch.onColour,
                             contentDescription = paletteContentDescription(colour.code, colour.nameEn, colour.nameAr, colour.grade),
                             size = SwatchSize.Small,
-                            grade = colour.grade,
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text("${colour.code} — ${colour.nameEn}", style = MaterialTheme.typography.titleMedium)
@@ -986,7 +984,6 @@ private fun AssignToFabricDialog(
                                     onColour = swatch.onColour,
                                     contentDescription = paletteContentDescription(colour.code, colour.nameEn, colour.nameAr, colour.grade),
                                     size = SwatchSize.Small,
-                                    grade = colour.grade,
                                 )
                                 Text("${colour.code} — ${colour.nameEn}", style = MaterialTheme.typography.bodyMedium, maxLines = 1)
                             }
