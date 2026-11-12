@@ -45,6 +45,7 @@ data class MovementRowDto(
     val colourNameAr: String,
     val grade: String,
     val family: String,
+    val customHex: String? = null,
 )
 
 data class ColourRowDto(
