@@ -89,13 +89,29 @@ private val PINNED_FAMILY_KEYS = setOf(
     "cotton", "linen", "wool", "silk", "polyester", "viscose", "denim", "velvet", "lycra", "oxford", "poplin",
 )
 
+private val FALLBACK_SWATCH = com.alazhartex.stock.domain.palette.PaletteResolver.Swatch(
+    argb = 0xFF9E9E9E.toInt(),
+    onColour = 0xFF212121.toInt(),
+    contrastRatio = 7.0,
+)
+
+// Any resolver failure renders a neutral swatch instead of crashing the whole composition.
+private fun safeSwatch(customHex: String?, family: String, grade: String, code: String): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
+    runCatching {
+        com.alazhartex.stock.domain.palette.CustomSwatch.parse(customHex)
+            ?.let { com.alazhartex.stock.domain.palette.PaletteResolver.Swatch(it.argb, it.onColour, 0.0) }
+            ?: if (family.trim().lowercase() in PINNED_FAMILY_KEYS) {
+                com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family.trim().lowercase(), grade.trim().uppercase(), code)
+            } else {
+                com.alazhartex.stock.domain.palette.PaletteFallback.resolve(family, grade, code)
+            }
+    }.getOrDefault(FALLBACK_SWATCH)
+
 /** Resolves the swatch for (family, grade, code), memoized per code for list render paths. */
 @androidx.compose.runtime.Composable
 fun rememberSwatch(family: String, grade: String, code: String, customHex: String? = null): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
     androidx.compose.runtime.remember(family, grade, code, customHex) {
-        com.alazhartex.stock.domain.palette.CustomSwatch.parse(customHex)
-            ?.let { com.alazhartex.stock.domain.palette.PaletteResolver.Swatch(it.argb, it.onColour, 0.0) }
-            ?: com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
+        safeSwatch(customHex, family, grade, code)
     }
 
 /**
@@ -106,13 +122,7 @@ fun rememberSwatch(family: String, grade: String, code: String, customHex: Strin
 @androidx.compose.runtime.Composable
 fun rememberAnySwatch(family: String, grade: String, code: String, customHex: String? = null): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
     androidx.compose.runtime.remember(family, grade, code, customHex) {
-        com.alazhartex.stock.domain.palette.CustomSwatch.parse(customHex)
-            ?.let { com.alazhartex.stock.domain.palette.PaletteResolver.Swatch(it.argb, it.onColour, 0.0) }
-            ?: if (family in PINNED_FAMILY_KEYS) {
-                com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
-            } else {
-                com.alazhartex.stock.domain.palette.PaletteFallback.resolve(family, grade, code)
-            }
+        safeSwatch(customHex, family, grade, code)
     }
 
 /** "Colour {code} — {name} — grade {grade}" with the AR name under RTL and the EN name otherwise. */

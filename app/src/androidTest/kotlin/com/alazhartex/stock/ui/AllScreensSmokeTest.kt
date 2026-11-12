@@ -4,6 +4,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -73,5 +74,42 @@ class AllScreensSmokeTest {
             // Re-open the drawer for the next destination.
             openDrawer()
         }
+    }
+
+    /**
+     * Regression: "Add roll(s)" sheet -> Fabric dropdown -> Choose colour.
+     * The palette picker previously crashed the app (reported on v1.3.0 by a user).
+     * Seed is SHA-pinned, so wh-alwa's first sorted EN fabric name is stable.
+     */
+    @Test
+    fun addRollChooseColourOpensPickerWithoutCrash() {
+        composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
+        openDrawer()
+        composeTestRule.onNodeWithText(res(R.string.nav_stock)).performScrollTo().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.action_add_roll)), timeoutMillis = 60_000)
+
+        // Click the first card's Add roll(s) button (warehouses render in seed order).
+        composeTestRule.onAllNodesWithText(res(R.string.action_add_roll))[0].performClick()
+        composeTestRule.waitForIdle()
+
+        // Pick the fabric that is mapped in the pinned demo seed.
+        composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.label_fabric)), timeoutMillis = 30_000)
+        composeTestRule.onNodeWithText(res(R.string.label_fabric), useUnmergedTree = true).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntilAtLeastOneExists(hasText("14oz Indigo Denim"), timeoutMillis = 30_000)
+        composeTestRule.onNodeWithText("14oz Indigo Denim").performClick()
+        composeTestRule.waitForIdle()
+
+        // Open the palette picker — this was the reported crash site.
+        composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.picker_title)), timeoutMillis = 30_000)
+        composeTestRule.onNodeWithText(res(R.string.picker_title), useUnmergedTree = true).performClick()
+        composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.picker_search_hint)), timeoutMillis = 30_000)
+
+        // Rendering/grid composition is where the reported crash happens. Dismiss the picker.
+        composeTestRule.onAllNodesWithText(res(R.string.action_cancel))[0].performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(res(R.string.action_cancel)).performClick()
+        composeTestRule.waitForIdle()
     }
 }

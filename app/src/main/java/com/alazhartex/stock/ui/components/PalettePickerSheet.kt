@@ -35,8 +35,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
@@ -93,8 +93,14 @@ fun PalettePickerSheet(
     }
     val selected = colours.firstOrNull { it.code == selectedCode }
 
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Card(modifier = Modifier.fillMaxSize()) {
+    // Full-screen Box overlay instead of a second Dialog window. The picker previously hosted a
+    // nested Dialog under the calling screen's Dialog, which is reported to crash on some devices
+    // when the wheel is opened from the stock "Add roll(s)" sheet. Surface fills the host window.
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+    ) {
             Scaffold(
                 topBar = {
                     androidx.compose.material3.TopAppBar(
@@ -185,7 +191,7 @@ fun PalettePickerSheet(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            items(items = filtered, key = { it.code }, contentType = { "picker_cell" }) { colour ->
+                            items(items = filtered, key = { it.id }, contentType = { "picker_cell" }) { colour ->
                                 val available = availableByCode[colour.code]
                                 val selectable = selectableCodes == null || colour.code in selectableCodes
                                 PickerCell(
@@ -201,7 +207,6 @@ fun PalettePickerSheet(
                     }
                 }
             }
-        }
     }
 }
 
