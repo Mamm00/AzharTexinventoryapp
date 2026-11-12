@@ -50,6 +50,7 @@ class ReadRepository(private val database: AppDatabase) {
             out += InventoryLineDto(
                 mappingId = m.id,
                 warehouseId = m.warehouseId,
+                fabricId = m.fabricId,
                 fabricNameEn = f.nameEn,
                 fabricNameAr = f.nameAr,
                 colourCode = c.code,

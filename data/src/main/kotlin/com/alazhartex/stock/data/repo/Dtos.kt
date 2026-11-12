@@ -17,6 +17,7 @@ data class ShedCardDto(
 data class InventoryLineDto(
     val mappingId: String,
     val warehouseId: String,
+    val fabricId: String,
     val fabricNameEn: String,
     val fabricNameAr: String,
     val colourCode: String,
