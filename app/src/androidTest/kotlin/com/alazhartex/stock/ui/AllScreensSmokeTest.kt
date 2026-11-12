@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.waitUntilAtLeastOneExists
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -115,7 +116,7 @@ class AllScreensSmokeTest {
 
         // Pick the fabric that is mapped in the pinned demo seed.
         composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.label_fabric)), timeoutMillis = 30_000)
-        composeTestRule.onNodeWithText(res(R.string.label_fabric), useUnmergedTree = true).performClick()
+        composeTestRule.onNodeWithTag("stock_fabric_field").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntilAtLeastOneExists(hasText("14oz Indigo Denim"), timeoutMillis = 30_000)
         composeTestRule.onNodeWithText("14oz Indigo Denim").performClick()
