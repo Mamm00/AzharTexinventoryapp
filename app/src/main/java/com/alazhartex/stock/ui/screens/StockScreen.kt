@@ -106,7 +106,10 @@ fun StockScreen(app: AlAzharApp) {
                             contentDescriptionPrefix = stringResource(R.string.label_utilisation_for, card.shedId),
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(onClick = { activeDialog = MutationDialog(card.shedId, MutationKind.ADD) }) {
+                            Button(
+                                onClick = { activeDialog = MutationDialog(card.shedId, MutationKind.ADD) },
+                                modifier = Modifier.testTag("stock_add_${card.shedId}"),
+                            ) {
                                 Text(stringResource(R.string.action_add_roll))
                             }
                             OutlinedButton(onClick = { activeDialog = MutationDialog(card.shedId, MutationKind.REMOVE) }) {

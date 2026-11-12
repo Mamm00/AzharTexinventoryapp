@@ -110,8 +110,9 @@ class AllScreensSmokeTest {
         composeTestRule.waitForIdle()
         composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.action_add_roll)), timeoutMillis = 60_000)
 
-        // Click the first card's Add roll(s) button (warehouses render in seed order).
-        composeTestRule.onAllNodesWithText(res(R.string.action_add_roll))[0].performClick()
+        // Target the Al-Waha card deterministically (wh-625's single mapped fabric would
+        // otherwise break the pinned-fabric assertion).
+        composeTestRule.onNodeWithTag("stock_add_wh-alwa").performScrollTo().performClick()
         composeTestRule.waitForIdle()
 
         // Pick the fabric that is mapped in the pinned demo seed.
