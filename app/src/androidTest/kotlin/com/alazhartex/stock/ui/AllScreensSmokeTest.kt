@@ -11,8 +11,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.waitUntilAtLeastOneExists
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.MainActivity
 import com.alazhartex.stock.R
+import kotlinx.coroutines.runBlocking
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +35,22 @@ class AllScreensSmokeTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    /**
+     * Fresh installs ship BLANK (accounts only, business tables empty — see SeedLoader), so the
+     * Stock cards never render unless the pinned demo dataset is (re)applied first. Reload it
+     * before the suite, exactly like DebugDangerZoneTest does.
+     */
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun resetToDemoDataset() {
+            val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as AlAzharApp
+            runBlocking {
+                app.container.debugRepository.reloadDemoData("instrumentation-smoke")
+            }
+        }
+    }
 
     private fun res(id: Int): String = composeTestRule.activity.getString(id)
 
