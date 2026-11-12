@@ -32,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -52,6 +53,18 @@ class DebugDangerZoneTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    /**
+     * Test-order independence: some tests wipe via the UI and assert that the safety-backup
+     * count GROWS; another test verifies pruning to 3 per prefix. AndroidJUnitRunner does not
+     * guarantee method order, so always start from an empty backup set.
+     */
+    @Before
+    fun clearSafetyBackups() {
+        val dir = File(InstrumentationRegistry.getInstrumentation().targetContext.filesDir, "backups")
+        dir.listFiles { f -> f.isFile && f.name.startsWith("safety-") && f.name.endsWith(".db") }
+            ?.forEach { it.delete() }
+    }
 
     private fun res(id: Int): String = composeTestRule.activity.getString(id)
 
