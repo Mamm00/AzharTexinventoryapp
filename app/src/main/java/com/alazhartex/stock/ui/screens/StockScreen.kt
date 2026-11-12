@@ -16,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -180,10 +181,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                         ) {
                             Text(fabricName ?: stringResource(R.string.label_fabric))
-                            androidx.compose.material3.Icon(
-                                androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
-                                contentDescription = null,
-                            )
+                            androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         }
                     }
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
