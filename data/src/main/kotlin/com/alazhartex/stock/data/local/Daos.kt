@@ -104,6 +104,9 @@ interface FabricDao {
     @Query("UPDATE fabrics SET name_ar = :nameAr, name_en = :nameEn, family = :family WHERE id = :id")
     suspend fun update(id: String, nameAr: String, nameEn: String, family: String): Int
 
+    @Query("UPDATE fabrics SET notes = :notes WHERE id = :id")
+    suspend fun updateNotes(id: String, notes: String?): Int
+
     @Query("SELECT COUNT(*) FROM fabrics WHERE id != :excludeId AND name_ar = :nameAr AND name_en = :nameEn")
     suspend fun duplicateCount(excludeId: String, nameAr: String, nameEn: String): Long
 
@@ -138,8 +141,8 @@ interface ColourDao {
     @Query("UPDATE colours SET is_active = :isActive WHERE id = :id")
     suspend fun updateActive(id: String, isActive: Boolean): Int
 
-    @Query("UPDATE colours SET name_ar = :nameAr, name_en = :nameEn, grade = :grade, family = :family, is_active = :isActive WHERE id = :id")
-    suspend fun updateDetails(id: String, nameAr: String, nameEn: String, grade: String, family: String, isActive: Boolean): Int
+    @Query("UPDATE colours SET name_ar = :nameAr, name_en = :nameEn, grade = :grade, family = :family, is_active = :isActive, custom_hex = :customHex WHERE id = :id")
+    suspend fun updateDetails(id: String, nameAr: String, nameEn: String, grade: String, family: String, isActive: Boolean, customHex: String?): Int
 
     @Query("SELECT COUNT(*) FROM colours WHERE keeper_code = :keeperCode")
     suspend fun countByKeeperCode(keeperCode: String): Long

@@ -68,7 +68,7 @@ fun ColoursScreen(app: AlAzharApp) {
                 items(items = filtered, key = { it.id }, contentType = { "colour" }) { colour ->
                     Card(colors = CardDefaults.cardColors()) {
                         Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            val sw = rememberAnySwatch(colour.family, colour.grade, colour.code)
+                            val sw = rememberAnySwatch(colour.family, colour.grade, colour.code, colour.customHex)
                             ColourSwatch(
                                 value = sw.argb,
                                 onColour = sw.onColour,

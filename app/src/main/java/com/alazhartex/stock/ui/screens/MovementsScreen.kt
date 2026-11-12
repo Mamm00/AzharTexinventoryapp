@@ -60,7 +60,7 @@ fun MovementsScreen(app: AlAzharApp) {
                 items(items = filtered, key = { it.id }, contentType = { "movement" }) { mv ->
                     Card(colors = CardDefaults.cardColors()) {
                         Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            val mvSw = rememberAnySwatch(mv.family, mv.grade, mv.colourCode)
+                            val mvSw = rememberAnySwatch(mv.family, mv.grade, mv.colourCode, mv.customHex)
                             ColourSwatch(
                                 value = mvSw.argb,
                                 onColour = mvSw.onColour,

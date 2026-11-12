@@ -53,6 +53,8 @@ data class FabricEntity(
     @ColumnInfo(name = "name_ar") val nameAr: String,
     @ColumnInfo(name = "name_en") val nameEn: String,
     @ColumnInfo(name = "family") val family: String,
+    // v1.3 "Fabric Information" (images: sample-booking form) — free text, may be NULL on seeded rows.
+    @ColumnInfo(name = "notes") val notes: String? = null,
 )
 
 @Entity(
@@ -69,6 +71,8 @@ data class ColourEntity(
     @ColumnInfo(name = "family") val family: String,
     @ColumnInfo(name = "keeper_code") val keeperCode: String?,
     @ColumnInfo(name = "is_active") val isActive: Boolean,
+    // v1.3 "color selection" — user-picked #RRGGBB for this colour, NULL for every seeded colour.
+    @ColumnInfo(name = "custom_hex") val customHex: String? = null,
 )
 
 @Entity(

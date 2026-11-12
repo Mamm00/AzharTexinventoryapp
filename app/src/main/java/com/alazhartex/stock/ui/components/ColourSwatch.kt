@@ -91,23 +91,28 @@ private val PINNED_FAMILY_KEYS = setOf(
 
 /** Resolves the swatch for (family, grade, code), memoized per code for list render paths. */
 @androidx.compose.runtime.Composable
-fun rememberSwatch(family: String, grade: String, code: String): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
-    androidx.compose.runtime.remember(family, grade, code) {
-        com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
+fun rememberSwatch(family: String, grade: String, code: String, customHex: String? = null): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
+    androidx.compose.runtime.remember(family, grade, code, customHex) {
+        com.alazhartex.stock.domain.palette.CustomSwatch.parse(customHex)
+            ?.let { com.alazhartex.stock.domain.palette.PaletteResolver.Swatch(it.argb, it.onColour, 0.0) }
+            ?: com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
     }
 
 /**
  * Pinned families go through [com.alazhartex.stock.domain.palette.PaletteResolver]; anything else
  * (v1.1 custom families) goes through the deterministic [com.alazhartex.stock.domain.palette.PaletteFallback].
+ * A non-null, parseable [customHex] (user-picked in the colour wheel, v1.3) wins over both.
  */
 @androidx.compose.runtime.Composable
-fun rememberAnySwatch(family: String, grade: String, code: String): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
-    androidx.compose.runtime.remember(family, grade, code) {
-        if (family in PINNED_FAMILY_KEYS) {
-            com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
-        } else {
-            com.alazhartex.stock.domain.palette.PaletteFallback.resolve(family, grade, code)
-        }
+fun rememberAnySwatch(family: String, grade: String, code: String, customHex: String? = null): com.alazhartex.stock.domain.palette.PaletteResolver.Swatch =
+    androidx.compose.runtime.remember(family, grade, code, customHex) {
+        com.alazhartex.stock.domain.palette.CustomSwatch.parse(customHex)
+            ?.let { com.alazhartex.stock.domain.palette.PaletteResolver.Swatch(it.argb, it.onColour, 0.0) }
+            ?: if (family in PINNED_FAMILY_KEYS) {
+                com.alazhartex.stock.domain.palette.PaletteResolver.resolve(family, grade, code)
+            } else {
+                com.alazhartex.stock.domain.palette.PaletteFallback.resolve(family, grade, code)
+            }
     }
 
 /** "Colour {code} — {name} — grade {grade}" with the AR name under RTL and the EN name otherwise. */

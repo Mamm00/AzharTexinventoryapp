@@ -72,7 +72,7 @@ fun InventoryScreen(app: AlAzharApp) {
                 items(items = filtered, key = { it.mappingId }, contentType = { "inventory_line" }) { line ->
                     Card(colors = CardDefaults.cardColors()) {
                         Row(modifier = Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            val lineSw = rememberAnySwatch(line.family, line.grade, line.colourCode)
+                            val lineSw = rememberAnySwatch(line.family, line.grade, line.colourCode, line.customHex)
                             ColourSwatch(
                                 value = lineSw.argb,
                                 onColour = lineSw.onColour,

@@ -61,6 +61,7 @@ class ReadRepository(private val database: AppDatabase) {
                 closing = closing,
                 openingCache = cache,
                 inactiveRolls = inactiveRolls,
+                customHex = c.customHex,
             )
         }
         return out.sortedWith(compareBy({ it.warehouseId }, { it.fabricNameEn }, { it.colourCode }))
@@ -80,12 +81,13 @@ class ReadRepository(private val database: AppDatabase) {
                 colourNameAr = colour?.nameAr ?: "",
                 grade = colour?.grade ?: "?",
                 family = colour?.family ?: "unknown",
+                customHex = colour?.customHex,
             )
         }
     }
 
     suspend fun colours(): List<ColourRowDto> =
-        database.colourDao().getAll().map { ColourRowDto(it.id, it.code, it.nameEn, it.nameAr, it.grade, it.family, it.keeperCode, it.isActive) }
+        database.colourDao().getAll().map { ColourRowDto(it.id, it.code, it.nameEn, it.nameAr, it.grade, it.family, it.keeperCode, it.isActive, it.customHex) }
 
     suspend fun audit(limit: Int = 500, onlyBlocked: Boolean = false): List<AuditRowDto> {
         val rows = if (onlyBlocked) database.auditDao().byResult("BLOCKED") else database.auditDao().latest(limit)
@@ -118,7 +120,7 @@ class ReadRepository(private val database: AppDatabase) {
         inventoryLines()
             .filter { it.isActive }
             .groupBy { it.colourCode }
-            .map { (code, lines) -> TopColourDto(code, lines.first().colourNameEn, lines.first().colourNameAr, lines.first().grade, lines.first().family, lines.sumOf { it.closing }) }
+            .map { (code, lines) -> TopColourDto(code, lines.first().colourNameEn, lines.first().colourNameAr, lines.first().grade, lines.first().family, lines.sumOf { it.closing }, lines.first().customHex) }
             .sortedWith(compareByDescending<TopColourDto> { it.rolls }.thenBy { it.colourCode })
             .take(limit)
 

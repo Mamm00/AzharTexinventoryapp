@@ -26,6 +26,7 @@ data class InventoryLineDto(
     val family: String,
     val isActive: Boolean,
     val closing: Long,
+    val customHex: String? = null,
     val openingCache: Long,
     val inactiveRolls: Long,
 )
@@ -55,6 +56,7 @@ data class ColourRowDto(
     val family: String,
     val keeperCode: String?,
     val isActive: Boolean,
+    val customHex: String? = null,
 )
 
 data class AuditRowDto(
@@ -74,6 +76,7 @@ data class TopColourDto(
     val grade: String,
     val family: String,
     val rolls: Long,
+    val customHex: String? = null,
 )
 
 data class DashboardDto(

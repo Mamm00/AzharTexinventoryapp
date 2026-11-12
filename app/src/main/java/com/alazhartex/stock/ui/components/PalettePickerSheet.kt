@@ -215,7 +215,7 @@ private fun PickerCell(
     arabicIndic: Boolean,
     onClick: () -> Unit,
 ) {
-    val swatch = rememberAnySwatch(colour.family, colour.grade, colour.code)
+    val swatch = rememberAnySwatch(colour.family, colour.grade, colour.code, colour.customHex)
     val cd = paletteContentDescription(colour.code, colour.nameEn, colour.nameAr, colour.grade)
     Card(
         onClick = onClick,

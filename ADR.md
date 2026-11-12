@@ -117,3 +117,16 @@ Settings keeps no reset affordance. Tracked in RES-023/RES-024 and VERIFICATION.
 in the context of one shed × fabric; cells outside the shed's mapped lines render disabled. This
 preserves v1 write semantics (rolls can only move through mapped pairs) while delivering the
 pinned picker UX. Zero-stock mapped lines stay selectable for IN. See RES-027.
+
+## ADR-018 — v1.3: user-picked hex swatches (`custom_hex`) and Fabric notes (§4.3 v3)
+v1.3 adds two NULLABLE columns via `MIGRATION_2_3` (Room v3): `colours.custom_hex`
+(`#RRGGBB`, normalized by `CustomSwatch.normalizeHex`) and `fabrics.notes` (free text, Fabric
+Information form). The v1.1 pinned-palette contract (ADR-013) is preserved by construction:
+every seeded colour carries `custom_hex = NULL` and renders through the unchanged pinned
+resolver; a colour ONLY renders the custom hex when the user explicitly picked one in the
+colour-wheel dialog (`ColorWheelDialog`, brand-palette presets + 12 on-device favourites in
+SharedPreferences `alazhartex.ui`, not Room). `PaletteResolver`/`PaletteFallback` are untouched
+and the seed parity surface is unchanged. Fresh installs create both columns from the entities;
+upgrades get them from the migration. UI resolution order everywhere: custom_hex → pinned/fallback
+deterministic swatch. Trade-off accepted: a user-picked colour can diverge from the deterministic
+palette for that colour id — deliberate, user-owned, and recorded here.

@@ -139,7 +139,7 @@ fun MastersScreen(app: AlAzharApp) {
                         items(items = data.colours, key = { it.id }, contentType = { "colour" }) { colour ->
                             Card(colors = CardDefaults.cardColors()) {
                                 Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                                    val mSw = rememberAnySwatch(colour.family, colour.grade, colour.code)
+                                    val mSw = rememberAnySwatch(colour.family, colour.grade, colour.code, colour.customHex)
                                     ColourSwatch(
                                         value = mSw.argb,
                                         onColour = mSw.onColour,
