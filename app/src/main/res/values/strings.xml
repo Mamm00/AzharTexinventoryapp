@@ -209,12 +209,11 @@
     <string name="family_members_count">Fabrics: %1$d · Colours: %2$d</string>
     <string name="custom_family_label">Custom</string>
     <string name="label_code">Code</string>
-</resources>
-    <!-- v1.2.0 debug danger zone -->
+<!-- v1.2.0 debug danger zone -->
     <string name="debug_zone_title">⚠️ Debug — full control, no restrictions</string>
     <string name="debug_zone_summary">Anyone signed in may use this section: manage warehouses (add, edit, delete — deletion cascades to the stock), wipe ALL operational data (warehouses, assignments, mappings, inventory, movements, rolls — fabrics &amp; colours masters are kept) or reload the demo data. A safety backup is taken before every destructive action. Every action is audited.</string>
     <string name="debug_warehouses_title">Warehouses</string>
-    <string name="debug_warehouses_empty">No warehouses. Add one, or tap \u201cReload demo data\u201d.</string>
+    <string name="debug_warehouses_empty">No warehouses. Add one, or tap "Reload demo data".</string>
     <string name="action_debug_add_warehouse">Add warehouse</string>
     <string name="debug_field_id">Warehouse ID</string>
     <string name="debug_field_name_ar">Name (Arabic)</string>
@@ -233,7 +232,8 @@
     <string name="action_wipe_all">Delete ALL operational data</string>
     <string name="action_keep_masters_note">Masters (fabrics &amp; colours) are kept</string>
     <string name="dialog_reload_demo_title">Reload demo data?</string>
-    <string name="dialog_reload_demo_body">This deletes ALL current operational data (like \u201cDelete ALL operational data\u201d) and then re-creates the demo warehouses, mappings, inventory and movements from the built-in seed. Accounts, masters and settings are kept.</string>
+    <string name="dialog_reload_demo_body">This deletes ALL current operational data (like "Delete ALL operational data") and then re-creates the demo warehouses, mappings, inventory and movements from the built-in seed. Accounts, masters and settings are kept.</string>
     <string name="action_reload_demo">Reload demo data</string>
     <string name="debug_row_stats">closing %1$d · active rolls %2$d</string>
     <string name="debug_row_meta">id: %1$s · capacity %2$d · keeper %3$s</string>
+</resources>

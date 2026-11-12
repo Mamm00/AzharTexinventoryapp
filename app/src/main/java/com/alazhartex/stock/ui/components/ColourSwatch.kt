@@ -24,8 +24,9 @@ import androidx.compose.ui.unit.dp
  * [contentDescription] is mandatory (interpolated by the caller). The swatch is never the sole
  * meaning carrier — every list/chip/picker/report also shows a text label next to it.
  * When [interactive] is true the touch target is padded to >= 48dp even at [SwatchSize.Tiny].
+ *
+ * v1.2.0: swatch icon size doubled (was 12/20/28/40dp); corner radius scales with it.
  */
-// v1.2.0: swatch icon size doubled (was 12/20/28/40dp); corner radius scales with it.
 enum class SwatchSize(val dp: Dp, val corner: Dp) {
     Tiny(24.dp, 8.dp),
     Small(40.dp, 8.dp),

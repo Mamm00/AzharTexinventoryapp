@@ -217,8 +217,7 @@
     <string name="family_members_count">خامات: %1$d · ألوان: %2$d</string>
     <string name="custom_family_label">مخصصة</string>
     <string name="label_code">الكود</string>
-</resources>
-    <!-- v1.2.0 debug danger zone -->
+<!-- v1.2.0 debug danger zone -->
     <string name="debug_zone_title">⚠️ التحكم الكامل — بدون قيود</string>
     <string name="debug_zone_summary">يمكن لأي حساب مسجل استخدام هذا القسم: إدارة المخازن (إضافة وتعديل وحذف — والحذف يحذف حركات المخزن المرتبطة)، أو مسح كل البيانات التشغيلية (المخازن والتعيينات والأصناف والمخزون والحركات واللفائف — مع الاحتفاظ بكتالوج الأقمشة والألوان)، أو إعادة تحميل بيانات العرض. يتم حفظ نسخة احتياطية تلقائيًا قبل أي حذف، ويُسجَّل كل إجراء في سجل التدقيق.</string>
     <string name="debug_warehouses_title">المخازن</string>
@@ -245,3 +244,4 @@
     <string name="action_reload_demo">إعادة تحميل بيانات العرض</string>
     <string name="debug_row_stats">المتبقي %1$d · لفائف نشطة %2$d</string>
     <string name="debug_row_meta">المعرّف: %1$s · السعة %2$d · الأمين %3$s</string>
+</resources>
