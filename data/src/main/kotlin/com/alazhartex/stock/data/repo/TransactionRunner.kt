@@ -4,8 +4,10 @@ import androidx.room.withTransaction
 import com.alazhartex.stock.data.local.AppDatabase
 import com.alazhartex.stock.data.local.AuditLogEntity
 import com.alazhartex.stock.domain.idempotency.MutationOutcome
+import com.alazhartex.stock.domain.model.DuplicateValueException
 import com.alazhartex.stock.domain.model.InvariantViolationException
 import com.alazhartex.stock.domain.model.RbacDeniedException
+import com.alazhartex.stock.domain.model.ReferencedByException
 import com.alazhartex.stock.domain.model.ShortfallException
 import java.util.UUID
 
@@ -60,6 +62,8 @@ class TransactionRunner(
             is ShortfallException -> "shortfall shortfall=${e.shortfall}"
             is RbacDeniedException -> e.reasonKey
             is InvariantViolationException -> "invariant_violation ${e.message}"
+            is DuplicateValueException -> e.reasonKey
+            is ReferencedByException -> e.reasonKey
             else -> "error ${e.javaClass.simpleName}"
         }
         try {

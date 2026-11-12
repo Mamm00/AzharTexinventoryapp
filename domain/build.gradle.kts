@@ -12,6 +12,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.kotest.property)
+    testImplementation(libs.json)
 }
 
 detekt {

@@ -1,6 +1,7 @@
 package com.alazhartex.stock.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,11 @@ import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.SwatchSize
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 
 @Composable
@@ -31,9 +36,17 @@ fun CrossViewScreen(app: AlAzharApp) {
         val cards = app.container.readRepository.shedCards()
         val lines = app.container.readRepository.inventoryLines().filter { it.isActive }
         val sheds = cards.map { it.shedId }
-        val byColour = lines.groupBy { "${it.colourCode}" }
+        val byColour = lines.groupBy { it.colourCode }
         val rows = byColour.keys.sorted().map { colour ->
-            colour to lines.filter { it.colourCode == colour }.associate { it.warehouseId to it.closing }
+            val first = byColour.getValue(colour).first()
+            com.alazhartex.stock.data.repo.TopColourDto(
+                colourCode = colour,
+                colourNameEn = first.colourNameEn,
+                colourNameAr = first.colourNameAr,
+                grade = first.grade,
+                family = first.family,
+                rolls = 0L,
+            ) to lines.filter { it.colourCode == colour }.associate { it.warehouseId to it.closing }
         }
         value = CrossData(sheds, rows)
     }
@@ -59,14 +72,26 @@ fun CrossViewScreen(app: AlAzharApp) {
             }
             HorizontalDivider()
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(count = d.rows.size, key = { d.rows[it].first }) { index ->
-                    val (colour, perShed) = d.rows[index]
-                    Row(modifier = Modifier.horizontalScroll(hScroll).padding(vertical = 2.dp)) {
-                        Column(modifier = Modifier.width(120.dp)) { Text(colour, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium) }
+                items(count = d.rows.size, key = { d.rows[it].first.colourCode }) { index ->
+                    val (colourMeta, perShed) = d.rows[index]
+                    val cw = rememberAnySwatch(colourMeta.family, colourMeta.grade, colourMeta.colourCode)
+                    val cwCd = paletteContentDescription(colourMeta.colourCode, colourMeta.colourNameEn, colourMeta.colourNameAr, colourMeta.grade)
+                    Row(modifier = Modifier.horizontalScroll(hScroll).padding(vertical = 2.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Row(modifier = Modifier.width(120.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            ColourSwatch(value = cw.argb, onColour = cw.onColour, contentDescription = cwCd, size = SwatchSize.Small)
+                            Text(colourMeta.colourCode, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+                        }
                         d.sheds.forEach { shed ->
                             Column(modifier = Modifier.width(92.dp)) {
                                 val v = perShed[shed]
-                                Text(if (v == null || v == 0L) "·" else integerString(v, arabicIndic), style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+                                if (v == null || v == 0L) {
+                                    Text("·", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+                                } else {
+                                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        ColourSwatch(value = cw.argb, onColour = cw.onColour, contentDescription = cwCd, size = SwatchSize.Tiny)
+                                        Text(integerString(v, arabicIndic), style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+                                    }
+                                }
                             }
                         }
                     }
@@ -77,4 +102,7 @@ fun CrossViewScreen(app: AlAzharApp) {
     }
 }
 
-private data class CrossData(val sheds: List<String>, val rows: List<Pair<String, Map<String, Long>>>)
+private data class CrossData(
+    val sheds: List<String>,
+    val rows: List<Pair<com.alazhartex.stock.data.repo.TopColourDto, Map<String, Long>>>,
+)

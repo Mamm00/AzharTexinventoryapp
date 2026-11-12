@@ -19,8 +19,8 @@ android {
         applicationId = "com.alazhartex.stock"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -96,6 +96,7 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(libs.core.ktx)
+    implementation(libs.core.splashscreen)
     implementation(libs.activity.compose)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.viewmodel.compose)

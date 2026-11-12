@@ -42,6 +42,18 @@ interface WarehouseDao {
 
     @Query("UPDATE warehouses SET capacity_rolls = :capacity WHERE id = :id")
     suspend fun updateCapacity(id: String, capacity: Long): Int
+
+    @Query("UPDATE warehouses SET name_ar = :nameAr, name_en = :nameEn, capacity_rolls = :capacity, keeper_account_id = :keeperAccountId WHERE id = :id")
+    suspend fun updateDetails(id: String, nameAr: String, nameEn: String, capacity: Long, keeperAccountId: String): Int
+
+    @Query("DELETE FROM warehouses WHERE id = :id")
+    suspend fun delete(id: String): Int
+
+    @Query("DELETE FROM warehouses")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM warehouses")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -51,6 +63,18 @@ interface ShedAssignmentDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<ShedAssignmentEntity>)
+
+    @Query("DELETE FROM shed_assignments WHERE warehouse_id = :warehouseId")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("SELECT COUNT(*) FROM shed_assignments WHERE warehouse_id = :warehouseId")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("DELETE FROM shed_assignments")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM shed_assignments")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -64,6 +88,10 @@ interface FabricDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<FabricEntity>)
 
+    /** Demo-reload path: keep the user's existing masters, insert only what is missing. */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAllIgnore(rows: List<FabricEntity>)
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(row: FabricEntity)
 
@@ -72,6 +100,15 @@ interface FabricDao {
 
     @Query("DELETE FROM fabrics WHERE id = :id")
     suspend fun delete(id: String): Int
+
+    @Query("UPDATE fabrics SET name_ar = :nameAr, name_en = :nameEn, family = :family WHERE id = :id")
+    suspend fun update(id: String, nameAr: String, nameEn: String, family: String): Int
+
+    @Query("SELECT COUNT(*) FROM fabrics WHERE id != :excludeId AND name_ar = :nameAr AND name_en = :nameEn")
+    suspend fun duplicateCount(excludeId: String, nameAr: String, nameEn: String): Long
+
+    @Query("SELECT COUNT(*) FROM fabrics WHERE name_ar = :nameAr AND name_en = :nameEn")
+    suspend fun duplicateCount(nameAr: String, nameEn: String): Long
 }
 
 @Dao
@@ -88,6 +125,10 @@ interface ColourDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<ColourEntity>)
 
+    /** Demo-reload path: keep the user's existing masters, insert only what is missing. */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAllIgnore(rows: List<ColourEntity>)
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(row: ColourEntity)
 
@@ -97,8 +138,20 @@ interface ColourDao {
     @Query("UPDATE colours SET is_active = :isActive WHERE id = :id")
     suspend fun updateActive(id: String, isActive: Boolean): Int
 
+    @Query("UPDATE colours SET name_ar = :nameAr, name_en = :nameEn, grade = :grade, family = :family, is_active = :isActive WHERE id = :id")
+    suspend fun updateDetails(id: String, nameAr: String, nameEn: String, grade: String, family: String, isActive: Boolean): Int
+
     @Query("SELECT COUNT(*) FROM colours WHERE keeper_code = :keeperCode")
     suspend fun countByKeeperCode(keeperCode: String): Long
+
+    @Query("SELECT COUNT(*) FROM mappings WHERE colour_id = :colourId")
+    suspend fun mappingCountForColour(colourId: String): Long
+
+    @Query("SELECT COUNT(*) FROM colours WHERE id != :excludeId AND code = :code")
+    suspend fun duplicateCodeCount(excludeId: String, code: String): Long
+
+    @Query("DELETE FROM colours WHERE id = :id")
+    suspend fun delete(id: String): Int
 }
 
 @Dao
@@ -124,6 +177,15 @@ interface MappingDao {
     @Query("SELECT COUNT(*) FROM mappings WHERE is_active = 0")
     suspend fun countInactive(): Long
 
+    @Query("SELECT COUNT(*) FROM mappings WHERE fabric_id = :fabricId")
+    suspend fun mappingCountForFabric(fabricId: String): Long
+
+    @Query("SELECT fabric_id, COUNT(*) AS count FROM mappings GROUP BY fabric_id")
+    suspend fun mappingCountsByFabric(): List<FabricMappingCount>
+
+    @Query("SELECT colour_id, COUNT(*) AS count FROM mappings GROUP BY colour_id")
+    suspend fun mappingCountsByColour(): List<ColourMappingCount>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<MappingEntity>)
 
@@ -132,7 +194,25 @@ interface MappingDao {
 
     @Query("UPDATE mappings SET is_active = :isActive WHERE id = :id")
     suspend fun updateActive(id: String, isActive: Boolean): Int
+
+    @Query("SELECT id FROM mappings WHERE warehouse_id = :warehouseId AND fabric_id = :fabricId AND colour_id = :colourId")
+    suspend fun findIds(warehouseId: String, fabricId: String, colourId: String): List<String>
+
+    @Query("DELETE FROM mappings WHERE warehouse_id = :warehouseId")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM mappings")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM mappings WHERE warehouse_id = :warehouseId")
+    suspend fun countForWarehouse(warehouseId: String): Long
 }
+
+/** Grouped-count row for the Fabrics Edit delete confirmation (delta §12). */
+data class FabricMappingCount(val fabric_id: String, val count: Long)
+
+/** Grouped-count row for the Fabrics Edit colour usage strip (delta §12). */
+data class ColourMappingCount(val colour_id: String, val count: Long)
 
 @Dao
 interface InventoryDao {
@@ -160,6 +240,18 @@ interface InventoryDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<InventoryEntity>)
+
+    @Query("DELETE FROM inventory WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM inventory")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM inventory WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("SELECT COUNT(*) FROM inventory")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -169,6 +261,9 @@ interface MovementDao {
 
     @Query("SELECT COALESCE(SUM(qty_delta), 0) FROM movements WHERE mapping_id = :mappingId")
     suspend fun sumDeltaFor(mappingId: String): Long
+
+    @Query("SELECT COUNT(*) FROM movements mv JOIN mappings m ON m.id = mv.mapping_id WHERE m.colour_id = :colourId")
+    suspend fun countForColour(colourId: String): Long
 
     @Query("SELECT COUNT(*) FROM movements WHERE idempotency_key = :key")
     suspend fun countByIdempotency(key: String): Long
@@ -181,6 +276,18 @@ interface MovementDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<MovementEntity>)
+
+    @Query("DELETE FROM movements WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM movements")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM movements WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("SELECT COUNT(*) FROM movements")
+    suspend fun countAll(): Long
 }
 
 @Dao
@@ -197,11 +304,26 @@ interface RollDao {
     @Query("SELECT COALESCE(SUM(count), 0) FROM rolls r JOIN mappings m ON m.id = r.mapping_id WHERE r.state = 'ACTIVE' AND m.warehouse_id = :warehouseId")
     suspend fun sumActiveForShed(warehouseId: String): Long
 
+    @Query("SELECT COALESCE(SUM(count), 0) FROM rolls r JOIN mappings m ON m.id = r.mapping_id WHERE r.state = :state AND m.colour_id = :colourId")
+    suspend fun sumForColour(colourId: String, state: String): Long
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<RollEntity>)
 
     @Query("UPDATE rolls SET count = :count WHERE mapping_id = :mappingId AND state = :state")
     suspend fun updateCount(mappingId: String, state: String, count: Long): Int
+
+    @Query("DELETE FROM rolls WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun deleteForWarehouse(warehouseId: String): Int
+
+    @Query("DELETE FROM rolls")
+    suspend fun deleteAll(): Int
+
+    @Query("SELECT COUNT(*) FROM rolls WHERE mapping_id IN (SELECT id FROM mappings WHERE warehouse_id = :warehouseId)")
+    suspend fun countForWarehouse(warehouseId: String): Long
+
+    @Query("SELECT COUNT(*) FROM rolls")
+    suspend fun countAll(): Long
 }
 
 @Dao

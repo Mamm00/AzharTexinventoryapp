@@ -39,3 +39,24 @@ rulings: **RESOLUTIONS.md** · content pins: **CONTENT.md** · plan: **PLAN.md**
 All data is in the app's private storage on the device. Export from Settings → "Export
 database" regularly and keep the `.db` + `.sha256` pair somewhere safe. Import verifies
 both before touching anything.
+
+## v1.1.0 — Tiny palette, Fabrics Edit, Room v2
+
+- **Deterministic tiny palette** — every colour's appearance is a pure function of `(family, grade, code)`
+  via a pinned FNV-1a-32 → LCH(D65) → sRGB pipeline (`domain/.../PaletteResolver.kt`). `palette-report.txt`
+  (208 rows) is committed and byte-compared in CI. Contrast on every colour ≥ 4.5. Nothing is stored;
+  swatches re-derive at render time.
+- **Colour swatches everywhere** — inventory, movements, colours, cross-view, masters, dashboard
+  top-colours and the stock pickers. CSV/print output stays code-only by design.
+- **New screen #13 — Fabrics Edit** (drawer, Masters button, Settings shortcut): tabs **Fabrics**
+  (ADMIN add/edit/delete; KEEPER add-only; two-step delete with exact counts + type `DELETE`),
+  **Types** (11 pinned families with gradient strips, member counts, A/B/C samples; ADMIN can add
+  custom families, stored in-app only, hue anchor pinned to (max+25) mod 360 → nearest 5°), and
+  **Colours** (code immutable for seeded colours, KEEPER gets a `K-` keeper-code prefix; delete is
+  refused while any mapping/roll/movement references the colour; **Assign to fabric** bulk-creates
+  zeroed mappings across all sheds in one audited transaction).
+- **Palette picker** in the Stock add/adjust+ flows (search AR/EN, grade + family filters,
+  pinned order grade→code, sticky selection footer).
+- **Room v2** — UNIQUE fabric `(name_ar, name_en)` enforced by migration (identity-hash-stable raw
+  index) and again inside the transaction; v1 installs upgrade in place. **Factory Reset is not in
+  this release** (see VERIFICATION.md / ADR-016); it lands in v1.2.0.

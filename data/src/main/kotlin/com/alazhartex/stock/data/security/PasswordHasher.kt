@@ -2,9 +2,9 @@ package com.alazhartex.stock.data.security
 
 import java.security.MessageDigest
 import java.security.SecureRandom
+import java.util.Base64
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
-import java.util.Base64
 
 /**
  * PBKDF2-SHA256 (spec §4.7): salt >= 16 bytes, iterations >= 100,000 (seed uses 210,000),

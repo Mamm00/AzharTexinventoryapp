@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -13,12 +14,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -43,9 +44,14 @@ import com.alazhartex.stock.domain.idempotency.MutationOutcome
 import com.alazhartex.stock.domain.model.MovementType
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
 import com.alazhartex.stock.ui.LocalSnackbar
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.PalettePickerSheet
+import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.UtilisationGauge
 import com.alazhartex.stock.ui.components.bucketLabelFor
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 import com.alazhartex.stock.ui.percentDisplay
 import java.util.UUID
@@ -139,11 +145,16 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
         lines = app.container.readRepository.inventoryLines(dialog.shedId).filter { it.isActive }
     }
     var expanded by remember { mutableStateOf(false) }
+    var fabricName by remember { mutableStateOf<String?>(null) }
     var selected by remember { mutableStateOf<com.alazhartex.stock.data.repo.InventoryLineDto?>(null) }
+    var showPicker by remember { mutableStateOf(false) }
     var qtyText by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
     var sign by remember { mutableStateOf(1) } // ADJUST only: +1 add, -1 remove
     var busy by remember { mutableStateOf(false) }
+    val fabrics = remember(lines) { lines.map { it.fabricNameEn }.distinct().sorted() }
+    val fabricLines = remember(lines, fabricName) { lines.filter { it.fabricNameEn == fabricName } }
+    val fabricFamily = fabricLines.firstOrNull()?.family
 
     Dialog(onDismissRequest = onClose) {
         Card(modifier = Modifier.fillMaxSize()) {
@@ -161,22 +172,45 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                 ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
                     OutlinedTextField(
                         readOnly = true,
-                        value = selected?.let { "${it.fabricNameEn} · ${it.colourCode} · ${it.grade} (${integerString(it.closing, arabicIndic)})" }
-                            ?: stringResource(R.string.label_fabric),
+                        value = fabricName ?: "",
                         onValueChange = {},
                         label = { Text(stringResource(R.string.label_fabric)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
+                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true).fillMaxWidth(),
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        lines.forEach { line ->
+                        fabrics.forEach { name ->
                             DropdownMenuItem(
-                                text = { Text("${line.fabricNameEn} · ${line.colourCode} · ${line.grade} — ${line.closing}") },
+                                text = { Text(name) },
                                 onClick = {
-                                    selected = line
+                                    fabricName = name
+                                    selected = null
                                     expanded = false
                                 },
                             )
+                        }
+                    }
+                }
+
+                if (fabricName != null) {
+                    val chosenLine = selected
+                    OutlinedButton(
+                        onClick = { showPicker = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        if (chosenLine == null) {
+                            Text(stringResource(R.string.picker_title))
+                        } else {
+                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                val itemSw = rememberAnySwatch(chosenLine.family, chosenLine.grade, chosenLine.colourCode)
+                                ColourSwatch(
+                                    value = itemSw.argb,
+                                    onColour = itemSw.onColour,
+                                    contentDescription = paletteContentDescription(chosenLine.colourCode, chosenLine.colourNameEn, chosenLine.colourNameAr, chosenLine.grade),
+                                    size = SwatchSize.Small,
+                                )
+                                Text("${chosenLine.colourCode} — ${chosenLine.colourNameEn} (${integerString(chosenLine.closing, arabicIndic)})")
+                            }
                         }
                     }
                 }
@@ -194,6 +228,20 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                             label = { Text("-") },
                         )
                     }
+                }
+
+                if (showPicker) {
+                    PalettePickerSheet(
+                        app = app,
+                        fixedFamily = fabricFamily,
+                        selectableCodes = fabricLines.map { it.colourCode }.toSet(),
+                        availableByCode = fabricLines.associate { it.colourCode to it.closing },
+                        onDismiss = { showPicker = false },
+                        onConfirm = { colour ->
+                            selected = fabricLines.firstOrNull { it.colourCode == colour.code }
+                            showPicker = false
+                        },
+                    )
                 }
 
                 OutlinedTextField(

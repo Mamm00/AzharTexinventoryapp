@@ -1,5 +1,6 @@
 package com.alazhartex.seed
 
+import com.alazhartex.stock.domain.palette.PaletteResolver
 import java.io.File
 import java.security.MessageDigest
 import java.time.Instant
@@ -290,13 +291,30 @@ class SeedBuild(val outDir: File) {
         applyDeltasAndValidate(inventory, movements)
         val (jsonText, reportText) = emit(colours, fabrics, mappings, rollActive, rollInactive, inventory, movements)
 
+        val paletteText = buildPaletteReport(colours)
         val jsonFile = File(outDir, "seed-alazhartex.json")
         val reportFile = File(outDir, "seed-report.txt")
+        val paletteFile = File(outDir, "palette-report.txt")
         jsonFile.writeText(jsonText, Charsets.UTF_8)
         reportFile.writeText(reportText, Charsets.UTF_8)
+        paletteFile.writeText(paletteText, Charsets.UTF_8)
         println("wrote ${jsonFile.absolutePath}")
         println("wrote ${reportFile.absolutePath}")
+        println("wrote ${paletteFile.absolutePath}")
         return 0
+    }
+
+    /** v1.1 (delta §10.1): 208 swatch rows. Oracle for D20/D21; the app never reads this file at runtime. */
+    private fun buildPaletteReport(colours: List<GenColour>): String = buildString {
+        append("alazhartex-palette-report v1\n")
+        append("generator=${SeedGenerator.GENERATOR_ID}\n")
+        append("colours=${colours.size}\n")
+        for (c in colours) {
+            val sw = PaletteResolver.resolve(c.family, c.grade, c.code)
+            val ratio = Math.round(sw.contrastRatio * 10000.0) / 10000.0
+            append(c.id).append(',').append(sw.hex()).append(',').append(sw.onHex()).append(',')
+                .append(String.format(java.util.Locale.ROOT, "%.4f", ratio)).append('\n')
+        }
     }
 
     // ---- colours ----

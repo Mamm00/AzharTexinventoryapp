@@ -25,7 +25,11 @@ import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.SwatchSize
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.dateTimeString
 import com.alazhartex.stock.ui.integerString
 
@@ -55,7 +59,14 @@ fun MovementsScreen(app: AlAzharApp) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 items(items = filtered, key = { it.id }, contentType = { "movement" }) { mv ->
                     Card(colors = CardDefaults.cardColors()) {
-                        Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            val mvSw = rememberAnySwatch(mv.family, mv.grade, mv.colourCode)
+                            ColourSwatch(
+                                value = mvSw.argb,
+                                onColour = mvSw.onColour,
+                                contentDescription = paletteContentDescription(mv.colourCode, mv.colourNameEn, mv.colourNameAr, mv.grade),
+                                size = SwatchSize.Small,
+                            )
                             Text(
                                 text = mv.type,
                                 style = MaterialTheme.typography.labelLarge,
@@ -67,7 +78,7 @@ fun MovementsScreen(app: AlAzharApp) {
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Column(modifier = Modifier.weight(1.6f)) {
-                                Text("${mv.warehouseId} · ${mv.mappingId}", style = MaterialTheme.typography.bodySmall)
+                                Text("${mv.warehouseId} · ${mv.colourCode} · ${mv.mappingId}", style = MaterialTheme.typography.bodySmall)
                                 Text(dateTimeString(mv.atMillis), style = MaterialTheme.typography.bodySmall)
                                 if (mv.note.isNotBlank()) Text(mv.note, style = MaterialTheme.typography.bodySmall)
                             }

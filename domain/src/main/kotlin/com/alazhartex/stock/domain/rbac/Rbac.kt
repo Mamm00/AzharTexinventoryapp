@@ -16,6 +16,14 @@ object Rbac {
     const val ACTION_REGRADE = "regrade"
     const val ACTION_MASTERS_ADD = "masters.add"
     const val ACTION_MASTERS_DELETE = "masters.delete"
+    const val ACTION_MASTERS_FABRIC_ADD = "masters.fabric.add"
+    const val ACTION_MASTERS_FABRIC_EDIT = "masters.fabric.edit"
+    const val ACTION_MASTERS_FABRIC_DELETE = "masters.fabric.delete"
+    const val ACTION_MASTERS_COLOUR_ADD = "masters.colour.add"
+    const val ACTION_MASTERS_COLOUR_EDIT = "masters.colour.edit"
+    const val ACTION_MASTERS_COLOUR_DELETE = "masters.colour.delete"
+    const val ACTION_MASTERS_BULK_ASSIGN = "masters.mapping.bulk_assign"
+    const val ACTION_MASTERS_FAMILY_CUSTOM_ADD = "masters.family.custom.add"
     const val ACTION_SETTINGS = "settings"
     const val ACTION_EXPORT = "export"
     const val ACTION_IMPORT = "import"
@@ -61,6 +69,24 @@ object Rbac {
             Role.KEEPER -> Verdict(false, "rbac.deny.keeper_settings")
             Role.SALES_MANAGER -> Verdict(false, "rbac.deny.sales_manager_settings")
         }
+
+    // ---------- v1.1 Fabrics Edit tiers (delta contract §12/G12) ----------
+    /** Fabric/colour edit and delete + custom families + family management: ADMIN only. */
+    fun canMastersEdit(role: Role): Verdict =
+        when (role) {
+            Role.ADMIN -> Verdict(true)
+            Role.KEEPER -> Verdict(false, "rbac.deny.keeper_masters_edit")
+            Role.SALES_MANAGER -> Verdict(false, "rbac.deny.sales_manager_masters")
+        }
+
+    /** Colour + fabric add-only tier: ADMIN and KEEPER (SALES_MANAGER read-only). */
+    fun canFabricsAddColours(role: Role): Verdict = canMastersAdd(role)
+
+    /** Bulk assign (mapping fan-out) is a masters ADD operation: ADMIN + KEEPER. */
+    fun canBulkAssign(role: Role): Verdict = canMastersAdd(role)
+
+    /** Custom family creation (app_settings, not Room): ADMIN only. */
+    fun canCustomFamilyAdd(role: Role): Verdict = canMastersEdit(role)
 
     fun canExportImport(role: Role): Verdict =
         when (role) {

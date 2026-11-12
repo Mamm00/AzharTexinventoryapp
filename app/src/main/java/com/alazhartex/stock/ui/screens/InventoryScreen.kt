@@ -2,6 +2,7 @@ package com.alazhartex.stock.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +25,11 @@ import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.SwatchSize
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 
 @Composable
@@ -66,7 +71,15 @@ fun InventoryScreen(app: AlAzharApp) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(items = filtered, key = { it.mappingId }, contentType = { "inventory_line" }) { line ->
                     Card(colors = CardDefaults.cardColors()) {
-                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Row(modifier = Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            val lineSw = rememberAnySwatch(line.family, line.grade, line.colourCode)
+                            ColourSwatch(
+                                value = lineSw.argb,
+                                onColour = lineSw.onColour,
+                                contentDescription = paletteContentDescription(line.colourCode, line.colourNameEn, line.colourNameAr, line.grade),
+                                size = SwatchSize.Small,
+                            )
+                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(
                                 "${line.fabricNameEn} · ${line.colourCode} ${line.colourNameEn}",
                                 style = MaterialTheme.typography.titleMedium,
@@ -79,6 +92,7 @@ fun InventoryScreen(app: AlAzharApp) {
                                 "${stringResource(R.string.label_total_rolls)}: ${integerString(line.closing, arabicIndic)} · ${stringResource(R.string.label_inactive_rolls)}: ${integerString(line.inactiveRolls, arabicIndic)}",
                                 style = MaterialTheme.typography.bodyMedium,
                             )
+                            }
                         }
                     }
                 }

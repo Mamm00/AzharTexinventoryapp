@@ -5,12 +5,17 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -30,28 +35,37 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.alazhartex.stock.AlAzharApp
+import com.alazhartex.stock.ui.LocalNavigate
+import com.alazhartex.stock.BuildConfig
 import com.alazhartex.stock.MainActivity
 import com.alazhartex.stock.R
 import com.alazhartex.stock.data.transfer.ExportImportManager
 import com.alazhartex.stock.ui.LocalSnackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SettingsScreen(app: AlAzharApp) {
     val context = LocalContext.current
     val snackbar = LocalSnackbar.current
     val scope = rememberCoroutineScope()
+    val navigate = LocalNavigate.current
     val prefs = context.getSharedPreferences(MainActivity.LOCALE_PREFS, Context.MODE_PRIVATE)
     var language by remember { mutableStateOf(prefs.getString(MainActivity.KEY_LANGUAGE, "ar") ?: "ar") }
     var digits by remember { mutableStateOf(app.container.digitsFlow.value) }
@@ -163,6 +177,20 @@ fun SettingsScreen(app: AlAzharApp) {
                 }
             }
 
+            // ---- masters catalogue shortcut (v1.1) ----
+            Card(colors = CardDefaults.cardColors()) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(stringResource(R.string.settings_masters_entry), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    Button(onClick = { navigate(com.alazhartex.stock.ui.navigation.Routes.FABRICS_EDIT) }) {
+                        Text(stringResource(R.string.nav_fabrics_edit))
+                    }
+                }
+            }
+
             // ---- letterhead ----
             Card(colors = CardDefaults.cardColors()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -222,6 +250,9 @@ fun SettingsScreen(app: AlAzharApp) {
                 }
             }
 
+            // ---- v1.2.0 debug danger zone (no restrictions) ----
+            DebugDangerZoneCard(app = app, actorId = ACTOR_ADMIN)
+
             // ---- import ----
             Card(colors = CardDefaults.cardColors()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -233,6 +264,36 @@ fun SettingsScreen(app: AlAzharApp) {
                     }
                     importStage?.let { Text("db: ${it.name}", style = MaterialTheme.typography.bodySmall) }
                     importSidecar?.let { Text("sidecar: ${it.name}", style = MaterialTheme.typography.bodySmall) }
+                }
+            }
+
+            // ---- about / brand ----
+            Card(colors = CardDefaults.cardColors()) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(stringResource(R.string.about_title), style = MaterialTheme.typography.titleMedium)
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.alazhartex_logo),
+                            // decorative — the company name text sits below it
+                            contentDescription = null,
+                            modifier = Modifier.height(88.dp),
+                            contentScale = ContentScale.Fit,
+                        )
+                    }
+                    Text(stringResource(R.string.brand_company), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.brand_tagline), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.about_version, BuildConfig.VERSION_NAME), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.about_offline), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.about_copyright), style = MaterialTheme.typography.labelSmall)
                 }
             }
         }

@@ -25,7 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
+import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.SwatchSize
+import com.alazhartex.stock.ui.components.paletteContentDescription
+import com.alazhartex.stock.ui.components.rememberAnySwatch
 
 @Composable
 fun ColoursScreen(app: AlAzharApp) {
@@ -63,7 +67,14 @@ fun ColoursScreen(app: AlAzharApp) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 items(items = filtered, key = { it.id }, contentType = { "colour" }) { colour ->
                     Card(colors = CardDefaults.cardColors()) {
-                        Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            val sw = rememberAnySwatch(colour.family, colour.grade, colour.code)
+                            ColourSwatch(
+                                value = sw.argb,
+                                onColour = sw.onColour,
+                                contentDescription = paletteContentDescription(colour.code, colour.nameEn, colour.nameAr, colour.grade),
+                                size = SwatchSize.Small,
+                            )
                             Column(modifier = Modifier.weight(1f)) {
                                 Text("${colour.code} — ${colour.nameEn}", style = MaterialTheme.typography.titleMedium)
                                 Text(colour.nameAr, style = MaterialTheme.typography.bodyMedium)

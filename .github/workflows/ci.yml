@@ -79,14 +79,17 @@ jobs:
           gradle --no-daemon :generator:run --args="/tmp/gen"
           cp /tmp/gen/seed-alazhartex.json /tmp/gen/seed.first.json
           cp /tmp/gen/seed-report.txt /tmp/gen/report.first.txt
-          sha256sum /tmp/gen/seed.first.json /tmp/gen/report.first.txt
+          cp /tmp/gen/palette-report.txt /tmp/gen/palette.first.txt
+          sha256sum /tmp/gen/seed.first.json /tmp/gen/report.first.txt /tmp/gen/palette.first.txt
           for i in 2 3 4 5 6; do
             gradle --no-daemon :generator:run --args="/tmp/gen"
             cmp /tmp/gen/seed-alazhartex.json /tmp/gen/seed.first.json
             cmp /tmp/gen/seed-report.txt /tmp/gen/report.first.txt
+            cmp /tmp/gen/palette-report.txt /tmp/gen/palette.first.txt
           done
           cmp /tmp/gen/seed.first.json seed-alazhartex.json
           cmp /tmp/gen/report.first.txt seed-report.txt
+          cmp /tmp/gen/palette.first.txt palette-report.txt
 
       # ktlint gate = format-only. Per-module check localization was attempted (generator/domain),
       # but CI logs and artifacts are network-blocked in the authoring sandbox, making rule-ID
