@@ -184,8 +184,9 @@ class DebugDangerZoneTest {
         // Sanitizer lowercases and strips everything except [a-z0-9_-].
         // Read the EditableText property directly — the field's merged label makes text-list matchers brittle.
         val editable = composeTestRule.onNodeWithTag("debug_field_id")
-            .fetchSemanticsNode().config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.EditableText)?.text
-        assertEquals("wh01", editable)
+            .fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.EditableText]
+            as? androidx.compose.ui.text.AnnotatedString
+        assertEquals("wh01", editable?.text)
         composeTestRule.onNodeWithTag("debug_field_id").performTextClearance()
         composeTestRule.onNodeWithTag("debug_field_id").performTextInput("!!")
         composeTestRule.onNodeWithTag("debug_form_save").assertIsNotEnabled()
