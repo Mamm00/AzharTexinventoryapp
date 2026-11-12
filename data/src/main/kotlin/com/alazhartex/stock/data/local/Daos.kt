@@ -88,6 +88,10 @@ interface FabricDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<FabricEntity>)
 
+    /** Demo-reload path: keep the user's existing masters, insert only what is missing. */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAllIgnore(rows: List<FabricEntity>)
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(row: FabricEntity)
 
@@ -120,6 +124,10 @@ interface ColourDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAll(rows: List<ColourEntity>)
+
+    /** Demo-reload path: keep the user's existing masters, insert only what is missing. */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAllIgnore(rows: List<ColourEntity>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(row: ColourEntity)

@@ -4,7 +4,6 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -183,7 +182,8 @@ class DebugDangerZoneTest {
         composeTestRule.onNodeWithTag("debug_field_id").performTextClearance()
         composeTestRule.onNodeWithTag("debug_field_id").performTextInput("WH 01!!")
         // Sanitizer lowercases and strips everything except [a-z0-9_-].
-        composeTestRule.onNodeWithTag("debug_field_id").assertTextEquals("wh01")
+        // The label text merges into the field's semantics node, so assert on a substring match.
+        composeTestRule.onNodeWithTag("debug_field_id").assert(hasText("wh01", substring = true))
         composeTestRule.onNodeWithTag("debug_field_id").performTextClearance()
         composeTestRule.onNodeWithTag("debug_field_id").performTextInput("!!")
         composeTestRule.onNodeWithTag("debug_form_save").assertIsNotEnabled()

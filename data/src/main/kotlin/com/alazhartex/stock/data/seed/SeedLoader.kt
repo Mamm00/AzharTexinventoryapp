@@ -77,7 +77,12 @@ class SeedLoader(
         applySettings(root)
     }
 
-    /** Warehouses, assignments, fabrics, colours, mappings, rolls, inventory, movements. */
+    /**
+     * Warehouses, assignments, fabrics, colours, mappings, rolls, inventory, movements.
+     * Masters (fabrics/colours) are inserted with IGNORE so a demo reload over an existing,
+     * user-curated catalogue skips what is already there instead of aborting on the UNIQUE
+     * pair (name_ar, name_en) / keeper_code. On a fresh install (empty tables) IGNORE == ABORT.
+     */
     private suspend fun applyBusiness(root: JSONObject) {
 
         val warehouses = root.getJSONArray("warehouses").let { arr ->
@@ -102,7 +107,7 @@ class SeedLoader(
                 FabricEntity(o.getString("id"), o.getString("name_ar"), o.getString("name_en"), o.getString("family"))
             }
         }
-        database.fabricDao().insertAll(fabrics)
+        database.fabricDao().insertAllIgnore(fabrics)
 
         val colours = root.getJSONArray("colours").let { arr ->
             (0 until arr.length()).map { i ->
@@ -119,7 +124,7 @@ class SeedLoader(
                 )
             }
         }
-        database.colourDao().insertAll(colours)
+        database.colourDao().insertAllIgnore(colours)
 
         val mappings = root.getJSONArray("mappings").let { arr ->
             (0 until arr.length()).map { i ->
