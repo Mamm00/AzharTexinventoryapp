@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -20,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -94,40 +95,37 @@ fun PalettePickerSheet(
     val selected = colours.firstOrNull { it.code == selectedCode }
 
     // Full-screen Box overlay instead of a second Dialog window. The picker previously hosted a
-    // nested Dialog under the calling screen's Dialog, which is reported to crash on some devices
-    // when the wheel is opened from the stock "Add roll(s)" sheet. Surface fills the host window.
+    // nested Dialog under the calling screen's Dialog, which crashed on open on-device; and a
+    // Material3 Scaffold body measured to infinity on API 34 (instrumented regression test).
+    // This layout is plain Box + Image/Column with an explicit weight — always bounded, and it
+    // depends on no experimental measure policy at all.
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
     ) {
-            Scaffold(
-                topBar = {
-                    androidx.compose.material3.TopAppBar(
-                        title = { Text(stringResource(R.string.picker_title)) },
-                        navigationIcon = {
-                            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
-                        },
-                    )
-                },
-                bottomBar = {
-                    Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
-                        Text(
-                            text = selected?.let {
-                                stringResource(R.string.palette_footer_selected, it.code, it.nameEn)
-                            } ?: stringResource(R.string.picker_footer_none),
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(bottom = 8.dp),
-                        )
-                        Button(
-                            enabled = selected != null,
-                            onClick = { selected?.let { onConfirm(it) } },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.picker_confirm)) }
-                    }
-                },
-            ) { padding ->
-                Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 12.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+                Text(
+                    stringResource(R.string.picker_title),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Spacer(Modifier.width(56.dp))
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+            ) {
                     OutlinedTextField(
                         value = query,
                         onValueChange = { query = it.take(60) },
@@ -206,7 +204,21 @@ fun PalettePickerSheet(
                         }
                     }
                 }
+            Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+                Text(
+                    text = selected?.let {
+                        stringResource(R.string.palette_footer_selected, it.code, it.nameEn)
+                    } ?: stringResource(R.string.picker_footer_none),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+                Button(
+                    enabled = selected != null,
+                    onClick = { selected?.let { onConfirm(it) } },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text(stringResource(R.string.picker_confirm)) }
             }
+        }
     }
 }
 
