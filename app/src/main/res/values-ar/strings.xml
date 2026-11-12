@@ -233,9 +233,9 @@
     <string name="toast_operational_wiped">تم حذف كل البيانات التشغيلية — مع الاحتفاظ بالكتالوج</string>
     <string name="toast_demo_reloaded">تمت إعادة تحميل بيانات العرض</string>
     <string name="dialog_delete_warehouse_title">حذف هذا المخزن؟</string>
-    <string name="dialog_delete_warehouse_body">سيتم حذف نهائيًا: %1$d صنف ربط، %2$d صف مخزون، %3$d حركة، %4$d لفة و%5$d تعيين — بالإضافة إلى المخزن نفسه. يتم الاحتفاظ بالأقمشة والألوان. تُحفظ نسخة احتياطية أولًا.</string>
+    <string name="dialog_delete_warehouse_body">حذف نهائي — أصناف الربط: %1$d · المخزون: %2$d · الحركات: %3$d · اللفائف: %4$d · التعيينات: %5$d. يتم حذف المخزن نفسه أيضًا. الأقمشة والألوان محفوظة. تُحفظ نسخة احتياطية أولًا.</string>
     <string name="dialog_wipe_all_title">حذف كل البيانات التشغيلية؟</string>
-    <string name="dialog_wipe_all_body">سيتم الحذف النهائي: %1$d مخزنًا، %2$d تعيينًا، %3$d صنف ربط، %4$d صف مخزون، %5$d حركة و%6$d لفة. يُحتفظ بالأقمشة والألوان (%7$d / %8$d) والحسابات والإعدادات. تُحفظ نسخة احتياطية أولًا.</string>
+    <string name="dialog_wipe_all_body">حذف نهائي — المخازن: %1$d · التعيينات: %2$d · أصناف الربط: %3$d · المخزون: %4$d · الحركات: %5$d · اللفائف: %6$d. الأقمشة والألوان (%7$d / %8$d) والحسابات والإعدادات محفوظة. تُحفظ نسخة احتياطية أولًا.</string>
     <string name="dialog_wipe_all_confirm">حذف كل شيء</string>
     <string name="action_wipe_all">حذف كل البيانات التشغيلية</string>
     <string name="action_keep_masters_note">يتم الاحتفاظ بالأقمشة والألوان</string>

@@ -1,5 +1,6 @@
 package com.alazhartex.stock.ui
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -46,6 +47,7 @@ import org.junit.runner.RunWith
  * The suite resets the store to the pinned demo dataset in @BeforeClass and every destructive
  * test restores it afterwards, so tests are order-independent.
  */
+@OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 class DebugDangerZoneTest {
 

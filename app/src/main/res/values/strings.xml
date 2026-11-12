@@ -225,9 +225,9 @@
     <string name="toast_operational_wiped">All operational data deleted — masters kept</string>
     <string name="toast_demo_reloaded">Demo data reloaded</string>
     <string name="dialog_delete_warehouse_title">Delete this warehouse?</string>
-    <string name="dialog_delete_warehouse_body">This permanently deletes: %1$d mappings, %2$d inventory rows, %3$d movements, %4$d rolls and %5$d shed assignments — plus the warehouse itself. Fabrics &amp; colours are kept. A safety backup is saved first.</string>
+    <string name="dialog_delete_warehouse_body">Permanently delete — mappings: %1$d · inventory: %2$d · movements: %3$d · rolls: %4$d · shed assignments: %5$d. The warehouse itself is deleted too. Fabrics &amp; colours are kept. A safety backup is saved first.</string>
     <string name="dialog_wipe_all_title">Delete ALL operational data?</string>
-    <string name="dialog_wipe_all_body">This permanently deletes: %1$d warehouses, %2$d assignments, %3$d mappings, %4$d inventory rows, %5$d movements and %6$d rolls. Fabrics &amp; colours masters (%7$d / %8$d), accounts and settings are kept. A safety backup is saved first.</string>
+    <string name="dialog_wipe_all_body">Permanently delete — warehouses: %1$d · assignments: %2$d · mappings: %3$d · inventory: %4$d · movements: %5$d · rolls: %6$d. Fabrics &amp; colours masters (%7$d / %8$d), accounts and settings are kept. A safety backup is saved first.</string>
     <string name="dialog_wipe_all_confirm">Delete everything</string>
     <string name="action_wipe_all">Delete ALL operational data</string>
     <string name="action_keep_masters_note">Masters (fabrics &amp; colours) are kept</string>
