@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -69,7 +70,7 @@ fun SettingsScreen(app: AlAzharApp) {
     val prefs = context.getSharedPreferences(MainActivity.LOCALE_PREFS, Context.MODE_PRIVATE)
     var language by remember { mutableStateOf(prefs.getString(MainActivity.KEY_LANGUAGE, "ar") ?: "ar") }
     var digits by remember { mutableStateOf(app.container.digitsFlow.value) }
-    val storedSettings by produceState(initialValue = emptyMap(), Unit) {
+    val storedSettings by produceState(initialValue = emptyMap(), rememberDbVersion()) {
         value = app.container.readRepository.settingsAll().associate { it.key to it.value }
     }
     var legalName by remember { mutableStateOf("") }
@@ -231,7 +232,13 @@ fun SettingsScreen(app: AlAzharApp) {
                         scope.launch {
                             busy = true
                             try {
-                                val result = withContext(Dispatchers.IO) { app.container.exportImportManager.exportDatabase() }
+                                val result = withContext(Dispatchers.IO) {
+                                    val exported = app.container.exportImportManager.exportDatabase()
+                                    // Export checkpoint may swap WAL state; reload anyway. A rebuild
+                                    // failure here must not fail the export the user just got.
+                                    runCatching { com.alazhartex.stock.data.local.DbProvider.refresh(context) }
+                                    exported
+                                }
                                 val uri = FileProvider.getUriForFile(context, "com.alazhartex.stock.fileprovider", result.file)
                                 val intent = Intent(Intent.ACTION_SEND).apply {
                                     type = "application/octet-stream"
@@ -247,6 +254,31 @@ fun SettingsScreen(app: AlAzharApp) {
                             }
                         }
                     }) { Text(stringResource(R.string.action_export_db)) }
+                }
+            }
+
+            // ---- v1.3.6 refresh database ----
+            Card(colors = CardDefaults.cardColors()) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.action_refresh_db), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.summary_refresh_db), style = MaterialTheme.typography.bodySmall)
+                    Button(
+                        enabled = !busy,
+                        modifier = Modifier.testTag("settings_refresh_db"),
+                        onClick = {
+                            scope.launch {
+                                busy = true
+                                try {
+                                    withContext(Dispatchers.IO) { com.alazhartex.stock.data.local.DbProvider.refresh(context) }
+                                    snackbar.showSnackbar(context.getString(R.string.toast_refresh_done))
+                                } catch (t: Throwable) {
+                                    snackbar.showSnackbar(context.getString(R.string.toast_refresh_failed))
+                                } finally {
+                                    busy = false
+                                }
+                            }
+                        },
+                    ) { Text(stringResource(R.string.action_refresh_db)) }
                 }
             }
 
@@ -315,13 +347,18 @@ fun SettingsScreen(app: AlAzharApp) {
                     val db = importStage ?: return@TextButton
                     scope.launch {
                         val current = context.getDatabasePath("alazhartex.db")
-                        withContext(Dispatchers.IO) { app.container.exportImportManager.safetyBackupAndReplace(current, db) }
-                        android.widget.Toast.makeText(context, context.getString(R.string.toast_import_done), android.widget.Toast.LENGTH_LONG).show()
-                        val relaunch = Intent(context, MainActivity::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        withContext(Dispatchers.IO) {
+                            app.container.exportImportManager.safetyBackupAndReplace(current, db)
+                            // The file is replaced atomically; reload from disk so the rest of the app
+                            // sees the imported data without a process restart. If the rebuild fails,
+                            // the old instance is kept and the next cold start loads the imported file.
+                            runCatching { com.alazhartex.stock.data.local.DbProvider.refresh(context) }
+                                .onFailure { android.util.Log.w("SettingsScreen", "refresh after import failed", it) }
                         }
-                        context.startActivity(relaunch)
-                        Runtime.getRuntime().exit(0)
+                        importStage = null
+                        importSidecar = null
+                        importPreview = null
+                        snackbar.showSnackbar(context.getString(R.string.toast_import_done))
                     }
                 }) { Text(stringResource(R.string.action_confirm)) }
             },

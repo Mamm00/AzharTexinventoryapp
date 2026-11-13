@@ -56,7 +56,7 @@ fun ReportsScreen(app: AlAzharApp) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbar = com.alazhartex.stock.ui.LocalSnackbar.current
-    val settings by produceState(initialValue = emptyMap(), Unit) {
+    val settings by produceState(initialValue = emptyMap(), rememberDbVersion()) {
         value = app.container.readRepository.settingsAll().associate { it.key to it.value }
     }
     var includeLetterhead by remember { mutableStateOf(true) }

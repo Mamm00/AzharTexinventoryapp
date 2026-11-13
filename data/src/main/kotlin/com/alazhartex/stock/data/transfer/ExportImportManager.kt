@@ -22,10 +22,12 @@ import java.util.UUID
  */
 class ExportImportManager(
     private val context: Context,
-    private val database: AppDatabase,
+    db: () -> AppDatabase,
     private val wallClock: () -> Long,
     private val appVersionName: String,
 ) {
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
     data class ExportResult(val file: File, val sidecar: File, val sha256Hex: String, val bytes: Long)
 
     sealed interface ImportReport {
@@ -159,10 +161,18 @@ class ExportImportManager(
     /**
      * Destructive step — call ONLY after runLadder() == Ready AND explicit user confirmation.
      * Safety copy first; keeps the 3 most recent; prune decisions are logged outside the DB.
-     * Returns the backup file; the caller must close/recreate the Room instance and relaunch.
+     * Returns the backup file; the caller must close/recreate the Room instance.
+     * v1.3.6: the WAL is TRUNCATEd before the safety copy so the backup is a complete,
+     * self-contained snapshot (previously the safety copy silently omitted WAL-only data).
+     * Callers are expected to follow up with DbProvider.refresh(context) instead of relaunching.
      */
     fun safetyBackupAndReplace(currentDb: File, candidate: File): File {
         pruneBackups()
+        try {
+            database.openHelper.writableDatabase.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
+        } catch (e: android.database.SQLException) {
+            android.util.Log.w("ExportImportManager", "pre-replace wal_checkpoint failed; backup may miss recent commits", e)
+        }
         val ts = fileTimestamp()
         val safety = File(backupsDir, "safety-$ts.db")
         currentDb.copyTo(safety, overwrite = true)

@@ -76,7 +76,9 @@ import com.alazhartex.stock.ui.components.paletteContentDescription
 import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -145,19 +147,20 @@ fun FabricsEditScreen(app: AlAzharApp) {
     val tick = refresh.tick.intValue
 
     var tab by rememberSaveable { mutableStateOf(FabricsTab.FABRICS.name) }
-    val snapshot by produceState(initialValue = null as com.alazhartex.stock.data.repo.MastersSnapshot?, tick) {
+    val snapshot by produceState(initialValue = null as com.alazhartex.stock.data.repo.MastersSnapshot?, tick, rememberDbVersion()) {
         value = app.container.readRepository.masters()
     }
     val counts by produceState(
         initialValue = null as Pair<Map<String, Long>, Map<String, Long>>?,
         tick,
+        rememberDbVersion(),
     ) {
         value = app.container.readRepository.mappingCountsByFabric() to app.container.readRepository.mappingCountsByColour()
     }
-    val account by produceState(initialValue = null as com.alazhartex.stock.data.local.AccountEntity?, Unit) {
+    val account by produceState(initialValue = null as com.alazhartex.stock.data.local.AccountEntity?, rememberDbVersion()) {
         value = app.container.readRepository.accountById(ACTOR_ADMIN)
     }
-    val customFamilies by produceState(initialValue = emptyList<CustomFamily>(), tick) {
+    val customFamilies by produceState(initialValue = emptyList<CustomFamily>(), tick, rememberDbVersion()) {
         value = parseCustomFamilies(app.container.readRepository.setting("custom_families"))
     }
 
@@ -385,7 +388,7 @@ fun FabricsEditScreen(app: AlAzharApp) {
             },
         )
     }
-    val deleteColourUsage by produceState(initialValue = null as Triple<Long, Long, Long>?, deleteColour) {
+    val deleteColourUsage by produceState(initialValue = null as Triple<Long, Long, Long>?, deleteColour, rememberDbVersion()) {
         value = deleteColour?.let { app.container.readRepository.colourUsage(it.id) }
     }
     deleteColour?.let { target ->
@@ -422,6 +425,7 @@ fun FabricsEditScreen(app: AlAzharApp) {
                     val created = app.container.mastersSettingsRepository.bulkAssignMapping(
                         ACTOR_ADMIN, fabric.id, colourIds, UUID.randomUUID().toString(),
                     )
+                    withContext(Dispatchers.IO) { com.alazhartex.stock.data.local.DbProvider.refresh(context) }
                     context.getString(R.string.bulk_assign_done, created)
                 } catch (t: Throwable) {
                     if (t is com.alazhartex.stock.domain.model.InvariantViolationException && t.message?.contains("bulk_assign_nothing_to_create") == true) {
@@ -924,7 +928,7 @@ private fun AssignToFabricDialog(
     var selectedFabric by remember { mutableStateOf<com.alazhartex.stock.data.local.FabricEntity?>(null) }
     var fabricExpanded by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
-    val colours by produceState(initialValue = emptyList<com.alazhartex.stock.data.repo.ColourRowDto>(), Unit) {
+    val colours by produceState(initialValue = emptyList<com.alazhartex.stock.data.repo.ColourRowDto>(), rememberDbVersion()) {
         value = app.container.readRepository.colours()
     }
     var selectedIds by remember { mutableStateOf(setOf<String>()) }

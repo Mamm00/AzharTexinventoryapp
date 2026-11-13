@@ -29,6 +29,8 @@
     <string name="action_confirm">تأكيد</string>
     <string name="action_export_db">تصدير قاعدة البيانات</string>
     <string name="action_import_db">استيراد قاعدة البيانات</string>
+    <string name="action_refresh_db">تحديث قاعدة البيانات</string>
+    <string name="summary_refresh_db">أعد تحميل كل بيانات المخزون ولوحات المعلومات واللفائف من القرص</string>
     <string name="action_generate">توليد</string>
     <string name="action_share">مشاركة</string>
 
@@ -114,7 +116,9 @@
     <string name="toast_export_done">التصدير جاهز: %1$s</string>
     <string name="toast_export_failed">فشل التصدير</string>
     <string name="toast_import_failed">تم رفض الاستيراد عند الفحص R%1$d: %2$s</string>
-    <string name="toast_import_done">اكتمل الاستيراد. يُعاد التشغيل…</string>
+    <string name="toast_import_done">اكتمل الاستيراد.</string>
+    <string name="toast_refresh_done">تم تحميل قاعدة البيانات من القرص.</string>
+    <string name="toast_refresh_failed">تعذر تحميل قاعدة البيانات.</string>
     <string name="toast_overwrite_confirm">تأكيد الاستبدال — ستُستبدل البيانات الحالية مع الاحتفاظ بنسخة احتياطية</string>
     <string name="toast_overwrite_body">ستُستبدل قاعدة البيانات بالملف المستورد. تُنسخ بياناتك الحالية إلى نسخة احتياطية أولًا. لا يمكن التراجع داخل التطبيق.</string>
     <string name="toast_setting_saved">تم حفظ الإعداد</string>

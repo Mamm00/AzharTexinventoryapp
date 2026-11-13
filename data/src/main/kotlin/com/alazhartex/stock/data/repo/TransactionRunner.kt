@@ -3,6 +3,7 @@ package com.alazhartex.stock.data.repo
 import androidx.room.withTransaction
 import com.alazhartex.stock.data.local.AppDatabase
 import com.alazhartex.stock.data.local.AuditLogEntity
+import com.alazhartex.stock.data.local.DbProvider
 import com.alazhartex.stock.domain.idempotency.MutationOutcome
 import com.alazhartex.stock.domain.model.DuplicateValueException
 import com.alazhartex.stock.domain.model.InvariantViolationException
@@ -18,9 +19,11 @@ import java.util.UUID
  * Any exception rolls everything back and writes exactly one BLOCKED audit row (reason populated).
  */
 class TransactionRunner(
-    private val database: AppDatabase,
+    db: () -> AppDatabase,
     private val wallClock: () -> Long,
 ) {
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
     suspend fun <R : MutationOutcome> withAudit(
         actorId: String,
         action: String,
@@ -50,9 +53,10 @@ class TransactionRunner(
                     MutationOutcome.AlreadyApplied -> Unit
                 }
                 outcome
-            }
+            }.also { DbProvider.bumpVersion() }
         } catch (e: Exception) {
             writeBlockedAudit(actorId, action, target, idempotencyKey, e)
+            DbProvider.bumpVersion()
             throw e
         }
     }

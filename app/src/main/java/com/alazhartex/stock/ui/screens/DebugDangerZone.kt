@@ -55,10 +55,10 @@ fun DebugDangerZoneCard(app: AlAzharApp, actorId: String) {
     var refreshKey by remember { mutableStateOf(0) }
     var busy by remember { mutableStateOf(false) }
 
-    val warehouses by produceState(initialValue = emptyList<DebugRepository.WarehouseSummary>(), refreshKey) {
+    val warehouses by produceState(initialValue = emptyList<DebugRepository.WarehouseSummary>(), refreshKey, rememberDbVersion()) {
         value = withContext(Dispatchers.IO) { app.container.debugRepository.warehouseSummaries() }
     }
-    val accounts by produceState(initialValue = emptyList<AccountEntity>(), refreshKey) {
+    val accounts by produceState(initialValue = emptyList<AccountEntity>(), refreshKey, rememberDbVersion()) {
         value = withContext(Dispatchers.IO) { app.container.debugRepository.accounts() }
     }
 
@@ -81,7 +81,11 @@ fun DebugDangerZoneCard(app: AlAzharApp, actorId: String) {
             busy = true
             var ok = false
             try {
-                withContext(Dispatchers.IO) { action() }
+                withContext(Dispatchers.IO) {
+                    action()
+                    // Debug actions can rewrite large chunks of the store (demo reload / wipe).
+                    com.alazhartex.stock.data.local.DbProvider.refresh(context)
+                }
                 ok = true
                 snackbar.showSnackbar(context.getString(toast))
             } catch (t: Throwable) {

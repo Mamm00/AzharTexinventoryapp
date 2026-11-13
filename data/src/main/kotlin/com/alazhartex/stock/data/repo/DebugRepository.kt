@@ -27,11 +27,13 @@ import java.util.UUID
  */
 class DebugRepository(
     private val context: Context,
-    private val database: AppDatabase,
+    db: () -> AppDatabase,
     private val wallClock: () -> Long,
     private val seedLoader: SeedLoader,
 ) {
-    private val runner = TransactionRunner(database) { wallClock() }
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
+    private val runner = TransactionRunner(db) { wallClock() }
 
     data class WarehouseCascadeCounts(
         val mappings: Long,

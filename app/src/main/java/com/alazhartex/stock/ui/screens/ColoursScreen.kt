@@ -34,7 +34,7 @@ import com.alazhartex.stock.ui.components.rememberAnySwatch
 @Composable
 fun ColoursScreen(app: AlAzharApp) {
     var query by remember { mutableStateOf("") }
-    val colours by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.ColourRowDto>?, Unit) {
+    val colours by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.ColourRowDto>?, rememberDbVersion()) {
         value = app.container.readRepository.colours()
     }
 

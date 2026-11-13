@@ -5,7 +5,9 @@ import com.alazhartex.stock.domain.gauge.Utilisation
 import com.alazhartex.stock.domain.stock.StockMath
 
 /** Read-side of the repository (UI queries). No writes here; writes go through TransactionRunner. */
-class ReadRepository(private val database: AppDatabase) {
+class ReadRepository(db: () -> AppDatabase) {
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
 
     suspend fun shedCards(): List<ShedCardDto> {
         val warehouses = database.warehouseDao().getAll()
