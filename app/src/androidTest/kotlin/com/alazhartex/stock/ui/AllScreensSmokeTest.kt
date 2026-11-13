@@ -61,6 +61,11 @@ class AllScreensSmokeTest {
 
     private fun appName(): String = res(R.string.app_name)
 
+    private fun flattenSemanticsText(node: androidx.compose.ui.semantics.SemanticsNode): String =
+        (node.config.getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }
+            .orEmpty().joinToString(" ") { it.text } +
+            " " + node.children.joinToString(" ") { flattenSemanticsText(it) }).trim()
+
     private fun openDrawer() {
         composeTestRule.onNodeWithContentDescription(appName(), useUnmergedTree = true).performClick()
     }
@@ -151,11 +156,9 @@ class AllScreensSmokeTest {
 
         // After the add: the row flips to mapped (add button gone) and C012 is selected.
         composeTestRule.waitUntilDoesNotExist(hasTestTag("colour_add_C012"), timeoutMillis = 30_000)
-        val summaryText = composeTestRule.onNodeWithTag("colour_summary", useUnmergedTree = true)
-            .fetchSemanticsNode().config
-            .getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }
-            .orEmpty()
-            .joinToString(" ") { it.text }
+        val summaryText = flattenSemanticsText(
+            composeTestRule.onNodeWithTag("colour_summary", useUnmergedTree = true).fetchSemanticsNode(),
+        )
         assert(summaryText.contains("C012")) { "Expected colour_summary to show C012 after assignment, was: $summaryText" }
 
         // Close the dialog.
