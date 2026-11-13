@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -39,7 +40,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +64,8 @@ import com.alazhartex.stock.ui.components.bucketLabelFor
 import com.alazhartex.stock.ui.components.paletteContentDescription
 import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
+import com.alazhartex.stock.ui.dashboard.DashboardViewModel
+import com.alazhartex.stock.ui.dashboard.DashboardViewModelFactory
 import com.alazhartex.stock.ui.navigation.Routes
 import com.alazhartex.stock.ui.percentDisplay
 
@@ -79,6 +84,7 @@ private val QUICK_ACTIONS = listOf(
     QuickAction(Routes.FABRICS_EDIT, R.string.nav_fabrics_edit, Icons.Filled.Edit),
     QuickAction(Routes.AUDIT, R.string.nav_audit, Icons.Filled.FactCheck),
     QuickAction(Routes.SETTINGS, R.string.nav_settings, Icons.Filled.Settings),
+    QuickAction(Routes.DASHBOARD_SETTINGS, R.string.nav_dashboard_settings, Icons.Filled.Tune),
     QuickAction(Routes.PROFILE, R.string.nav_profile, Icons.Filled.Person),
     QuickAction(Routes.GUIDE, R.string.nav_guide, Icons.Filled.MenuBook),
 )
@@ -87,15 +93,21 @@ private val QUICK_ACTIONS = listOf(
 fun DashboardScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
     val navigate = LocalNavigate.current
-    val dashboard by produceState(initialValue = null as com.alazhartex.stock.data.repo.DashboardDto?, rememberDbVersion()) {
-        // Keep the last good snapshot if a database rebuild races an in-flight query.
-        value = runCatching { app.container.readRepository.dashboard() }.getOrElse { cause -> value ?: throw cause }
-    }
+    val viewModel: DashboardViewModel = viewModel(
+        factory = remember { DashboardViewModelFactory(app.container.readRepository, app.container.overrideStore) },
+    )
+    val data by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold { padding ->
-        val data = dashboard
-        if (data == null) {
+        if (data.loading) {
             LoadingBox(stringResource(R.string.loading), Modifier.padding(padding))
+            return@Scaffold
+        }
+        if (data.loadError != null && data.topColours.isEmpty() && data.topSheds.isEmpty() && data.totalRolls == 0L && data.capacityRolls == 0L) {
+            // Fatal, nothing cached yet — surface the failure instead of crashing the composition.
+            Box(modifier = Modifier.fillMaxSize().padding(padding).padding(24.dp), contentAlignment = Alignment.Center) {
+                Text(stringResource(R.string.error_generic), style = MaterialTheme.typography.bodyLarge)
+            }
             return@Scaffold
         }
         val bucketLabel = bucketLabelFor(
@@ -136,15 +148,23 @@ fun DashboardScreen(app: AlAzharApp) {
                         percentDisplay = percentDisplay(data.percentDisplay, arabicIndic),
                         bucket = data.bucket,
                         bucketLabel = bucketLabel,
-                        percentFraction = ((data.percentDisplay?.toFloatOrNull() ?: 0f) / 100f),
+                        percentFraction = data.percentFraction,
                         contentDescriptionPrefix = stringResource(R.string.app_name),
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        KpiCell(integerString(data.totalActiveRolls, arabicIndic), stringResource(R.string.label_total_rolls), Modifier.weight(1f))
-                        KpiCell(integerString(data.totalCapacity, arabicIndic), stringResource(R.string.label_capacity), Modifier.weight(1f))
+                        KpiCell(integerString(data.totalRolls, arabicIndic), stringResource(R.string.label_total_rolls), Modifier.weight(1f))
+                        KpiCell(integerString(data.activeRolls, arabicIndic), stringResource(R.string.label_active_rolls), Modifier.weight(1f))
+                        KpiCell(integerString(data.capacityRolls, arabicIndic), stringResource(R.string.label_capacity), Modifier.weight(1f))
                         KpiCell(integerString(data.inactiveRolls, arabicIndic), stringResource(R.string.label_inactive_rolls), Modifier.weight(1f))
                     }
-                    DriftBanner(ok = data.driftViolations == 0, count = data.driftViolations)
+                    when {
+                        data.overridesEnabled && data.overrideFieldDiffs.isNotEmpty() ->
+                            OverrideBanner(ok = false, count = data.overrideFieldDiffs.size)
+                        data.overridesEnabled ->
+                            OverrideBanner(ok = true, count = 0)
+                        else ->
+                            DriftBanner(ok = data.driftViolations == 0, count = data.driftViolations)
+                    }
                 }
             }
 
@@ -296,6 +316,38 @@ private fun DriftBanner(ok: Boolean, count: Int) {
                     stringResource(R.string.label_drift_ok)
                 } else {
                     stringResource(R.string.label_drift_detected) + ": " + count
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (ok) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onErrorContainer,
+            )
+        }
+    }
+}
+
+@Composable
+private fun OverrideBanner(ok: Boolean, count: Int) {
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = if (ok) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.errorContainer,
+        modifier = Modifier.testTag("override_banner"),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(10.dp)
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error),
+            )
+            Text(
+                if (ok) {
+                    stringResource(R.string.banner_overrides_ok)
+                } else {
+                    stringResource(R.string.banner_overrides_mismatch, count)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (ok) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onErrorContainer,

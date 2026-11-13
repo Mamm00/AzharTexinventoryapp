@@ -4,6 +4,48 @@ All notable changes to Al Azhar Tex Inventory are documented here. The format lo
 follows [Keep a Changelog](https://keepachangelog.com/); every release ships a signed APK
 attached to its GitHub Release.
 
+## [1.4.0] — 2026-11-13
+
+### Added
+- **New destination: Dashboard Settings** ("Admin"). A drawer entry and a quick-action tile
+  (Tune icon) open a screen where KPIs can be entered manually when you want the board to
+  see pinned figures instead of the live ones.
+- **Manual overrides** for the Dashboard KPIs: Total rolls, Active rolls, Inactive rolls,
+  Capacity (rolls) and Utilisation %. Persisted in **DataStore (Preferences)** — not in
+  Room, not in SharedPreferences; export/import of the database does not carry them.
+  The **Enable Manual Overrides** toggle gates everything; every field may be left blank
+  (blank falls back to the live SQL value); a Save button validates and persists;
+  "Reset to live values" clears overrides entirely.
+- **Drift detection for overrides (Task 4).** When overrides are enabled the dashboard
+  compares every manual value against the live SQL sums and shows a warning banner
+  ("Manual overrides differ from the live database (N of 5 fields)") on any mismatch;
+  when they match it shows a green "matches the live database" state. When overrides are
+  disabled the classic "No drift — every row balances" / "Drift detected: N" logic applies.
+- **DashboardViewModel** — the KPI state now flows from a ViewModel observing both the
+  override store (DataStore) and `DbProvider.dataVersion`. Any committed write or override
+  edit updates the KPIs instantly; the section above the drift banner shows all four KPIs
+  (Total, Active, Capacity, Inactive).
+
+### Fixed
+- **Dashboard KPIs now aggregate the inventory ledger (the actual bug report: "Total rolls: 0"
+  while Top colours showed 50/50).** The dashboard used to derive ACTIVE rolls solely from the
+  derived `rolls` cache — which can silently fall out of sync with `inventory.closing`
+  (`applyRollDelta` is a no-op when no ACTIVE roll row exists for a mapping). It now computes:
+  Active = `SUM(inventory.closing)` (the same source Top colours reads, so the KPIs and the
+  colour ranking can never disagree again), Inactive = `SUM(rolls.count) WHERE state='INACTIVE'`,
+  Total = Active + Inactive, Capacity = `SUM(warehouses.capacity_rolls)`.
+  Per-shed cards use `SUM(inventory.closing)` per warehouse as well.
+- **Utilisation** is now `(Total / Capacity) × 100` everywhere on the dashboard and is guarded
+  against capacity == 0 (percent renders "—", bucket null) instead of dividing by zero.
+  Active = Total − Inactive is enforced by construction in the ViewModel (an explicitly typed
+  Total derives Active as `Total − Inactive`).
+
+### Notes
+- Room schema unchanged (no new entities; overrides live in DataStore). `versionName` 1.4.0,
+  `versionCode` 11.
+- Spec deviation, deliberate: the destination list grew by one (Dashboard Settings) on top of
+  the spec §4.5 baseline, per feature request.
+
 ## [1.3.6] — 2026-11-13
 
 ### Fixed

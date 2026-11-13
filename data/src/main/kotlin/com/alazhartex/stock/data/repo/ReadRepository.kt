@@ -12,7 +12,7 @@ class ReadRepository(db: () -> AppDatabase) {
     suspend fun shedCards(): List<ShedCardDto> {
         val warehouses = database.warehouseDao().getAll()
         return warehouses.map { wh ->
-            val active = database.rollDao().sumActiveForShed(wh.id)
+            val active = database.inventoryDao().sumClosingForShed(wh.id)
             val pct = Utilisation.percentTwoDp(active, wh.capacityRolls)
             val display = Utilisation.percentOneDp(active, wh.capacityRolls)
                 ?.stripTrailingZeros()?.toPlainString()
@@ -97,23 +97,35 @@ class ReadRepository(db: () -> AppDatabase) {
         return rows.take(limit).map { AuditRowDto(it.id, it.at, it.actorId, it.action, it.target, it.result, it.reason) }
     }
 
+    /**
+     * Dashboard totals (v1.4). Aggregates the ledger of record, not the derived roll cache:
+     *  - Active rolls  = SUM(inventory.closing)   — the same source Top colours/inventory lines read,
+     *                     so the KPIs can never disagree with the colour ranking again.
+     *  - Inactive rolls = SUM(rolls.count) WHERE state = 'INACTIVE'
+     *  - Total rolls   = Active + Inactive         — "Active = Total − Inactive" holds by construction
+     *  - Capacity      = SUM(warehouses.capacity_rolls) — shed (Stock) side, via [WarehouseDao.sumCapacity]
+     *  - Utilisation   = (Total / Capacity) x 100, zero-capacity safe (null percent, null bucket)
+     * Everything is a fresh SQL SUM, evaluated per call; committed writes bump `DbProvider.dataVersion`
+     * so collectors re-query instantly.
+     */
     suspend fun dashboard(): DashboardDto {
         val topColours = rankTopColours(5)
         val cards = shedCards()
-        val totalActive = cards.sumOf { it.activeRolls }
-        val totalCapacity = cards.sumOf { it.capacityRolls }
+        val active = database.inventoryDao().sumClosingAll()
         val inactive = database.rollDao().sumByState("INACTIVE")
-        val display = Utilisation.percentOneDp(totalActive, totalCapacity)?.stripTrailingZeros()?.toPlainString()
+        val total = active + inactive
+        val totalCapacity = database.warehouseDao().sumCapacity()
+        val display = Utilisation.percentOneDp(total, totalCapacity)?.stripTrailingZeros()?.toPlainString()
         val drift = driftRows().size
         return DashboardDto(
-            totalActiveRolls = totalActive,
+            totalRolls = total,
+            activeRolls = active,
+            inactiveRolls = inactive,
             totalCapacity = totalCapacity,
             percentDisplay = display,
-            bucket = Utilisation.bucket(totalActive, totalCapacity),
+            bucket = Utilisation.bucket(total, totalCapacity),
             topSheds = cards.sortedByDescending { it.activeRolls }.take(5),
             driftViolations = drift,
-            inactiveRolls = inactive,
-            rawRolls = totalActive + inactive,
             topColours = topColours,
         )
     }

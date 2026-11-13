@@ -19,8 +19,8 @@ android {
         applicationId = "com.alazhartex.stock"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = 34
-        versionCode = 10
-        versionName = "1.3.6"
+        versionCode = 11
+        versionName = "1.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -103,6 +103,7 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.process)
     implementation(libs.navigation.compose)
+    implementation(libs.datastore.preferences)
     implementation(libs.coroutines.android)
 
     implementation(platform(libs.compose.bom))

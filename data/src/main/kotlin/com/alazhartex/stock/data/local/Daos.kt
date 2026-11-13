@@ -52,6 +52,9 @@ interface WarehouseDao {
     @Query("DELETE FROM warehouses")
     suspend fun deleteAll(): Int
 
+    @Query("SELECT COALESCE(SUM(capacity_rolls), 0) FROM warehouses")
+    suspend fun sumCapacity(): Long
+
     @Query("SELECT COUNT(*) FROM warehouses")
     suspend fun countAll(): Long
 }
