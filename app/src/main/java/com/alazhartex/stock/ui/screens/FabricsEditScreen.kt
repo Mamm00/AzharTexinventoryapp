@@ -266,9 +266,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                     } catch (t: Throwable) {
                         snackbarFor(context, t)
                     }
-                    snackbar.showSnackbar(message)
                     showAddFabric = false
                     refresh.bump()
+                    snackbar.showSnackbar(message)
                 }
             },
         )
@@ -287,9 +287,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                     } catch (t: Throwable) {
                         snackbarFor(context, t)
                     }
-                    snackbar.showSnackbar(message)
                     editFabric = null
                     refresh.bump()
+                    snackbar.showSnackbar(message)
                 }
             },
         )
@@ -329,9 +329,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                             } catch (t: Throwable) {
                                 snackbarFor(context, t)
                             }
-                            snackbar.showSnackbar(message)
                             deleteFabric = null
                             refresh.bump()
+                            snackbar.showSnackbar(message)
                         }
                     }) { Text(stringResource(R.string.action_confirm)) }
                 },
@@ -355,9 +355,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                     } catch (t: Throwable) {
                         snackbarFor(context, t)
                     }
-                    snackbar.showSnackbar(message)
                     showAddColour = false
                     refresh.bump()
+                    snackbar.showSnackbar(message)
                 }
             },
         )
@@ -378,9 +378,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                     } catch (t: Throwable) {
                         snackbarFor(context, t)
                     }
-                    snackbar.showSnackbar(message)
                     editColour = null
                     refresh.bump()
+                    snackbar.showSnackbar(message)
                 }
             },
         )
@@ -405,9 +405,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                         } catch (t: Throwable) {
                             snackbarFor(context, t)
                         }
-                        snackbar.showSnackbar(message)
                         deleteColour = null
                         refresh.bump()
+                        snackbar.showSnackbar(message)
                     }
                 }) { Text(stringResource(R.string.action_delete)) }
             },
@@ -430,9 +430,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                         snackbarFor(context, t)
                     }
                 }
-                snackbar.showSnackbar(message)
                 showAssign = false
                 refresh.bump()
+                snackbar.showSnackbar(message)
             }
         }
     }
@@ -456,9 +456,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                     } catch (t: Throwable) {
                         snackbarFor(context, t)
                     }
-                    snackbar.showSnackbar(message)
                     showAddFamily = false
                     refresh.bump()
+                    snackbar.showSnackbar(message)
                 }
             },
         )
@@ -481,9 +481,9 @@ fun FabricsEditScreen(app: AlAzharApp) {
                         } catch (t: Throwable) {
                             snackbarFor(context, t)
                         }
-                        snackbar.showSnackbar(message)
                         deleteFamilyId = null
                         refresh.bump()
+                        snackbar.showSnackbar(message)
                     }
                 }) { Text(stringResource(R.string.action_delete)) }
             },

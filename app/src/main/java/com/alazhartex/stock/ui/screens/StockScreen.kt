@@ -288,6 +288,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                     onValueChange = { qtyText = it.filter { ch -> ch.isDigit() }.take(9) },
                     label = { Text(stringResource(R.string.label_qty)) },
                     singleLine = true,
+                    modifier = Modifier.testTag("add_qty"),
                 )
                 OutlinedTextField(
                     value = note,
@@ -335,8 +336,8 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                                 } catch (t: Throwable) {
                                     snackbarFor(context, t)
                                 }
-                                snackbar.showSnackbar(message)
                                 onClose()
+                                snackbar.showSnackbar(message)
                             }
                         },
                     ) { Text(stringResource(R.string.action_save)) }
