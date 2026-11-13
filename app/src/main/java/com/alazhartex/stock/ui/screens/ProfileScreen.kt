@@ -33,7 +33,7 @@ private data class ProfileState(
 
 @Composable
 fun ProfileScreen(app: AlAzharApp) {
-    val state by produceState(initialValue = null as ProfileState?, Unit) {
+    val state by produceState(initialValue = null as ProfileState?, rememberDbVersion()) {
         val account = app.container.readRepository.accountById(ACTOR_ADMIN)
         val sheds = if (account?.role == "ADMIN") {
             app.container.readRepository.shedCards().map { it.shedId }

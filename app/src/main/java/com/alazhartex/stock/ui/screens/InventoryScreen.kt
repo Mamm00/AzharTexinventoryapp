@@ -36,7 +36,7 @@ import com.alazhartex.stock.ui.integerString
 fun InventoryScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
     var query by remember { mutableStateOf("") }
-    val lines by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.InventoryLineDto>?, Unit) {
+    val lines by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.InventoryLineDto>?, rememberDbVersion()) {
         value = app.container.readRepository.inventoryLines()
     }
 

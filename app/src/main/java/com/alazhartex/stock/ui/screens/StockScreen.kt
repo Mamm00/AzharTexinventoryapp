@@ -63,8 +63,9 @@ fun StockScreen(app: AlAzharApp) {
     val snackbar = LocalSnackbar.current
     val refresh = rememberRefresh()
     val tick = refresh.tick.intValue
-    val cards by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.ShedCardDto>?, tick) {
-        value = app.container.readRepository.shedCards()
+    val cards by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.ShedCardDto>?, tick, rememberDbVersion()) {
+        // Keep the last good snapshot if a database rebuild races an in-flight query.
+        value = runCatching { app.container.readRepository.shedCards() }.getOrElse { cause -> value ?: throw cause }
     }
     var activeDialog by remember { mutableStateOf<MutationDialog?>(null) }
 
@@ -159,7 +160,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
     // the shed showed 0 rolls forever. List ALL master fabrics (mapped first, unmapped tagged
     // "new here"); picking one enables the inline colour list where "Add here" bootstraps the
     // mapping for this warehouse on the spot.
-    val allFabrics by produceState(initialValue = emptyList<com.alazhartex.stock.data.local.FabricEntity>(), Unit) {
+    val allFabrics by produceState(initialValue = emptyList<com.alazhartex.stock.data.local.FabricEntity>(), rememberDbVersion()) {
         value = app.container.readRepository.masters().fabrics.sortedBy { it.nameEn }
     }
     val mappedNames = remember(lines) { lines.map { it.fabricNameEn }.toSet() }
@@ -223,7 +224,7 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                         stringResource(R.string.picker_title),
                         style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
                     )
-                    val colourList by produceState(initialValue = emptyList<com.alazhartex.stock.data.repo.ColourRowDto>(), Unit) {
+                    val colourList by produceState(initialValue = emptyList<com.alazhartex.stock.data.repo.ColourRowDto>(), rememberDbVersion()) {
                         value = app.container.readRepository.colours().filter { it.isActive }
                     }
                     InlineColourPicker(

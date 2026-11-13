@@ -18,10 +18,11 @@ import java.util.UUID
  * Every write audited via TransactionRunner (spec §4.4/§4.7). Keepers never delete or regrade shared data.
  */
 class MastersSettingsRepository(
-    private val database: AppDatabase,
+    db: () -> AppDatabase,
     private val wallClock: () -> Long,
 ) {
-    private val runner = TransactionRunner(database) { wallClock() }
+    private val database get() = db()
+    private val runner = TransactionRunner(db) { wallClock() }
 
     private suspend fun actorRole(actorId: String): Role =
         database.accountDao().getById(actorId)?.role?.let { Role.valueOf(it) }

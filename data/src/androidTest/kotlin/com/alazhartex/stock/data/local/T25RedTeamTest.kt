@@ -85,7 +85,7 @@ class T25RedTeamTest {
     }
 
     private fun repo(verdict: SessionPolicy.MutationResolution = SessionPolicy.MutationResolution.PROCEED) =
-        StockRepository(database, { 1_700_000_100_000L }) { _, _ -> verdict }
+        StockRepository({ database }, { 1_700_000_100_000L }) { _, _ -> verdict }
 
     private suspend fun seedBase() {
         database.accountDao().insert(AccountEntity("admin", "admin", "pbkdf2\$210000\$salt\$hash", "ADMIN", "Admin"))

@@ -17,11 +17,12 @@ import java.util.UUID
  * Negative-stock refusal uses an ATOMIC conditional UPDATE, so concurrent removals lose safely.
  */
 class StockRepository(
-    private val database: AppDatabase,
+    db: () -> AppDatabase,
     private val wallClock: () -> Long,
     private val sessionVerdict: suspend (actorId: String, actorIsAdmin: Boolean) -> com.alazhartex.stock.domain.session.SessionPolicy.MutationResolution,
 ) {
-    private val runner = TransactionRunner(database) { wallClock() }
+    private val database get() = db()
+    private val runner = TransactionRunner(db) { wallClock() }
 
     private suspend fun requireSessionAndRole(actorId: String): Pair<String, Set<String>> {
         val account = database.accountDao().getById(actorId) ?: throw RbacDeniedException(

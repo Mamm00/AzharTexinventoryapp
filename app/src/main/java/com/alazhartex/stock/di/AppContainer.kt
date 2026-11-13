@@ -1,10 +1,8 @@
 package com.alazhartex.stock.di
 
 import android.content.Context
-import androidx.room.Room
 import com.alazhartex.stock.data.local.AppDatabase
-import com.alazhartex.stock.data.local.MIGRATION_1_2
-import com.alazhartex.stock.data.local.MIGRATION_2_3
+import com.alazhartex.stock.data.local.DbProvider
 import com.alazhartex.stock.data.repo.DebugRepository
 import com.alazhartex.stock.data.repo.MastersSettingsRepository
 import com.alazhartex.stock.data.repo.ReadRepository
@@ -30,20 +28,17 @@ class AppContainer(private val context: Context) {
 
     private val sessionPrefs = context.getSharedPreferences("alazhartex.session", Context.MODE_PRIVATE)
 
-    val database: AppDatabase by lazy {
-        Room.databaseBuilder(context, AppDatabase::class.java, "alazhartex.db")
-            .addCallback(AppDatabase.TriggersCallback())
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-            .build()
-    }
+    val database: AppDatabase get() = DbProvider.ensure(context)
+    /** Supply a fresh instance reference at every access (repos hold this lambda, not the instance). */
+    private val dbSupplier: () -> AppDatabase = { DbProvider.ensure(context) }
 
-    val seedLoader by lazy { SeedLoader(context, database, clock::wallMillis) }
+    val seedLoader by lazy { SeedLoader(context, dbSupplier, clock::wallMillis) }
 
     val sessionManager by lazy {
         SessionManager(
-            sessionDao = database.sessionDao(),
+            sessionDao = { DbProvider.ensure(context).sessionDao() },
             auditWriter = { ctx, action, target, result, reason ->
-                database.auditDao().insert(
+                DbProvider.ensure(context).auditDao().insert(
                     com.alazhartex.stock.data.local.AuditLogEntity(
                         id = UUID.randomUUID().toString(),
                         at = ctx.wallMillis,
@@ -61,22 +56,22 @@ class AppContainer(private val context: Context) {
         )
     }
 
-    val readRepository by lazy { ReadRepository(database) }
+    val readRepository by lazy { ReadRepository(dbSupplier) }
     val stockRepository by lazy {
-        StockRepository(database, clock::wallMillis) { actorId, actorIsAdmin ->
+        StockRepository(dbSupplier, clock::wallMillis) { actorId, actorIsAdmin ->
             sessionManager.mutationSessionVerdict(actorId, actorIsAdmin)
         }
     }
-    val mastersSettingsRepository by lazy { MastersSettingsRepository(database, clock::wallMillis) }
-    val debugRepository by lazy { DebugRepository(context, database, clock::wallMillis, seedLoader) }
-    val exportImportManager by lazy { ExportImportManager(context, database, clock::wallMillis, APP_VERSION) }
+    val mastersSettingsRepository by lazy { MastersSettingsRepository(dbSupplier, clock::wallMillis) }
+    val debugRepository by lazy { DebugRepository(context, dbSupplier, clock::wallMillis, seedLoader) }
+    val exportImportManager by lazy { ExportImportManager(context, dbSupplier, clock::wallMillis, APP_VERSION) }
     val passwordHasher = PasswordHasher // exposed for tooling/tests; UI never sees it
 
     /** UI state: Arabic-Indic digits toggle (persisted in app_settings, loaded at bootstrap). */
     val digitsFlow = MutableStateFlow(false)
 
     suspend fun loadPersistedPrefs() {
-        digitsFlow.update { database.appSettingsDao().get("arabic_indic_digits") == "true" }
+        digitsFlow.update { DbProvider.ensure(context).appSettingsDao().get("arabic_indic_digits") == "true" }
     }
 
     private val _bootstrapped = MutableStateFlow(false)
@@ -92,7 +87,7 @@ class AppContainer(private val context: Context) {
         sessionPrefs.getString(KEY_BOOT_ID, null) ?: UUID.randomUUID().toString().also { rotateProcessBootId() }
 
     companion object {
-        const val APP_VERSION = "1.3.5"
+        const val APP_VERSION = "1.3.6"
         private const val KEY_BOOT_ID = "process_boot_id"
     }
 }

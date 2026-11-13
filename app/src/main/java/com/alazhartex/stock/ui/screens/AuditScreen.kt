@@ -31,7 +31,7 @@ import com.alazhartex.stock.ui.dateTimeString
 @Composable
 fun AuditScreen(app: AlAzharApp) {
     var blockedOnly by remember { mutableStateOf(false) }
-    val rows by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.AuditRowDto>?, blockedOnly) {
+    val rows by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.AuditRowDto>?, blockedOnly, rememberDbVersion()) {
         value = app.container.readRepository.audit(limit = 500, onlyBlocked = blockedOnly)
     }
 

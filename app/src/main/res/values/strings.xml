@@ -29,6 +29,8 @@
     <string name="action_confirm">Confirm</string>
     <string name="action_export_db">Export database</string>
     <string name="action_import_db">Import database</string>
+    <string name="action_refresh_db">Refresh database</string>
+    <string name="summary_refresh_db">Reload all stock, dashboard and roll data from disk</string>
     <string name="action_generate">Generate</string>
     <string name="action_share">Share</string>
 
@@ -110,7 +112,9 @@
     <string name="toast_export_done">Export ready: %1$s</string>
     <string name="toast_export_failed">Export failed</string>
     <string name="toast_import_failed">Import refused at check R%1$d: %2$s</string>
-    <string name="toast_import_done">Import complete. Restarting…</string>
+    <string name="toast_import_done">Import complete.</string>
+    <string name="toast_refresh_done">Database reloaded from disk.</string>
+    <string name="toast_refresh_failed">Could not reload the database.</string>
     <string name="toast_overwrite_confirm">Confirm overwrite — current data will be replaced. A safety copy will be kept.</string>
     <string name="toast_overwrite_body">The database will be replaced with the imported file. Your current data is copied to a safety backup first. This cannot be undone inside the app.</string>
     <string name="toast_setting_saved">Setting saved</string>

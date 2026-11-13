@@ -31,10 +31,11 @@ import org.json.JSONObject
  */
 class SeedLoader(
     private val context: Context,
-    private val database: AppDatabase,
+    db: () -> AppDatabase,
     private val wallClock: () -> Long,
 ) {
-    private val runner = TransactionRunner(database) { wallClock() }
+    private val database get() = db()
+    private val runner = TransactionRunner(db) { wallClock() }
     private val prefs = context.getSharedPreferences(SEED_PREFS, Context.MODE_PRIVATE)
 
     suspend fun seedIfNeeded(): MutationOutcome {

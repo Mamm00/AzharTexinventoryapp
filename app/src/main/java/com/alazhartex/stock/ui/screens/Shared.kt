@@ -4,6 +4,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.domain.model.DuplicateValueException
@@ -28,6 +29,15 @@ class RefreshScope {
 
 @Composable
 fun rememberRefresh(): RefreshScope = remember { RefreshScope() }
+
+/**
+ * Live invalidation token from DbProvider (bumped on every committed write and after
+ * DbProvider.refresh()). Screens key their loaders on this so they re-query the CURRENT
+ * database instance instead of racing a stale one.
+ */
+@Composable
+fun rememberDbVersion(): Long =
+    com.alazhartex.stock.data.local.DbProvider.dataVersion.collectAsStateWithLifecycle().value
 
 /** Maps domain exceptions to snackbar-safe user messages (RBAC-first). Plain function — callers pass a Context (it is called from coroutines, not composition). */
 fun snackbarFor(context: android.content.Context, error: Throwable): String {

@@ -16,14 +16,15 @@ import java.util.UUID
  *  - boot_id changes on every process start; cold-boot path uses wall clock (RES-008).
  */
 class SessionManager(
-    private val sessionDao: SessionDao,
+    sessionDao: () -> SessionDao,
     private val auditWriter: suspend (WriteContext, action: String, target: String, result: String, reason: String?) -> Unit,
     private val clock: AppClock,
     private val currentBootId: () -> String,
 ) {
+    private val dao get() = sessionDao()
     suspend fun ensureAdminSessionOnForeground() {
         val boot = currentBootId()
-        val existing = sessionDao.latestActive("admin")
+        val existing = dao.latestActive("admin")
         if (existing == null) {
             issueSession("admin", boot)
             auditWriter(writeContextFor("admin", "session.reissue"), "session.reissue", "admin", "ALLOWED", "missing_session")
@@ -38,7 +39,7 @@ class SessionManager(
         when (verdict) {
             SessionPolicy.Verdict.ACTIVE -> Unit
             SessionPolicy.Verdict.EXPIRED_REFRESHABLE -> {
-                sessionDao.deactivateFor("admin")
+                dao.deactivateFor("admin")
                 issueSession("admin", boot)
                 auditWriter(writeContextFor("admin", "session.reissue"), "session.reissue", "admin", "ALLOWED", "expired_reissue")
             }
@@ -52,7 +53,7 @@ class SessionManager(
     /** Called by the transaction runner BEFORE every mutation. Returns the action to take. */
     suspend fun mutationSessionVerdict(actorId: String, actorIsAdmin: Boolean): SessionPolicy.MutationResolution {
         val boot = currentBootId()
-        val existing = sessionDao.latestActive(actorId)
+        val existing = dao.latestActive(actorId)
         if (existing == null) {
             return if (actorIsAdmin) {
                 issueSession("admin", boot)
@@ -70,7 +71,7 @@ class SessionManager(
         )
         val resolution = SessionPolicy.resolveForMutation(actorIsAdmin, verdict)
         if (resolution == SessionPolicy.MutationResolution.SILENT_REISSUE_AND_PROCEED) {
-            sessionDao.deactivateFor(actorId)
+            dao.deactivateFor(actorId)
             issueSession(actorId, boot)
             auditWriter(writeContextFor(actorId, "session.refresh"), "session.refresh", actorId, "ALLOWED", "silent_refresh")
             return SessionPolicy.MutationResolution.PROCEED
@@ -79,7 +80,7 @@ class SessionManager(
     }
 
     /** Session-expiry countdown for My Profile screen. */
-    suspend fun adminSessionExpiresAtWall(): Long? = sessionDao.latestActive("admin")?.expiresAtWall
+    suspend fun adminSessionExpiresAtWall(): Long? = dao.latestActive("admin")?.expiresAtWall
 
     private suspend fun issueSession(accountId: String, bootId: String): SessionEntity {
         val now = clock.wallMillis()
@@ -92,7 +93,7 @@ class SessionManager(
             expiresAtWall = now + SessionPolicy.SESSION_DURATION_MILLIS,
             isActive = true,
         )
-        sessionDao.insert(row)
+        dao.insert(row)
         return row
     }
 
@@ -102,7 +103,7 @@ class SessionManager(
     /** Debug-only account switch for androidTest (RES-022); never exposed in release builds. */
     suspend fun debugSwitchAccountForTests(accountId: String) {
         val boot = currentBootId()
-        sessionDao.deactivateFor(accountId)
+        dao.deactivateFor(accountId)
         issueSession(accountId, boot)
     }
 }

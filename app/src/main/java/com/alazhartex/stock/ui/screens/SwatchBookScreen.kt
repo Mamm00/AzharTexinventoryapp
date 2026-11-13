@@ -53,7 +53,9 @@ import com.alazhartex.stock.ui.components.paletteContentDescription
 import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Swatch book (v1.3) — the digital twin of the physical fabric sample cards.
@@ -76,13 +78,13 @@ fun SwatchBookScreen(app: AlAzharApp) {
     val refresh = rememberRefresh()
     val tick = refresh.tick.intValue
 
-    val warehouses by produceState(initialValue = null as List<com.alazhartex.stock.data.local.WarehouseEntity>?, tick) {
+    val warehouses by produceState(initialValue = null as List<com.alazhartex.stock.data.local.WarehouseEntity>?, tick, rememberDbVersion()) {
         value = app.container.readRepository.masters().warehouses
     }
-    val fabrics by produceState(initialValue = null as List<com.alazhartex.stock.data.local.FabricEntity>?, tick) {
+    val fabrics by produceState(initialValue = null as List<com.alazhartex.stock.data.local.FabricEntity>?, tick, rememberDbVersion()) {
         value = app.container.readRepository.masters().fabrics
     }
-    val colours by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.ColourRowDto>?, tick) {
+    val colours by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.ColourRowDto>?, tick, rememberDbVersion()) {
         value = app.container.readRepository.colours()
     }
 
@@ -96,7 +98,7 @@ fun SwatchBookScreen(app: AlAzharApp) {
         }
     }
 
-    val lines by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.InventoryLineDto>?, warehouseId, tick) {
+    val lines by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.InventoryLineDto>?, warehouseId, tick, rememberDbVersion()) {
         value = warehouseId?.let { app.container.readRepository.inventoryLines(it) } ?: emptyList()
     }
 
@@ -241,6 +243,7 @@ fun SwatchBookScreen(app: AlAzharApp) {
                                 val created = app.container.mastersSettingsRepository.loadFamilyPalette(
                                     ACTOR_ADMIN, warehouseIdOrNull, fabric.id, UUID.randomUUID().toString(),
                                 )
+                                withContext(Dispatchers.IO) { com.alazhartex.stock.data.local.DbProvider.refresh(context) }
                                 if (created > 0) {
                                     context.getString(R.string.swatchbook_load_done, integerString(created.toLong(), arabicIndic))
                                 }

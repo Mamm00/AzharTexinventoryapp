@@ -87,8 +87,9 @@ private val QUICK_ACTIONS = listOf(
 fun DashboardScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
     val navigate = LocalNavigate.current
-    val dashboard by produceState(initialValue = null as com.alazhartex.stock.data.repo.DashboardDto?, Unit) {
-        value = app.container.readRepository.dashboard()
+    val dashboard by produceState(initialValue = null as com.alazhartex.stock.data.repo.DashboardDto?, rememberDbVersion()) {
+        // Keep the last good snapshot if a database rebuild races an in-flight query.
+        value = runCatching { app.container.readRepository.dashboard() }.getOrElse { cause -> value ?: throw cause }
     }
 
     Scaffold { padding ->

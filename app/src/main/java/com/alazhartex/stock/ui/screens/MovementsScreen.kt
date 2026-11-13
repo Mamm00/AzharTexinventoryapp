@@ -39,7 +39,7 @@ private val TYPE_FILTERS = listOf("ALL", "IN", "OUT", "TRANSFER_IN", "TRANSFER_O
 fun MovementsScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
     var filter by remember { mutableStateOf("ALL") }
-    val rows by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.MovementRowDto>?, Unit) {
+    val rows by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.MovementRowDto>?, rememberDbVersion()) {
         value = app.container.readRepository.movements()
     }
 

@@ -32,7 +32,7 @@ import com.alazhartex.stock.ui.integerString
 @Composable
 fun CrossViewScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
-    val data by produceState(initialValue = null as CrossData?, Unit) {
+    val data by produceState(initialValue = null as CrossData?, rememberDbVersion()) {
         val cards = app.container.readRepository.shedCards()
         val lines = app.container.readRepository.inventoryLines().filter { it.isActive }
         val sheds = cards.map { it.shedId }

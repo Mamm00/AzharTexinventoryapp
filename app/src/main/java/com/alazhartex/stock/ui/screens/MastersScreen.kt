@@ -57,7 +57,7 @@ fun MastersScreen(app: AlAzharApp) {
     val refresh = rememberRefresh()
     val tick = refresh.tick.intValue
     var tab by remember { mutableStateOf(MastersTab.WAREHOUSES) }
-    val snapshot by produceState(initialValue = null as com.alazhartex.stock.data.repo.MastersSnapshot?, tick) {
+    val snapshot by produceState(initialValue = null as com.alazhartex.stock.data.repo.MastersSnapshot?, tick, rememberDbVersion()) {
         value = app.container.readRepository.masters()
     }
     var showAddFabric by remember { mutableStateOf(false) }
