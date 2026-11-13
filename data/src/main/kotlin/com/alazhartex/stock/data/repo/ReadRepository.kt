@@ -9,10 +9,20 @@ class ReadRepository(db: () -> AppDatabase) {
     private val dbSupplier: () -> AppDatabase = db
     private val database get() = dbSupplier()
 
-    suspend fun shedCards(): List<ShedCardDto> {
+    /** Where per-shed active rolls come from. ROLLS_CACHE keeps the v1.3.6 invalidation contract
+     * (raw external writes into `rolls` show up on the Stock grid after DbProvider.refresh());
+     * INVENTORY_LEDGER is the dashboard's source of truth (matches Top colours). */
+    private enum class ShedRollsSource { ROLLS_CACHE, INVENTORY_LEDGER }
+
+    suspend fun shedCards(): List<ShedCardDto> = shedCardsFrom(ShedRollsSource.ROLLS_CACHE)
+
+    private suspend fun shedCardsFrom(source: ShedRollsSource): List<ShedCardDto> {
         val warehouses = database.warehouseDao().getAll()
         return warehouses.map { wh ->
-            val active = database.inventoryDao().sumClosingForShed(wh.id)
+            val active = when (source) {
+                ShedRollsSource.ROLLS_CACHE -> database.rollDao().sumActiveForShed(wh.id)
+                ShedRollsSource.INVENTORY_LEDGER -> database.inventoryDao().sumClosingForShed(wh.id)
+            }
             val pct = Utilisation.percentTwoDp(active, wh.capacityRolls)
             val display = Utilisation.percentOneDp(active, wh.capacityRolls)
                 ?.stripTrailingZeros()?.toPlainString()
@@ -110,7 +120,7 @@ class ReadRepository(db: () -> AppDatabase) {
      */
     suspend fun dashboard(): DashboardDto {
         val topColours = rankTopColours(5)
-        val cards = shedCards()
+        val cards = shedCardsFrom(ShedRollsSource.INVENTORY_LEDGER)
         val active = database.inventoryDao().sumClosingAll()
         val inactive = database.rollDao().sumByState("INACTIVE")
         val total = active + inactive

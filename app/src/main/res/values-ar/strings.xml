@@ -10,7 +10,6 @@
     <string name="nav_dashboard">لوحة المعلومات</string>
     <string name="nav_dashboard_settings">إعدادات لوحة المعلومات</string>
 
-    <string name="overrides_title">القيم اليدوية</string>
     <string name="overrides_description">اكتب مؤشرات الأداء المعروضة في لوحة المعلومات بدلًا من إجمالي قاعدة البيانات الحية. مفيد عندما لم تستقر البيانات المستوردة بعد أو عندما تريد تثبيت أرقام العرض. الحقول الفارغة تعود إلى قيم SQL الحية.</string>
     <string name="overrides_enable">تفعيل القيم اليدوية</string>
     <string name="overrides_enable_summary">اعرض القيم أدناه في لوحة المعلومات بدلًا من إجمالي قاعدة البيانات الحية</string>

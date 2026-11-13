@@ -10,7 +10,6 @@
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_dashboard_settings">Dashboard Settings</string>
 
-    <string name="overrides_title">Manual overrides</string>
     <string name="overrides_description">Type the KPIs shown on the Dashboard instead of the live database totals. Useful when the imported file has not settled yet or you want the board deck figures pinned. Blank fields fall back to the live SQL values.</string>
     <string name="overrides_enable">Enable Manual Overrides</string>
     <string name="overrides_enable_summary">Show the values below on the Dashboard instead of live database totals</string>

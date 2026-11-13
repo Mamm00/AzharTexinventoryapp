@@ -34,7 +34,9 @@ attached to its GitHub Release.
   Active = `SUM(inventory.closing)` (the same source Top colours reads, so the KPIs and the
   colour ranking can never disagree again), Inactive = `SUM(rolls.count) WHERE state='INACTIVE'`,
   Total = Active + Inactive, Capacity = `SUM(warehouses.capacity_rolls)`.
-  Per-shed cards use `SUM(inventory.closing)` per warehouse as well.
+  The dashboard's Top sheds list uses `SUM(inventory.closing)` per warehouse as well; the
+  Stock grid, Cross-View, profile and CSV stock exports keep the rolls-cache cards
+  (`shedCards()`), whose external-write invalidation is pinned by `DbRefreshTest`.
 - **Utilisation** is now `(Total / Capacity) × 100` everywhere on the dashboard and is guarded
   against capacity == 0 (percent renders "—", bucket null) instead of dividing by zero.
   Active = Total − Inactive is enforced by construction in the ViewModel (an explicitly typed
