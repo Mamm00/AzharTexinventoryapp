@@ -155,7 +155,6 @@
     <string name="about_offline">يعمل دون اتصال تمامًا — بلا صلاحية إنترنت، وكل بايت يبقى على هذا الجهاز.</string>
     <string name="about_copyright">© الأزهر تكستيل. جميع الحقوق محفوظة.</string>
     <string name="palette_swatch_cd">لون %1$s — %2$s — الدرجة %3$s</string>
-    <string name="palette_footer_selected">المحدد: %1$s — %2$s</string>
     <string name="label_top_colours">أكثر الألوان استخدامًا</string>
     <string name="nav_fabrics_edit">تعديل الخامات</string>
     <string name="masters_edit_entry">إدارة الخامات والأنواع والألوان</string>
@@ -196,15 +195,12 @@
     <string name="keeper_code_keeper_only">أكواد الأمين تُخزن ببادئة K- للألوان التي يضيفها الأمين</string>
     <string name="picker_title">اختر اللون</string>
     <string name="picker_search_hint">ابحث بالكود أو الاسم (عربي/إنجليزي)</string>
-    <string name="picker_grade_all">الكل</string>
-    <string name="picker_family_all">كل العائلات</string>
     <string name="picker_empty">لا توجد ألوان مطابقة</string>
     <string name="picker_clear_filters">مسح المرشحات</string>
     <string name="picker_not_mapped">غير مضاف لهذا القماش</string>
-    <string name="picker_assign_selected">أضف الألوان المحددة لهذا القماش هنا (%1$s)</string>
-    <string name="picker_assigned_ok">تمت إضافة %1$s لونًا لهذا القماش</string>
+    <string name="picker_add_here">أضف هنا</string>
+    <string name="picker_colour_added">تمت إضافة %1$s لهذا القماش — اضغط عليها للاختيار</string>
     <string name="picker_available">المتاح: %1$s</string>
-    <string name="picker_confirm">تأكيد</string>
     <string name="picker_footer_none">اختر لونًا للمتابعة</string>
     <string name="family_cotton">قطن</string>
     <string name="family_linen">كتان</string>

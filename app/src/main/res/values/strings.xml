@@ -147,7 +147,6 @@
     <string name="about_offline">Works fully offline — no internet permission, every byte stays on this device.</string>
     <string name="about_copyright">© AlAzhar Textiles. All rights reserved.</string>
     <string name="palette_swatch_cd">Colour %1$s — %2$s — grade %3$s</string>
-    <string name="palette_footer_selected">Selected: %1$s — %2$s</string>
     <string name="label_top_colours">Top colours</string>
     <string name="nav_fabrics_edit">Fabrics Edit</string>
     <string name="masters_edit_entry">Manage fabrics, types &amp; colours</string>
@@ -188,15 +187,12 @@
     <string name="keeper_code_keeper_only">Keeper codes are stored under a K- prefix for keeper-created colours</string>
     <string name="picker_title">Choose colour</string>
     <string name="picker_search_hint">Search code or name (AR/EN)</string>
-    <string name="picker_grade_all">All</string>
-    <string name="picker_family_all">All families</string>
     <string name="picker_empty">No colours match these filters</string>
     <string name="picker_clear_filters">Clear filters</string>
     <string name="picker_not_mapped">Not in this fabric</string>
-    <string name="picker_assign_selected">Add selected colours to this fabric here (%1$s)</string>
-    <string name="picker_assigned_ok">Added %1$s colour(s) to this fabric</string>
+    <string name="picker_add_here">Add here</string>
+    <string name="picker_colour_added">Added %1$s to this fabric — tap it to select</string>
     <string name="picker_available">Available: %1$s</string>
-    <string name="picker_confirm">Confirm</string>
     <string name="picker_footer_none">Select a colour to continue</string>
     <string name="family_cotton">Cotton</string>
     <string name="family_linen">Linen</string>
