@@ -226,7 +226,7 @@ class AllScreensSmokeTest {
                     .getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }
                     .orEmpty()
                     .joinToString(" ") { it.text }
-                Regex("\\d[\\d,]*\\s*/").find(normalizeDigits(raw))
+                Regex("(\\d[\\d,]*)\\s*/").find(normalizeDigits(raw))
                     ?.groupValues?.get(1)?.replace(",", "")?.toLongOrNull() ?: 0L
             }
 }
