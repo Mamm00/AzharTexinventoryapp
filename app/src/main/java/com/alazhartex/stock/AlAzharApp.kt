@@ -2,6 +2,7 @@ package com.alazhartex.stock
 
 import android.app.Application
 import com.alazhartex.stock.di.AppContainer
+import com.alazhartex.stock.permissions.AlAzharNotifier
 import kotlinx.coroutines.launch
 
 /**
@@ -14,6 +15,7 @@ class AlAzharApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AlAzharNotifier.ensureChannel(this)
         container = AppContainer(this)
         container.rotateProcessBootId()
         container.applicationScope.launch {

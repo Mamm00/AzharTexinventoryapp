@@ -9,6 +9,25 @@
     <string name="nav_crossview">عرض شامل</string>
     <string name="nav_dashboard">لوحة المعلومات</string>
     <string name="nav_dashboard_settings">إعدادات لوحة المعلومات</string>
+    <string name="permissions_title">أذونات التطبيق</string>
+    <string name="permissions_description">يصرّح الأزهر تكستيل بالوصول إلى الملفات والوسائط المشتركة وإلى الإشعارات. تصدير/استيراد قاعدة البيانات عبر منتقي النظام لا يحتاج إلى إذن — هذه الأذونات للوصول المباشر إلى الملفات وإشعارات النسخ الاحتياطي. لا يمكن منح كل إذن إلا منك.</string>
+    <string name="permissions_notifications">الإشعارات</string>
+    <string name="permissions_notifications_summary">إظهار إشعار عند اكتمال تصدير أو استيراد قاعدة البيانات.</string>
+    <string name="permissions_media">الملفات والوسائط</string>
+    <string name="permissions_media_summary">قراءة الصور والفيديو والصوت من التخزين المشترك (الصور والملفات).</string>
+    <string name="permissions_all_files">الوصول إلى كل الملفات</string>
+    <string name="permissions_all_files_summary">وصول كامل بالقراءة والكتابة إلى التخزين المشترك — مفتاح داخل إعدادات النظام. لمواقع النسخ الاحتياطي المباشرة، وغير مطلوب للمنتقي.</string>
+    <string name="permissions_grant">منح</string>
+    <string name="permissions_open_settings">فتح الإعدادات</string>
+    <string name="permissions_status_granted">ممنوح</string>
+    <string name="permissions_status_denied">غير ممنوح</string>
+    <string name="permissions_not_required">غير مطلوب في إصدار Android هذا</string>
+    <string name="notif_channel_name">نسخ الأزهر تكستيل الاحتياطية</string>
+    <string name="notif_channel_description">إشعارات عن اكتمال تصدير واستيراد قاعدة البيانات.</string>
+    <string name="notif_export_title">التصدير جاهز</string>
+    <string name="notif_export_body">تم تصدير قاعدة البيانات: %1$s</string>
+    <string name="notif_import_title">اكتمل الاستيراد</string>
+    <string name="notif_import_body">تم استيراد قاعدة البيانات بنجاح.</string>
 
     <string name="overrides_description">اكتب مؤشرات الأداء المعروضة في لوحة المعلومات بدلًا من إجمالي قاعدة البيانات الحية. مفيد عندما لم تستقر البيانات المستوردة بعد أو عندما تريد تثبيت أرقام العرض. الحقول الفارغة تعود إلى قيم SQL الحية.</string>
     <string name="overrides_enable">تفعيل القيم اليدوية</string>

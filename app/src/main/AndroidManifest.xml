@@ -2,6 +2,21 @@
 <!-- Offline-first: NO INTERNET permission anywhere. Backups are explicit user exports (Settings). -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Files & media. The app distributes as a sideloaded APK (GitHub Releases), not via Play,
+         so declaring broad file access is allowed — Google Play would require the
+         MANAGE_EXTERNAL_STORAGE declaration form, do NOT list this app on Play as-is.
+         Export/import of the database itself uses the Storage Access Framework and needs
+         no permission; these exist so the app can read/write shared files & media directly. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <!-- Notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".AlAzharApp"
         android:allowBackup="false"

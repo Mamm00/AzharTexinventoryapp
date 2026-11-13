@@ -16,6 +16,7 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.waitUntilAtLeastOneExists
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.MainActivity
@@ -50,6 +51,9 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 class DebugDangerZoneTest {
+
+    @get:Rule
+    val grantNotifications: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.POST_NOTIFICATIONS)
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()

@@ -3,6 +3,7 @@ package com.alazhartex.stock.ui.screens
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -10,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -56,6 +58,9 @@ import com.alazhartex.stock.data.transfer.ExportImportManager
 import com.alazhartex.stock.ui.LocalSnackbar
 import java.io.File
 import java.util.UUID
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.alazhartex.stock.permissions.AlAzharNotifier
+import com.alazhartex.stock.permissions.Permissions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -247,6 +252,7 @@ fun SettingsScreen(app: AlAzharApp) {
                                 }
                                 context.startActivity(Intent.createChooser(intent, result.file.name))
                                 snackbar.showSnackbar(context.getString(R.string.toast_export_done, result.file.name))
+                                AlAzharNotifier.notify(context, AlAzharNotifier.ID_EXPORT, context.getString(R.string.notif_export_title), context.getString(R.string.notif_export_body, result.file.name))
                             } catch (t: Throwable) {
                                 snackbar.showSnackbar(context.getString(R.string.toast_export_failed))
                             } finally {
@@ -254,6 +260,66 @@ fun SettingsScreen(app: AlAzharApp) {
                             }
                         }
                     }) { Text(stringResource(R.string.action_export_db)) }
+                }
+            }
+
+            // ---- app permissions (notifications + files/media) ----
+            var permissionsTick by remember { mutableStateOf(0) }
+            LifecycleResumeEffect(Unit) {
+                permissionsTick++
+                onDispose { }
+            }
+            val notifGranted = remember(permissionsTick) { Permissions.notificationGranted(context) }
+            val mediaGranted = remember(permissionsTick) { Permissions.mediaGranted(context) }
+            val allFilesGranted = remember(permissionsTick) { Permissions.allFilesGranted(context) }
+            val requestNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionsTick++ }
+            val requestMedia = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionsTick++ }
+            Card(colors = CardDefaults.cardColors(), modifier = Modifier.testTag("permissions_card")) {
+                Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(R.string.permissions_title), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        stringResource(R.string.permissions_description),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    PermissionRow(
+                        title = stringResource(R.string.permissions_notifications),
+                        summary = stringResource(R.string.permissions_notifications_summary),
+                        status = if (Build.VERSION.SDK_INT >= 33) {
+                            stringResource(if (notifGranted) R.string.permissions_status_granted else R.string.permissions_status_denied)
+                        } else {
+                            stringResource(R.string.permissions_not_required)
+                        },
+                        granted = notifGranted,
+                        actionLabel = stringResource(R.string.permissions_grant),
+                        actionVisible = Build.VERSION.SDK_INT >= 33 && !notifGranted,
+                        onAction = { requestNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS) },
+                        testTag = "permissions_notifications",
+                    )
+                    PermissionRow(
+                        title = stringResource(R.string.permissions_media),
+                        summary = stringResource(R.string.permissions_media_summary),
+                        status = stringResource(if (mediaGranted) R.string.permissions_status_granted else R.string.permissions_status_denied),
+                        granted = mediaGranted,
+                        actionLabel = stringResource(R.string.permissions_grant),
+                        actionVisible = !mediaGranted,
+                        onAction = { requestMedia.launch(Permissions.mediaRequestPermissions()) },
+                        testTag = "permissions_media",
+                    )
+                    PermissionRow(
+                        title = stringResource(R.string.permissions_all_files),
+                        summary = stringResource(R.string.permissions_all_files_summary),
+                        status = if (Build.VERSION.SDK_INT >= 30) {
+                            stringResource(if (allFilesGranted) R.string.permissions_status_granted else R.string.permissions_status_denied)
+                        } else {
+                            stringResource(R.string.permissions_not_required)
+                        },
+                        granted = allFilesGranted,
+                        actionLabel = stringResource(R.string.permissions_open_settings),
+                        actionVisible = Build.VERSION.SDK_INT >= 30 && !allFilesGranted,
+                        onAction = { runCatching { context.startActivity(Permissions.manageAllFilesIntent(context)) } },
+                        testTag = "permissions_all_files",
+                    )
                 }
             }
 
@@ -359,10 +425,44 @@ fun SettingsScreen(app: AlAzharApp) {
                         importSidecar = null
                         importPreview = null
                         snackbar.showSnackbar(context.getString(R.string.toast_import_done))
+                        AlAzharNotifier.notify(context, AlAzharNotifier.ID_IMPORT, context.getString(R.string.notif_import_title), context.getString(R.string.notif_import_body))
                     }
                 }) { Text(stringResource(R.string.action_confirm)) }
             },
             dismissButton = { TextButton(onClick = { importPreview = null }) { Text(stringResource(R.string.action_cancel)) } },
         )
+    }
+}
+
+@Composable
+private fun PermissionRow(
+    title: String,
+    summary: String,
+    status: String,
+    granted: Boolean,
+    actionLabel: String,
+    actionVisible: Boolean,
+    onAction: () -> Unit,
+    testTag: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag(testTag),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                status,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (granted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+            )
+        }
+        if (actionVisible) {
+            TextButton(onClick = onAction, modifier = Modifier.testTag("${'$'}{testTag}_grant")) {
+                Text(actionLabel)
+            }
+        }
     }
 }
