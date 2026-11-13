@@ -9,6 +9,10 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.waitUntilDoesNotExist
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.waitUntilAtLeastOneExists
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -98,12 +102,13 @@ class AllScreensSmokeTest {
     }
 
     /**
-     * Regression: "Add roll(s)" sheet -> Fabric dropdown -> Choose colour.
-     * The palette picker previously crashed the app (reported on v1.3.0 by a user).
-     * Seed is SHA-pinned, so wh-alwa's first sorted EN fabric name is stable.
+     * Regression: "Add roll(s)" -> Fabric dropdown -> inline colour list.
+     * Wh-alwa's 14oz Indigo Denim has exactly one mapping in the pinned demo seed (C036),
+     * so the inline list must (a) render, (b) select a mapped colour, (c) assign an
+     * unmapped colour (C012) to the fabric on the spot and auto-select it.
      */
     @Test
-    fun addRollChooseColourOpensPickerWithoutCrash() {
+    fun addRollInlineColourSelectAndAssign() {
         composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
         openDrawer()
         composeTestRule.onNodeWithText(res(R.string.nav_stock)).performScrollTo().performClick()
@@ -123,15 +128,35 @@ class AllScreensSmokeTest {
         composeTestRule.onNodeWithText("14oz Indigo Denim").performClick()
         composeTestRule.waitForIdle()
 
-        // Open the palette picker — this was the reported crash site.
-        composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.picker_title)), timeoutMillis = 30_000)
-        composeTestRule.onNodeWithText(res(R.string.picker_title), useUnmergedTree = true).performClick()
-        composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.picker_search_hint)), timeoutMillis = 30_000)
+        // Inline colour list renders inside the dialog (no overlay). wh-alwa's 14oz Indigo
+        // Denim has exactly one mapping in the pinned demo seed: C036 (Bright Amber).
+        composeTestRule.waitUntilAtLeastOneExists(hasText("C036"), timeoutMillis = 30_000)
 
-        // Rendering/grid composition is where the reported crash happens. Dismiss the picker.
-        composeTestRule.onAllNodesWithText(res(R.string.action_cancel))[0].performClick()
+        // Tap the mapped colour row — it must select, no crash, summary shows the code.
+        composeTestRule.onNodeWithTag("colour_row_C036").performScrollTo().performClick()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText(res(R.string.action_cancel)).performClick()
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_summary"), timeoutMillis = 30_000)
+        composeTestRule.onNodeWithTag("colour_summary", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("C036", useUnmergedTree = true).assertIsDisplayed()
+
+        // The fabric's palette at wh-alwa does NOT include C012 (Light Rose). Adding it to
+        // the fabric from the inline list must create the mapping and auto-select it.
+        composeTestRule.onNodeWithTag("colour_search").performTextClearance()
+        composeTestRule.onNodeWithTag("colour_search").performTextInput("C012")
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_add_C012"), timeoutMillis = 30_000)
+        composeTestRule.onNodeWithTag("colour_add_C012").performClick()
+        composeTestRule.waitForIdle()
+
+        // After the add: the row flips to mapped (add button gone) and C012 is selected.
+        composeTestRule.waitUntilDoesNotExist(hasTestTag("colour_add_C012"), timeoutMillis = 30_000)
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_summary"), timeoutMillis = 30_000)
+        assert(
+            composeTestRule.onAllNodesWithText("C012", substring = true, useUnmergedTree = true)
+                .fetchSemanticsNodes().isNotEmpty(),
+        ) { "C012 should be visible after assigning it to the fabric" }
+
+        // Close the dialog.
+        composeTestRule.onAllNodesWithText(res(R.string.action_cancel))[0].performClick()
         composeTestRule.waitForIdle()
     }
 }

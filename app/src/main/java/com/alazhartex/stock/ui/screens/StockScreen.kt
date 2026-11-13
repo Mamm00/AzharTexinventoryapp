@@ -45,7 +45,7 @@ import com.alazhartex.stock.ui.LocalArabicIndicDigits
 import com.alazhartex.stock.ui.LocalSnackbar
 import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
-import com.alazhartex.stock.ui.components.PalettePickerSheet
+import com.alazhartex.stock.ui.components.InlineColourPicker
 import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.UtilisationGauge
 import com.alazhartex.stock.ui.components.bucketLabelFor
@@ -149,14 +149,13 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
     var expanded by remember { mutableStateOf(false) }
     var fabricName by remember { mutableStateOf<String?>(null) }
     var selected by remember { mutableStateOf<com.alazhartex.stock.data.repo.InventoryLineDto?>(null) }
-    var showPicker by remember { mutableStateOf(false) }
+    var assigningCode by remember { mutableStateOf<String?>(null) }
     var qtyText by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
     var sign by remember { mutableStateOf(1) } // ADJUST only: +1 add, -1 remove
     var busy by remember { mutableStateOf(false) }
     val fabrics = remember(lines) { lines.map { it.fabricNameEn }.distinct().sorted() }
     val fabricLines = remember(lines, fabricName) { lines.filter { it.fabricNameEn == fabricName } }
-    val fabricFamily = fabricLines.firstOrNull()?.family
     val fabricId = fabricLines.firstOrNull()?.fabricId
 
     Dialog(onDismissRequest = onClose) {
@@ -203,24 +202,67 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                 }
 
                 if (fabricName != null) {
-                    val chosenLine = selected
-                    OutlinedButton(
-                        onClick = { showPicker = true },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        if (chosenLine == null) {
-                            Text(stringResource(R.string.picker_title))
-                        } else {
-                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                val itemSw = rememberAnySwatch(chosenLine.family, chosenLine.grade, chosenLine.colourCode, chosenLine.customHex)
-                                ColourSwatch(
-                                    value = itemSw.argb,
-                                    onColour = itemSw.onColour,
-                                    contentDescription = paletteContentDescription(chosenLine.colourCode, chosenLine.colourNameEn, chosenLine.colourNameAr, chosenLine.grade),
-                                    size = SwatchSize.Small,
-                                )
-                                Text("${chosenLine.colourCode} — ${chosenLine.colourNameEn} (${integerString(chosenLine.closing, arabicIndic)})")
+                    Text(
+                        stringResource(R.string.picker_title),
+                        style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                    )
+                    val colourList by produceState(initialValue = emptyList<com.alazhartex.stock.data.repo.ColourRowDto>(), Unit) {
+                        value = app.container.readRepository.colours().filter { it.isActive }
+                    }
+                    InlineColourPicker(
+                        colours = colourList,
+                        lines = fabricLines,
+                        selectedCode = selected?.colourCode,
+                        arabicIndic = arabicIndic,
+                        assigningCode = assigningCode,
+                        onSelectLine = { line -> selected = line },
+                        onAddColour = { colour ->
+                            val targetFabricId = fabricId
+                            if (targetFabricId != null && assigningCode == null) {
+                                assigningCode = colour.code
+                                app.container.applicationScope.launch {
+                                    val message = try {
+                                        app.container.mastersSettingsRepository.assignColoursToMapping(
+                                            ACTOR_ADMIN,
+                                            dialog.shedId,
+                                            targetFabricId,
+                                            listOf(colour.id),
+                                            UUID.randomUUID().toString(),
+                                        )
+                                        val refreshed = app.container.readRepository.inventoryLines(dialog.shedId).filter { it.isActive }
+                                        lines = refreshed
+                                        selected = refreshed.firstOrNull { it.colourCode.equals(colour.code, ignoreCase = true) } ?: selected
+                                        context.getString(R.string.picker_colour_added, colour.code)
+                                    } catch (t: Throwable) {
+                                        snackbarFor(context, t)
+                                    }
+                                    assigningCode = null
+                                    snackbar.showSnackbar(message)
+                                }
                             }
+                        },
+                    )
+                    val chosenLine = selected
+                    if (chosenLine == null) {
+                        Text(
+                            stringResource(R.string.picker_footer_none),
+                            style = androidx.compose.material3.MaterialTheme.typography.labelMedium,
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        Row(
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.testTag("colour_summary"),
+                        ) {
+                            val itemSw = rememberAnySwatch(chosenLine.family, chosenLine.grade, chosenLine.colourCode, chosenLine.customHex)
+                            ColourSwatch(
+                                value = itemSw.argb,
+                                onColour = itemSw.onColour,
+                                contentDescription = paletteContentDescription(chosenLine.colourCode, chosenLine.colourNameEn, chosenLine.colourNameAr, chosenLine.grade),
+                                size = SwatchSize.Small,
+                            )
+                            Text("${chosenLine.colourCode} — ${chosenLine.colourNameEn} (${integerString(chosenLine.closing, arabicIndic)})")
                         }
                     }
                 }
@@ -240,41 +282,6 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                     }
                 }
 
-                if (showPicker) {
-                    PalettePickerSheet(
-                        app = app,
-                        fixedFamily = fabricFamily,
-                        selectableCodes = fabricLines.map { it.colourCode }.toSet(),
-                        availableByCode = fabricLines.associate { it.colourCode to it.closing },
-                        onDismiss = { showPicker = false },
-                        onConfirm = { colour ->
-                            selected = fabricLines.firstOrNull { it.colourCode == colour.code }
-                            showPicker = false
-                        },
-                        onAssignColours = { toAssign ->
-                            val targetFabricId = fabricId
-                            if (targetFabricId != null && toAssign.isNotEmpty()) {
-                                app.container.applicationScope.launch {
-                                val message = try {
-                                    val created = app.container.mastersSettingsRepository.assignColoursToMapping(
-                                        ACTOR_ADMIN,
-                                        dialog.shedId,
-                                        targetFabricId,
-                                        toAssign.map { it.id },
-                                        UUID.randomUUID().toString(),
-                                    )
-                                    android.util.Log.i("PalettePicker", "assigned $created mappings for fabric=$targetFabricId in shed=${dialog.shedId}")
-                                    lines = app.container.readRepository.inventoryLines(dialog.shedId).filter { it.isActive }
-                                    context.getString(R.string.picker_assigned_ok, integerString(created.toLong(), arabicIndic))
-                                } catch (t: Throwable) {
-                                    snackbarFor(context, t)
-                                }
-                                snackbar.showSnackbar(message)
-                                }
-                            }
-                        },
-                    )
-                }
 
                 OutlinedTextField(
                     value = qtyText,
