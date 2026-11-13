@@ -248,10 +248,10 @@ fun SwatchBookScreen(app: AlAzharApp) {
                             } catch (t: Throwable) {
                                 snackbarFor(context, t)
                             }
-                            snackbar.showSnackbar(message)
                             busy = false
                             loadTarget = null
                             refresh.bump()
+                            snackbar.showSnackbar(message)
                         }
                     },
                 ) { Text(stringResource(R.string.action_confirm)) }

@@ -85,8 +85,8 @@ fun AddFabricDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
             } catch (t: Throwable) {
                 snackbarFor(context, t)
             }
-            snackbar.showSnackbar(message)
             onClose()
+            snackbar.showSnackbar(message)
             }
         },
         onCancel = onClose,
@@ -127,8 +127,8 @@ fun AddColourDialog(app: AlAzharApp, snackbar: SnackbarHostState, onClose: () ->
             } catch (t: Throwable) {
                 snackbarFor(context, t)
             }
-            snackbar.showSnackbar(message)
             onClose()
+            snackbar.showSnackbar(message)
             }
         },
         onCancel = onClose,
@@ -180,8 +180,8 @@ fun AddMappingDialog(app: AlAzharApp, snackbar: SnackbarHostState, snapshot: Mas
             } catch (t: Throwable) {
                 snackbarFor(context, t)
             }
-            snackbar.showSnackbar(message)
             onClose()
+            snackbar.showSnackbar(message)
             }
         },
         onCancel = onClose,

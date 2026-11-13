@@ -191,9 +191,9 @@ fun MastersScreen(app: AlAzharApp) {
                         } catch (t: Throwable) {
                             snackbarFor(context, t)
                         }
-                        snackbar.showSnackbar(message)
                         deleteTarget = null
                         refresh.bump()
+                        snackbar.showSnackbar(message)
                     }
                 }) { Text(stringResource(R.string.action_confirm)) }
             },
