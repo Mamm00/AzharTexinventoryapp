@@ -153,7 +153,7 @@ class AllScreensSmokeTest {
         composeTestRule.waitUntilDoesNotExist(hasTestTag("colour_add_C012"), timeoutMillis = 30_000)
         val summaryText = composeTestRule.onNodeWithTag("colour_summary", useUnmergedTree = true)
             .fetchSemanticsNode().config
-            .getOrNull(androidx.compose.ui.semantics.SemanticsProperties.Text)
+            .getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }
             .orEmpty()
             .joinToString(" ") { it.text }
         assert(summaryText.contains("C012")) { "Expected colour_summary to show C012 after assignment, was: $summaryText" }
