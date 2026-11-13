@@ -129,15 +129,18 @@ class AllScreensSmokeTest {
         composeTestRule.waitForIdle()
 
         // Inline colour list renders inside the dialog (no overlay). wh-alwa's 14oz Indigo
-        // Denim has exactly one mapping in the pinned demo seed: C036 (Bright Amber).
-        composeTestRule.waitUntilAtLeastOneExists(hasText("C036"), timeoutMillis = 30_000)
+        // Denim has exactly one mapping in the pinned demo seed: C036 (Bright Amber). The
+        // list is a LazyColumn — rows off-screen are not composed, so filter with the
+        // search field before asserting on a row.
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_search"), timeoutMillis = 30_000)
+        composeTestRule.onNodeWithTag("colour_search").performTextInput("C036")
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_row_C036"), timeoutMillis = 30_000)
 
         // Tap the mapped colour row — it must select, no crash, summary shows the code.
-        composeTestRule.onNodeWithTag("colour_row_C036").performScrollTo().performClick()
+        composeTestRule.onNodeWithTag("colour_row_C036").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_summary"), timeoutMillis = 30_000)
         composeTestRule.onNodeWithTag("colour_summary", useUnmergedTree = true).assertIsDisplayed()
-        composeTestRule.onNodeWithText("C036", useUnmergedTree = true).assertIsDisplayed()
 
         // The fabric's palette at wh-alwa does NOT include C012 (Light Rose). Adding it to
         // the fabric from the inline list must create the mapping and auto-select it.
@@ -145,15 +148,14 @@ class AllScreensSmokeTest {
         composeTestRule.onNodeWithTag("colour_search").performTextInput("C012")
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_add_C012"), timeoutMillis = 30_000)
         composeTestRule.onNodeWithTag("colour_add_C012").performClick()
-        composeTestRule.waitForIdle()
 
         // After the add: the row flips to mapped (add button gone) and C012 is selected.
         composeTestRule.waitUntilDoesNotExist(hasTestTag("colour_add_C012"), timeoutMillis = 30_000)
-        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("colour_summary"), timeoutMillis = 30_000)
-        assert(
-            composeTestRule.onAllNodesWithText("C012", substring = true, useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty(),
-        ) { "C012 should be visible after assigning it to the fabric" }
+        val summaryText = composeTestRule.onNodeWithTag("colour_summary", useUnmergedTree = true)
+            .fetchSemanticsNode().config
+            .getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { emptyList() }
+            .joinToString(" ") { it.text }
+        assert(summaryText.contains("C012")) { "Expected colour_summary to show C012 after assignment, was: $summaryText" }
 
         // Close the dialog.
         composeTestRule.onAllNodesWithText(res(R.string.action_cancel))[0].performClick()

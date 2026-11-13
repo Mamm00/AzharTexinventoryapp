@@ -201,7 +201,6 @@
     <string name="picker_add_here">أضف هنا</string>
     <string name="picker_colour_added">تمت إضافة %1$s لهذا القماش — اضغط عليها للاختيار</string>
     <string name="picker_available">المتاح: %1$s</string>
-    <string name="picker_confirm">تأكيد</string>
     <string name="picker_footer_none">اختر لونًا للمتابعة</string>
     <string name="family_cotton">قطن</string>
     <string name="family_linen">كتان</string>

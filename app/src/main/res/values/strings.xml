@@ -193,7 +193,6 @@
     <string name="picker_add_here">Add here</string>
     <string name="picker_colour_added">Added %1$s to this fabric — tap it to select</string>
     <string name="picker_available">Available: %1$s</string>
-    <string name="picker_confirm">Confirm</string>
     <string name="picker_footer_none">Select a colour to continue</string>
     <string name="family_cotton">Cotton</string>
     <string name="family_linen">Linen</string>
