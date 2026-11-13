@@ -97,6 +97,7 @@ class AllScreensSmokeTest {
             com.alazhartex.stock.ui.navigation.Routes.MASTERS,
             com.alazhartex.stock.ui.navigation.Routes.AUDIT,
             com.alazhartex.stock.ui.navigation.Routes.SETTINGS,
+            com.alazhartex.stock.ui.navigation.Routes.DASHBOARD_SETTINGS,
             com.alazhartex.stock.ui.navigation.Routes.PROFILE,
         )
         for (route in routes) {

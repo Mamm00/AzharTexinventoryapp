@@ -57,6 +57,7 @@ class AppContainer(private val context: Context) {
     }
 
     val readRepository by lazy { ReadRepository(dbSupplier) }
+    val overrideStore by lazy { com.alazhartex.stock.overrides.DashboardOverrideStore(context) }
     val stockRepository by lazy {
         StockRepository(dbSupplier, clock::wallMillis) { actorId, actorIsAdmin ->
             sessionManager.mutationSessionVerdict(actorId, actorIsAdmin)
@@ -87,7 +88,7 @@ class AppContainer(private val context: Context) {
         sessionPrefs.getString(KEY_BOOT_ID, null) ?: UUID.randomUUID().toString().also { rotateProcessBootId() }
 
     companion object {
-        const val APP_VERSION = "1.3.6"
+        const val APP_VERSION = "1.4.0"
         private const val KEY_BOOT_ID = "process_boot_id"
     }
 }

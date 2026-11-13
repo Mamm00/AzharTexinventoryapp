@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -69,6 +70,7 @@ import com.alazhartex.stock.ui.screens.AuditScreen
 import com.alazhartex.stock.ui.screens.ColoursScreen
 import com.alazhartex.stock.ui.screens.CrossViewScreen
 import com.alazhartex.stock.ui.screens.DashboardScreen
+import com.alazhartex.stock.ui.screens.DashboardSettingsScreen
 import com.alazhartex.stock.ui.screens.FabricsEditScreen
 import com.alazhartex.stock.ui.screens.GuideScreen
 import com.alazhartex.stock.ui.screens.InventoryScreen
@@ -88,6 +90,7 @@ private data class DrawerDestination(val route: String, val labelRes: Int, val i
 private val DESTINATIONS = listOf(
     DrawerDestination(Routes.GUIDE, R.string.nav_guide, Icons.Filled.MenuBook),
     DrawerDestination(Routes.DASHBOARD, R.string.nav_dashboard, Icons.Filled.Dashboard),
+    DrawerDestination(Routes.DASHBOARD_SETTINGS, R.string.nav_dashboard_settings, Icons.Filled.Tune),
     DrawerDestination(Routes.STOCK, R.string.nav_stock, Icons.Filled.Inventory2),
     DrawerDestination(Routes.INVENTORY, R.string.nav_inventory, Icons.Filled.ListAlt),
     DrawerDestination(Routes.MOVEMENTS, R.string.nav_movements, Icons.Filled.SwapHoriz),
@@ -210,6 +213,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                         composable(Routes.CROSS_VIEW) { CrossViewScreen(app) }
                         composable(Routes.SWATCH_BOOK) { SwatchBookScreen(app) }
                         composable(Routes.DASHBOARD) { DashboardScreen(app) }
+                        composable(Routes.DASHBOARD_SETTINGS) { DashboardSettingsScreen(app) }
                         composable(Routes.REPORTS) { ReportsScreen(app) }
                         composable(Routes.MASTERS) { MastersScreen(app) }
                         composable(Routes.FABRICS_EDIT) { FabricsEditScreen(app) }

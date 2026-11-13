@@ -8,6 +8,27 @@
     <string name="nav_colours">Colours</string>
     <string name="nav_crossview">Cross-View</string>
     <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_dashboard_settings">Dashboard Settings</string>
+
+    <string name="overrides_description">Type the KPIs shown on the Dashboard instead of the live database totals. Useful when the imported file has not settled yet or you want the board deck figures pinned. Blank fields fall back to the live SQL values.</string>
+    <string name="overrides_enable">Enable Manual Overrides</string>
+    <string name="overrides_enable_summary">Show the values below on the Dashboard instead of live database totals</string>
+    <string name="overrides_values_title">Manual values</string>
+    <string name="overrides_field_total">Total rolls</string>
+    <string name="overrides_field_active">Active rolls</string>
+    <string name="overrides_field_inactive">Inactive rolls</string>
+    <string name="overrides_field_capacity">Capacity (rolls)</string>
+    <string name="overrides_field_utilisation">Utilisation %</string>
+    <string name="overrides_field_blank_hint">Blank = use live database value</string>
+    <string name="overrides_field_invalid">Enter a non-negative number</string>
+    <string name="overrides_save">Save overrides</string>
+    <string name="overrides_reset">Reset to live values</string>
+    <string name="overrides_saved">Dashboard overrides saved</string>
+    <string name="overrides_cleared">Overrides cleared — showing live database totals</string>
+    <string name="overrides_live_title">Live database totals (SQL)</string>
+    <string name="overrides_persistence_note">Stored on this device in DataStore (Preferences) — export/import of the database does not carry these values.</string>
+    <string name="banner_overrides_ok">Manual overrides active — matches the live database</string>
+    <string name="banner_overrides_mismatch">Manual overrides differ from the live database (%1$d of 5 fields)</string>
     <string name="nav_reports">Reports</string>
     <string name="nav_masters">Masters</string>
     <string name="nav_audit">Audit Log</string>

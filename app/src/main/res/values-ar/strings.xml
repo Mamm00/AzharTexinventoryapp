@@ -8,6 +8,27 @@
     <string name="nav_colours">الألوان</string>
     <string name="nav_crossview">عرض شامل</string>
     <string name="nav_dashboard">لوحة المعلومات</string>
+    <string name="nav_dashboard_settings">إعدادات لوحة المعلومات</string>
+
+    <string name="overrides_description">اكتب مؤشرات الأداء المعروضة في لوحة المعلومات بدلًا من إجمالي قاعدة البيانات الحية. مفيد عندما لم تستقر البيانات المستوردة بعد أو عندما تريد تثبيت أرقام العرض. الحقول الفارغة تعود إلى قيم SQL الحية.</string>
+    <string name="overrides_enable">تفعيل القيم اليدوية</string>
+    <string name="overrides_enable_summary">اعرض القيم أدناه في لوحة المعلومات بدلًا من إجمالي قاعدة البيانات الحية</string>
+    <string name="overrides_values_title">القيم اليدوية</string>
+    <string name="overrides_field_total">إجمالي اللفات</string>
+    <string name="overrides_field_active">اللفات النشطة</string>
+    <string name="overrides_field_inactive">اللفات غير النشطة</string>
+    <string name="overrides_field_capacity">السعة (لفة)</string>
+    <string name="overrides_field_utilisation">نسبة الاستغلال %</string>
+    <string name="overrides_field_blank_hint">فارغ = استخدم قيمة قاعدة البيانات الحية</string>
+    <string name="overrides_field_invalid">أدخل رقمًا غير سالب</string>
+    <string name="overrides_save">حفظ القيم اليدوية</string>
+    <string name="overrides_reset">إعادة الضبط إلى القيم الحية</string>
+    <string name="overrides_saved">تم حفظ إعدادات لوحة المعلومات</string>
+    <string name="overrides_cleared">تم مسح القيم اليدوية — يتم عرض إجمالي قاعدة البيانات الحية</string>
+    <string name="overrides_live_title">إجمالي قاعدة البيانات الحية (SQL)</string>
+    <string name="overrides_persistence_note">تُخزَّن على هذا الجهاز في DataStore (تفضيلات) — لا ينقلها تصدير/استيراد قاعدة البيانات.</string>
+    <string name="banner_overrides_ok">القيم اليدوية مفعّلة — مطابقة لقاعدة البيانات الحية</string>
+    <string name="banner_overrides_mismatch">القيم اليدوية تختلف عن قاعدة البيانات الحية (%1$d من 5 حقول)</string>
     <string name="nav_reports">التقارير</string>
     <string name="nav_masters">البيانات الأساسية</string>
     <string name="nav_audit">سجل المراجعة</string>

@@ -82,14 +82,17 @@ data class TopColourDto(
 )
 
 data class DashboardDto(
-    val totalActiveRolls: Long,
+    /** All physical rolls on hand: active (inventory closing) + inactive. */
+    val totalRolls: Long,
+    /** Active rolls = total − inactive (inventory ledger of record). */
+    val activeRolls: Long,
+    val inactiveRolls: Long,
     val totalCapacity: Long,
+    /** (totalRolls / totalCapacity) x 100, 1dp HALF_UP; null when capacity == 0 (renders "—"). */
     val percentDisplay: String?,
     val bucket: GaugeBucket?,
     val topSheds: List<ShedCardDto>,
     val driftViolations: Int,
-    val inactiveRolls: Long,
-    val rawRolls: Long,
     val topColours: List<TopColourDto>,
 )
 

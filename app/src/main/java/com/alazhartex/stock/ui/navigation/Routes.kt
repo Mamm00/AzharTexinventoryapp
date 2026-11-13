@@ -1,6 +1,6 @@
 package com.alazhartex.stock.ui.navigation
 
-/** All twelve destinations (spec §4.5). */
+/** Every destination (spec §4.5 baseline + Dashboard Settings admin screen). */
 object Routes {
     const val GUIDE = "guide"
     const val STOCK = "stock"
@@ -15,6 +15,7 @@ object Routes {
     const val FABRICS_EDIT = "fabrics_edit"
     const val AUDIT = "audit"
     const val SETTINGS = "settings"
+    const val DASHBOARD_SETTINGS = "dashboard_settings"
     const val PROFILE = "profile"
-    val ALL = listOf(GUIDE, STOCK, INVENTORY, MOVEMENTS, COLOURS, CROSS_VIEW, SWATCH_BOOK, DASHBOARD, REPORTS, MASTERS, FABRICS_EDIT, AUDIT, SETTINGS, PROFILE)
+    val ALL = listOf(GUIDE, STOCK, INVENTORY, MOVEMENTS, COLOURS, CROSS_VIEW, SWATCH_BOOK, DASHBOARD, REPORTS, MASTERS, FABRICS_EDIT, AUDIT, SETTINGS, DASHBOARD_SETTINGS, PROFILE)
 }
