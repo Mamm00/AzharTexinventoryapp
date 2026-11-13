@@ -22,7 +22,8 @@ class TransactionRunner(
     db: () -> AppDatabase,
     private val wallClock: () -> Long,
 ) {
-    private val database get() = db()
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
     suspend fun <R : MutationOutcome> withAudit(
         actorId: String,
         action: String,

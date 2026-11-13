@@ -21,7 +21,8 @@ class StockRepository(
     private val wallClock: () -> Long,
     private val sessionVerdict: suspend (actorId: String, actorIsAdmin: Boolean) -> com.alazhartex.stock.domain.session.SessionPolicy.MutationResolution,
 ) {
-    private val database get() = db()
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
     private val runner = TransactionRunner(db) { wallClock() }
 
     private suspend fun requireSessionAndRole(actorId: String): Pair<String, Set<String>> {

@@ -31,7 +31,8 @@ class DebugRepository(
     private val wallClock: () -> Long,
     private val seedLoader: SeedLoader,
 ) {
-    private val database get() = db()
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
     private val runner = TransactionRunner(db) { wallClock() }
 
     data class WarehouseCascadeCounts(

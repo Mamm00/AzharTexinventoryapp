@@ -21,7 +21,8 @@ class SessionManager(
     private val clock: AppClock,
     private val currentBootId: () -> String,
 ) {
-    private val dao get() = sessionDao()
+    private val sessionDaoSupplier: () -> SessionDao = sessionDao
+    private val dao get() = sessionDaoSupplier()
     suspend fun ensureAdminSessionOnForeground() {
         val boot = currentBootId()
         val existing = dao.latestActive("admin")

@@ -21,7 +21,8 @@ class MastersSettingsRepository(
     db: () -> AppDatabase,
     private val wallClock: () -> Long,
 ) {
-    private val database get() = db()
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
     private val runner = TransactionRunner(db) { wallClock() }
 
     private suspend fun actorRole(actorId: String): Role =

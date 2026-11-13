@@ -26,7 +26,8 @@ class ExportImportManager(
     private val wallClock: () -> Long,
     private val appVersionName: String,
 ) {
-    private val database get() = db()
+    private val dbSupplier: () -> AppDatabase = db
+    private val database get() = dbSupplier()
     data class ExportResult(val file: File, val sidecar: File, val sha256Hex: String, val bytes: Long)
 
     sealed interface ImportReport {
