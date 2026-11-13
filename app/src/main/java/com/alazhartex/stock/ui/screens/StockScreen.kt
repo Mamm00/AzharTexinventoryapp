@@ -154,9 +154,22 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
     var note by remember { mutableStateOf("") }
     var sign by remember { mutableStateOf(1) } // ADJUST only: +1 add, -1 remove
     var busy by remember { mutableStateOf(false) }
-    val fabrics = remember(lines) { lines.map { it.fabricNameEn }.distinct().sorted() }
+    // Pinned fix (v1.3.5): a freshly created shed has ZERO mappings, so lines is empty and the
+    // old dropdown was empty too — the keeper could never pick a fabric, never add a colour, and
+    // the shed showed 0 rolls forever. List ALL master fabrics (mapped first, unmapped tagged
+    // "new here"); picking one enables the inline colour list where "Add here" bootstraps the
+    // mapping for this warehouse on the spot.
+    val allFabrics by produceState(initialValue = emptyList<com.alazhartex.stock.data.local.FabricEntity>(), Unit) {
+        value = app.container.readRepository.masters().fabrics.sortedBy { it.nameEn }
+    }
+    val mappedNames = remember(lines) { lines.map { it.fabricNameEn }.toSet() }
+    val fabrics = remember(allFabrics, mappedNames) {
+        allFabrics.map { it.nameEn }
+            .sortedWith(compareByDescending<String> { it in mappedNames }.thenBy { it })
+    }
+    var selectedFabricId by remember { mutableStateOf<String?>(null) }
     val fabricLines = remember(lines, fabricName) { lines.filter { it.fabricNameEn == fabricName } }
-    val fabricId = fabricLines.firstOrNull()?.fabricId
+    val fabricId = selectedFabricId ?: fabricLines.firstOrNull()?.fabricId
 
     Dialog(onDismissRequest = onClose) {
         Card(modifier = Modifier.fillMaxSize()) {
@@ -189,10 +202,14 @@ private fun MutationDialogHost(app: AlAzharApp, dialog: MutationDialog, snackbar
                     }
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         fabrics.forEach { name ->
+                            val mapped = name in mappedNames
                             DropdownMenuItem(
-                                text = { Text(name) },
+                                text = {
+                                    Text(if (mapped) name else name + " (" + stringResource(R.string.fabric_new_here) + ")")
+                                },
                                 onClick = {
                                     fabricName = name
+                                    selectedFabricId = allFabrics.firstOrNull { it.nameEn == name }?.id
                                     selected = null
                                     expanded = false
                                 },

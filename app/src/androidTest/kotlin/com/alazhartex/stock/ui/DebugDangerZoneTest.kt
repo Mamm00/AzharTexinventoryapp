@@ -108,7 +108,7 @@ class DebugDangerZoneTest {
     private fun openSettings() {
         composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 90_000)
         openDrawer()
-        composeTestRule.onNodeWithText(res(R.string.nav_settings)).performScrollTo().performClick()
+        composeTestRule.onNodeWithTag("nav_settings").performScrollTo().performClick()
         composeTestRule.waitForIdle()
         // Make sure the danger-zone card exists on screen.
         composeTestRule.onNodeWithText(res(R.string.debug_zone_title)).performScrollTo().assertIsDisplayed()

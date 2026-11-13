@@ -37,9 +37,7 @@
     <string name="label_inactive_rolls">لفات غير نشطة</string>
     <string name="label_utilisation">نسبة الاستغلال</string>
     <string name="label_total_rolls">إجمالي اللفات</string>
-    <string name="label_raw_rolls">الإجمالي الخام</string>
     <string name="label_top_sheds">أعلى العنابر بعدد اللفات</string>
-    <string name="label_drift_indicator">مؤشر الانحراف</string>
     <string name="label_drift_ok">لا يوجد انحراف — كل صف متوازن</string>
     <string name="label_drift_detected">تم رصد انحراف</string>
     <string name="label_grade">الدرجة</string>
@@ -75,7 +73,6 @@
     <string name="label_email">البريد الإلكتروني</string>
     <string name="label_tax_id">الرقم الضريبي</string>
     <string name="label_logo_uri">اسم ملف الشعار</string>
-    <string name="label_wh625_scale">اختبار سعة عنبر 625</string>
     <string name="label_report_choose">اختر تقريرًا</string>
     <string name="label_include_letterhead">تضمين الترويسة إن وُجدت</string>
     <string name="label_signed_in_as">مسجّل الدخول باسم</string>
@@ -194,6 +191,9 @@
     <string name="pinned_families_note">العائلات الـ11 المثبتة ثابتة؛ العائلات المخصصة تُحفظ على هذا الجهاز فقط</string>
     <string name="keeper_code_keeper_only">أكواد الأمين تُخزن ببادئة K- للألوان التي يضيفها الأمين</string>
     <string name="picker_title">اختر اللون</string>
+    <string name="fabric_new_here">جديد هنا</string>
+    <string name="dashboard_subtitle">لقطة حية لكل المخازن</string>
+    <string name="dashboard_quick_actions">إجراءات سريعة</string>
     <string name="picker_search_hint">ابحث بالكود أو الاسم (عربي/إنجليزي)</string>
     <string name="picker_empty">لا توجد ألوان مطابقة</string>
     <string name="picker_clear_filters">مسح المرشحات</string>

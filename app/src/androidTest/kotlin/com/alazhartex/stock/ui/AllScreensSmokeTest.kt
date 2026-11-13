@@ -81,25 +81,26 @@ class AllScreensSmokeTest {
     @Test
     fun allRoutesAreReachable() {
         composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
-        // Open the drawer once; it stays open for the whole traversal.
+        // Open the drawer once; it stays open for the whole traversal. Drawer items carry
+        // testTags (nav_<route>) since dashboard quick-action tiles share the same labels.
         openDrawer()
-        val labels = listOf(
-            R.string.nav_guide,
-            R.string.nav_stock,
-            R.string.nav_inventory,
-            R.string.nav_movements,
-            R.string.nav_colours,
-            R.string.nav_crossview,
-            R.string.nav_swatch_book,
-            R.string.nav_dashboard,
-            R.string.nav_reports,
-            R.string.nav_masters,
-            R.string.nav_audit,
-            R.string.nav_settings,
-            R.string.nav_profile,
-        ).map(::res)
-        for (label in labels) {
-            composeTestRule.onNodeWithText(label).performScrollTo().performClick()
+        val routes = listOf(
+            com.alazhartex.stock.ui.navigation.Routes.GUIDE,
+            com.alazhartex.stock.ui.navigation.Routes.STOCK,
+            com.alazhartex.stock.ui.navigation.Routes.INVENTORY,
+            com.alazhartex.stock.ui.navigation.Routes.MOVEMENTS,
+            com.alazhartex.stock.ui.navigation.Routes.COLOURS,
+            com.alazhartex.stock.ui.navigation.Routes.CROSS_VIEW,
+            com.alazhartex.stock.ui.navigation.Routes.SWATCH_BOOK,
+            com.alazhartex.stock.ui.navigation.Routes.DASHBOARD,
+            com.alazhartex.stock.ui.navigation.Routes.REPORTS,
+            com.alazhartex.stock.ui.navigation.Routes.MASTERS,
+            com.alazhartex.stock.ui.navigation.Routes.AUDIT,
+            com.alazhartex.stock.ui.navigation.Routes.SETTINGS,
+            com.alazhartex.stock.ui.navigation.Routes.PROFILE,
+        )
+        for (route in routes) {
+            composeTestRule.onNodeWithTag("nav_$route").performScrollTo().performClick()
             composeTestRule.waitForIdle()
             // Re-open the drawer for the next destination.
             openDrawer()
@@ -116,7 +117,7 @@ class AllScreensSmokeTest {
     fun addRollInlineColourSelectAndAssign() {
         composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
         openDrawer()
-        composeTestRule.onNodeWithText(res(R.string.nav_stock)).performScrollTo().performClick()
+        composeTestRule.onNodeWithTag("nav_stock").performScrollTo().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntilAtLeastOneExists(hasText(res(R.string.action_add_roll)), timeoutMillis = 60_000)
 
@@ -167,6 +168,22 @@ class AllScreensSmokeTest {
     }
 
     /**
+     * v1.3.5: the launch screen IS the dashboard (quick actions to every destination).
+     * No drawer needed — the hero must be visible on cold start, and the Stock quick-action
+     * tile must navigate straight to the stock screen.
+     */
+    @Test
+    fun dashboardIsLaunchScreenAndTileNavigatesToStock() {
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("dash_hero"), timeoutMillis = 60_000)
+        composeTestRule.onNodeWithTag("dash_tile_stock").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithTag("dash_tile_stock").performClick()
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasText(res(R.string.action_add_roll)),
+            timeoutMillis = 30_000,
+        )
+    }
+
+    /**
      * Regression: "Add roll(s)" Save used to leave the Stock screen stale — the dialog closed
      * only after snackbar.showSnackbar suspended (and the snackbar hosted BEHIND the dialog was
      * invisible), so the active-rolls figure appeared frozen until the ~4s timeout. The screen
@@ -175,7 +192,7 @@ class AllScreensSmokeTest {
     @Test
     fun stockAddRollIncrementsActiveCountImmediately() {
         openDrawer()
-        composeTestRule.onNodeWithText(res(R.string.nav_stock)).performScrollTo().performClick()
+        composeTestRule.onNodeWithTag("nav_stock").performScrollTo().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntilAtLeastOneExists(
             hasText(res(R.string.label_active_rolls), substring = true),
