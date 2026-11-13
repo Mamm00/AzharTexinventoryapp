@@ -86,13 +86,13 @@ private data class DrawerDestination(val route: String, val labelRes: Int, val i
 
 private val DESTINATIONS = listOf(
     DrawerDestination(Routes.GUIDE, R.string.nav_guide, Icons.Filled.MenuBook),
+    DrawerDestination(Routes.DASHBOARD, R.string.nav_dashboard, Icons.Filled.Dashboard),
     DrawerDestination(Routes.STOCK, R.string.nav_stock, Icons.Filled.Inventory2),
     DrawerDestination(Routes.INVENTORY, R.string.nav_inventory, Icons.Filled.ListAlt),
     DrawerDestination(Routes.MOVEMENTS, R.string.nav_movements, Icons.Filled.SwapHoriz),
     DrawerDestination(Routes.COLOURS, R.string.nav_colours, Icons.Filled.Palette),
     DrawerDestination(Routes.CROSS_VIEW, R.string.nav_crossview, Icons.Filled.GridView),
     DrawerDestination(Routes.SWATCH_BOOK, R.string.nav_swatch_book, Icons.Filled.ContentCut),
-    DrawerDestination(Routes.DASHBOARD, R.string.nav_dashboard, Icons.Filled.Dashboard),
     DrawerDestination(Routes.REPORTS, R.string.nav_reports, Icons.Filled.Assessment),
     DrawerDestination(Routes.MASTERS, R.string.nav_masters, Icons.Filled.Storage),
     DrawerDestination(Routes.FABRICS_EDIT, R.string.nav_fabrics_edit, Icons.Filled.Edit),
@@ -196,7 +196,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                 } else {
                     NavHost(
                         navController = navController,
-                        startDestination = Routes.STOCK,
+                        startDestination = Routes.DASHBOARD,
                         modifier = Modifier.fillMaxSize().padding(padding),
                     ) {
                         composable(Routes.GUIDE) { GuideScreen() }

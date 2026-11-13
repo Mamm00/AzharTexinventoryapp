@@ -75,7 +75,6 @@
     <string name="label_email">Email</string>
     <string name="label_tax_id">Tax ID</string>
     <string name="label_logo_uri">Logo file name</string>
-    <string name="label_wh625_scale">wh-625 scale test</string>
     <string name="label_report_choose">Choose a report</string>
     <string name="label_include_letterhead">Include letterhead if set</string>
     <string name="label_signed_in_as">Signed in as</string>
@@ -186,6 +185,9 @@
     <string name="pinned_families_note">The 11 pinned families are fixed; custom families are stored on this device only</string>
     <string name="keeper_code_keeper_only">Keeper codes are stored under a K- prefix for keeper-created colours</string>
     <string name="picker_title">Choose colour</string>
+    <string name="fabric_new_here">new here</string>
+    <string name="dashboard_subtitle">Live snapshot of every shed</string>
+    <string name="dashboard_quick_actions">Quick actions</string>
     <string name="picker_search_hint">Search code or name (AR/EN)</string>
     <string name="picker_empty">No colours match these filters</string>
     <string name="picker_clear_filters">Clear filters</string>
