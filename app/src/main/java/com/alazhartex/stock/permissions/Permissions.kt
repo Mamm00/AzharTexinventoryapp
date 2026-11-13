@@ -1,6 +1,7 @@
 package com.alazhartex.stock.permissions
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -15,6 +16,10 @@ import androidx.core.content.ContextCompat
  * user opts in once, per kind, from the launch prompt (notifications) or Settings.
  */
 object Permissions {
+
+    /** API 33+ constant — safe to reference from call sites; value is the plain permission string. */
+    @SuppressLint("InlinedApi")
+    val POST_NOTIFICATIONS: String = Manifest.permission.POST_NOTIFICATIONS
 
     fun notificationGranted(context: Context): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
@@ -48,6 +53,7 @@ object Permissions {
         }
 
     /** MANAGE_EXTERNAL_STORAGE is not grantable via requestPermissions — only via the system toggle. */
+    @SuppressLint("InlinedApi")
     fun manageAllFilesIntent(context: Context): Intent {
         val specific = Intent(
             Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,

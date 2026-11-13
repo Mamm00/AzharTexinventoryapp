@@ -300,7 +300,7 @@ fun SettingsScreen(app: AlAzharApp) {
                         granted = notifGranted,
                         actionLabel = stringResource(R.string.permissions_grant),
                         actionVisible = Build.VERSION.SDK_INT >= 33 && !notifGranted,
-                        onAction = { requestNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS) },
+                        onAction = { requestNotifications.launch(Permissions.POST_NOTIFICATIONS) },
                         testTag = "permissions_notifications",
                     )
                     PermissionRow(
