@@ -76,6 +76,7 @@ android {
         // Informational/packaging nags that must not gate CI; correctness checks stay on.
         // GradleDependency/AndroidGradlePluginVersion: "newer available" nags — toolchain/dep upgrades are a deliberate, reviewed task.
         // OldTargetApi: targetSdk is pinned at 34 by product decision. AppBundleLocaleChanges: sideloaded app; dynamic locale is intentional, AAB splitting N/A.
+        // ScopedStorage: MANAGE_EXTERNAL_STORAGE is an intentional, user-facing capability of a sideloaded (GitHub Releases) APK; Play-policy nag, not a defect.
         // ProduceStateDoesNotAssignValue: false positive in this toolchain — the producer lambdas DO assign
         // `value = …` (canonical documented usage); the detector's UAST resolution fails for suspend produceState
         // here (flagged at every produceState site). Revisit on compose-bom/AGP upgrades.
@@ -85,6 +86,7 @@ android {
             "OldTargetApi",
             "AppBundleLocaleChanges",
             "ProduceStateDoesNotAssignValue",
+            "ScopedStorage",
         )
     }
 }
