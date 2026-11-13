@@ -37,9 +37,7 @@
     <string name="label_inactive_rolls">Inactive rolls</string>
     <string name="label_utilisation">Utilisation</string>
     <string name="label_total_rolls">Total rolls</string>
-    <string name="label_raw_rolls">Total (raw)</string>
     <string name="label_top_sheds">Top sheds by rolls</string>
-    <string name="label_drift_indicator">Drift indicator</string>
     <string name="label_drift_ok">No drift — every row balances</string>
     <string name="label_drift_detected">Drift detected</string>
     <string name="label_grade">Grade</string>

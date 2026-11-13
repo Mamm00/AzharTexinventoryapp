@@ -37,9 +37,7 @@
     <string name="label_inactive_rolls">لفات غير نشطة</string>
     <string name="label_utilisation">نسبة الاستغلال</string>
     <string name="label_total_rolls">إجمالي اللفات</string>
-    <string name="label_raw_rolls">الإجمالي الخام</string>
     <string name="label_top_sheds">أعلى العنابر بعدد اللفات</string>
-    <string name="label_drift_indicator">مؤشر الانحراف</string>
     <string name="label_drift_ok">لا يوجد انحراف — كل صف متوازن</string>
     <string name="label_drift_detected">تم رصد انحراف</string>
     <string name="label_grade">الدرجة</string>
