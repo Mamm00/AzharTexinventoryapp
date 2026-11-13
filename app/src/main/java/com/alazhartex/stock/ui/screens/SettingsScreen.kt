@@ -58,7 +58,10 @@ import com.alazhartex.stock.data.transfer.ExportImportManager
 import com.alazhartex.stock.ui.LocalSnackbar
 import java.io.File
 import java.util.UUID
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.alazhartex.stock.permissions.AlAzharNotifier
 import com.alazhartex.stock.permissions.Permissions
 import kotlinx.coroutines.Dispatchers
@@ -265,9 +268,13 @@ fun SettingsScreen(app: AlAzharApp) {
 
             // ---- app permissions (notifications + files/media) ----
             var permissionsTick by remember { mutableStateOf(0) }
-            LifecycleResumeEffect(Unit) {
-                permissionsTick++
-                onDispose { }
+            val lifecycleOwner = LocalLifecycleOwner.current
+            DisposableEffect(lifecycleOwner) {
+                val observer = LifecycleEventObserver { _, event ->
+                    if (event == Lifecycle.Event.ON_RESUME) permissionsTick++
+                }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
             }
             val notifGranted = remember(permissionsTick) { Permissions.notificationGranted(context) }
             val mediaGranted = remember(permissionsTick) { Permissions.mediaGranted(context) }

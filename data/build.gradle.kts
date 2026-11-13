@@ -26,11 +26,7 @@ android {
     testOptions { unitTests { isIncludeAndroidResources = true } }
     lint {
         // Informational/packaging nags only; correctness lint checks stay enabled.
-        disable += setOf(
-            "GradleDependency",
-            "AndroidGradlePluginVersion",
-            "OldTargetApi",
-        )
+        disable += setOf("GradleDependency", "AndroidGradlePluginVersion", "OldTargetApi")
     }
 }
 
