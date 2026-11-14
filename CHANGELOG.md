@@ -4,6 +4,29 @@ All notable changes to Al Azhar Tex Inventory are documented here. The format lo
 follows [Keep a Changelog](https://keepachangelog.com/); every release ships a signed APK
 attached to its GitHub Release.
 
+## [1.5.0] — 2026-11-13
+
+### Added
+- **Files & media permissions.** The app now declares broad storage access for a
+  sideloaded APK (READ_MEDIA_IMAGES/VIDEO/AUDIO, READ_MEDIA_VISUAL_USER_SELECTED on
+  API 34+, legacy READ/WRITE_EXTERNAL_STORAGE on older releases, and
+  MANAGE_EXTERNAL_STORAGE for "All files access" via the system toggle). Status and
+  one-tap grant flows live in a new **Settings → App permissions** card; notification
+  and media access can also be requested inline. Database export/import keeps working
+  through the system file picker, which needs no permission.
+- **Notifications.** New `alazhartex.general` channel (created at application start)
+  and notifications for the two long-running backup actions: database export ready and
+  import complete. Android 13+ (API 33+) asks for POST_NOTIFICATIONS once at cold
+  start; denying it changes nothing else in the app.
+
+### Notes
+- Permissions cannot be granted silently — the user opts in once per permission.
+  MANAGE_EXTERNAL_STORAGE is only grantable from the system settings toggle
+  (Settings → App permissions → All files access).
+- Google Play would require the All files access declaration form; this app ships as a
+  sideloaded APK from GitHub Releases, where the permission is permitted.
+- versionCode 12, versionName 1.5.0.
+
 ## [1.4.0] — 2026-11-13
 
 ### Added

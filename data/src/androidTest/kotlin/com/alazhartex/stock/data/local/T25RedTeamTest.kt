@@ -32,15 +32,15 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class T25RedTeamTest {
-
     private lateinit var database: AppDatabase
 
     @Before
     fun setUp() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .addCallback(AppDatabase.TriggersCallback())
-            .build()
+        database =
+            Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                .addCallback(AppDatabase.TriggersCallback())
+                .build()
     }
 
     @After
@@ -100,104 +100,112 @@ class T25RedTeamTest {
     }
 
     @Test
-    fun replayAddRollsIsNoOp() = runBlocking {
-        seedLedger()
-        val first = repo().addRolls("admin", "map-a", 3L, MovementType.IN, "in", "idem-replay-1")
-        val second = repo().addRolls("admin", "map-a", 3L, MovementType.IN, "in", "idem-replay-1")
-        assertTrue(first is MutationOutcome.Applied)
-        assertTrue(second is MutationOutcome.AlreadyApplied)
-        assertEquals(11L, database.inventoryDao().getByMapping("map-a")?.closing)
-        assertEquals(1L, database.movementDao().countByIdempotency("idem-replay-1"))
-    }
-
-    @Test
-    fun shortfallRollsBackEverything() = runBlocking {
-        seedLedger()
-        try {
-            repo().removeRolls("admin", "map-b", 5L, MovementType.OUT, "too much", "idem-short-1")
-            fail("expected ShortfallException")
-        } catch (expected: ShortfallException) {
-            assertEquals(3L, expected.shortfall)
+    fun replayAddRollsIsNoOp() =
+        runBlocking {
+            seedLedger()
+            val first = repo().addRolls("admin", "map-a", 3L, MovementType.IN, "in", "idem-replay-1")
+            val second = repo().addRolls("admin", "map-a", 3L, MovementType.IN, "in", "idem-replay-1")
+            assertTrue(first is MutationOutcome.Applied)
+            assertTrue(second is MutationOutcome.AlreadyApplied)
+            assertEquals(11L, database.inventoryDao().getByMapping("map-a")?.closing)
+            assertEquals(1L, database.movementDao().countByIdempotency("idem-replay-1"))
         }
-        assertEquals(2L, database.inventoryDao().getByMapping("map-b")?.closing)
-        assertEquals(0L, database.movementDao().countByIdempotency("idem-short-1"))
-        val blocked = database.auditDao().byResult("BLOCKED")
-        assertEquals(1, blocked.size)
-        assertTrue(blocked.first().reason?.startsWith("shortfall") == true)
-    }
 
     @Test
-    fun capacityIsNotAnEnforcementGate() = runBlocking {
-        seedLedger()
-        // wh-b capacity = 3, closing = 2; adding 5 rolls must be ALLOWED (wh-625 is over capacity by design).
-        val outcome = repo().addRolls("admin", "map-b", 5L, MovementType.IN, "over capacity is legal", "idem-cap-1")
-        assertTrue(outcome is MutationOutcome.Applied)
-        assertEquals(7L, database.inventoryDao().getByMapping("map-b")?.closing)
-    }
-
-    @Test
-    fun keeperCannotWriteForeignShed() = runBlocking {
-        seedLedger()
-        try {
-            repo().removeRolls("keeper1", "map-b", 1L, MovementType.OUT, "not my shed", "idem-rbac-1")
-            fail("expected RbacDeniedException")
-        } catch (expected: RbacDeniedException) {
-            // reason key comes from the Rbac truth table — must name the foreign-shed rule
-            assertTrue(expected.reasonKey.isNotBlank())
+    fun shortfallRollsBackEverything() =
+        runBlocking {
+            seedLedger()
+            try {
+                repo().removeRolls("admin", "map-b", 5L, MovementType.OUT, "too much", "idem-short-1")
+                fail("expected ShortfallException")
+            } catch (expected: ShortfallException) {
+                assertEquals(3L, expected.shortfall)
+            }
+            assertEquals(2L, database.inventoryDao().getByMapping("map-b")?.closing)
+            assertEquals(0L, database.movementDao().countByIdempotency("idem-short-1"))
+            val blocked = database.auditDao().byResult("BLOCKED")
+            assertEquals(1, blocked.size)
+            assertTrue(blocked.first().reason?.startsWith("shortfall") == true)
         }
-        assertEquals(2L, database.inventoryDao().getByMapping("map-b")?.closing)
-    }
 
     @Test
-    fun keeperCannotWriteOwnShedThroughTransferChain() = runBlocking {
-        seedLedger()
-        // keeper1 owns wh-a but not wh-b: a transfer FROM a foreign shed must fail even as source leg.
-        try {
-            repo().transferRolls("keeper1", "map-b", "map-a", 1L, "steal", "idem-rbac-2")
-            fail("expected RbacDeniedException")
-        } catch (expected: RbacDeniedException) {
-            assertTrue(expected.reasonKey.isNotBlank())
+    fun capacityIsNotAnEnforcementGate() =
+        runBlocking {
+            seedLedger()
+            // wh-b capacity = 3, closing = 2; adding 5 rolls must be ALLOWED (wh-625 is over capacity by design).
+            val outcome = repo().addRolls("admin", "map-b", 5L, MovementType.IN, "over capacity is legal", "idem-cap-1")
+            assertTrue(outcome is MutationOutcome.Applied)
+            assertEquals(7L, database.inventoryDao().getByMapping("map-b")?.closing)
         }
-        assertEquals(8L, database.inventoryDao().getByMapping("map-a")?.closing)
-        assertEquals(2L, database.inventoryDao().getByMapping("map-b")?.closing)
-    }
 
     @Test
-    fun sessionAnomalyFailsClosedEverywhere() = runBlocking {
-        seedLedger()
-        try {
-            repo(SessionPolicy.MutationResolution.REFUSE_ANOMALY)
-                .addRolls("admin", "map-a", 1L, MovementType.IN, "anomaly", "idem-anomaly-1")
-            fail("expected SessionClockAnomalyException")
-        } catch (expected: SessionClockAnomalyException) {
-            // fail closed
+    fun keeperCannotWriteForeignShed() =
+        runBlocking {
+            seedLedger()
+            try {
+                repo().removeRolls("keeper1", "map-b", 1L, MovementType.OUT, "not my shed", "idem-rbac-1")
+                fail("expected RbacDeniedException")
+            } catch (expected: RbacDeniedException) {
+                // reason key comes from the Rbac truth table — must name the foreign-shed rule
+                assertTrue(expected.reasonKey.isNotBlank())
+            }
+            assertEquals(2L, database.inventoryDao().getByMapping("map-b")?.closing)
         }
-        assertEquals(8L, database.inventoryDao().getByMapping("map-a")?.closing)
-    }
 
     @Test
-    fun transferLegsAreAtomicPair() = runBlocking {
-        seedLedger()
-        val outcome = repo().transferRolls("admin", "map-a", "map-b", 3L, "move", "idem-transfer-1")
-        assertTrue(outcome is MutationOutcome.Applied)
-        assertEquals(5L, database.inventoryDao().getByMapping("map-a")?.closing)
-        assertEquals(5L, database.inventoryDao().getByMapping("map-b")?.closing)
-        val transfers = database.movementDao().getAll().filter { it.transferPairId != null }
-        assertEquals(2, transfers.size)
-        assertEquals(transfers[0].transferPairId, transfers[1].transferPairId)
-    }
+    fun keeperCannotWriteOwnShedThroughTransferChain() =
+        runBlocking {
+            seedLedger()
+            // keeper1 owns wh-a but not wh-b: a transfer FROM a foreign shed must fail even as source leg.
+            try {
+                repo().transferRolls("keeper1", "map-b", "map-a", 1L, "steal", "idem-rbac-2")
+                fail("expected RbacDeniedException")
+            } catch (expected: RbacDeniedException) {
+                assertTrue(expected.reasonKey.isNotBlank())
+            }
+            assertEquals(8L, database.inventoryDao().getByMapping("map-a")?.closing)
+            assertEquals(2L, database.inventoryDao().getByMapping("map-b")?.closing)
+        }
+
+    @Test
+    fun sessionAnomalyFailsClosedEverywhere() =
+        runBlocking {
+            seedLedger()
+            try {
+                repo(SessionPolicy.MutationResolution.REFUSE_ANOMALY)
+                    .addRolls("admin", "map-a", 1L, MovementType.IN, "anomaly", "idem-anomaly-1")
+                fail("expected SessionClockAnomalyException")
+            } catch (expected: SessionClockAnomalyException) {
+                // fail closed
+            }
+            assertEquals(8L, database.inventoryDao().getByMapping("map-a")?.closing)
+        }
+
+    @Test
+    fun transferLegsAreAtomicPair() =
+        runBlocking {
+            seedLedger()
+            val outcome = repo().transferRolls("admin", "map-a", "map-b", 3L, "move", "idem-transfer-1")
+            assertTrue(outcome is MutationOutcome.Applied)
+            assertEquals(5L, database.inventoryDao().getByMapping("map-a")?.closing)
+            assertEquals(5L, database.inventoryDao().getByMapping("map-b")?.closing)
+            val transfers = database.movementDao().getAll().filter { it.transferPairId != null }
+            assertEquals(2, transfers.size)
+            assertEquals(transfers[0].transferPairId, transfers[1].transferPairId)
+        }
 
     // --- Room constraint suite (merged from former RoomConstraintsTest) ---
 
     @Test
-    fun conditionalDecrementRefusesBelowZero() = runBlocking {
-        seedBase()
-        val ok = database.inventoryDao().conditionalDecrement("mapping-1", 10L, 1_700_000_001_000L)
-        assertEquals(1, ok)
-        val refused = database.inventoryDao().conditionalDecrement("mapping-1", 1L, 1_700_000_002_000L)
-        assertEquals(0, refused)
-        assertEquals(0L, database.inventoryDao().getByMapping("mapping-1")?.closing)
-    }
+    fun conditionalDecrementRefusesBelowZero() =
+        runBlocking {
+            seedBase()
+            val ok = database.inventoryDao().conditionalDecrement("mapping-1", 10L, 1_700_000_001_000L)
+            assertEquals(1, ok)
+            val refused = database.inventoryDao().conditionalDecrement("mapping-1", 1L, 1_700_000_002_000L)
+            assertEquals(0, refused)
+            assertEquals(0L, database.inventoryDao().getByMapping("mapping-1")?.closing)
+        }
 
     @Test
     fun movementTriggerRejectsZeroDelta() = runBlocking<Unit> {
@@ -253,20 +261,21 @@ class T25RedTeamTest {
     }
 
     @Test
-    fun derivedOpeningMatchesStoredCache() = runBlocking {
-        seedBase()
-        database.movementDao().insert(
-            MovementEntity(
-                id = "mv-in", type = "IN", mappingId = "mapping-1", qtyDelta = 4L,
-                transferPairId = null, idempotencyKey = "sum-check",
-                actorAccountId = "admin", at = 1_700_000_005_000L, note = "",
-            ),
-        )
-        database.inventoryDao().increment("mapping-1", 4L, 1_700_000_005_000L)
-        val deltas = database.movementDao().sumDeltaFor("mapping-1")
-        val row = database.inventoryDao().getByMapping("mapping-1")
-        assertNotNull(row)
-        // closing(14) == derived opening (10) + deltas(4)
-        assertEquals(14L, (row!!.openingCache + deltas))
-    }
+    fun derivedOpeningMatchesStoredCache() =
+        runBlocking {
+            seedBase()
+            database.movementDao().insert(
+                MovementEntity(
+                    id = "mv-in", type = "IN", mappingId = "mapping-1", qtyDelta = 4L,
+                    transferPairId = null, idempotencyKey = "sum-check",
+                    actorAccountId = "admin", at = 1_700_000_005_000L, note = "",
+                ),
+            )
+            database.inventoryDao().increment("mapping-1", 4L, 1_700_000_005_000L)
+            val deltas = database.movementDao().sumDeltaFor("mapping-1")
+            val row = database.inventoryDao().getByMapping("mapping-1")
+            assertNotNull(row)
+            // closing(14) == derived opening (10) + deltas(4)
+            assertEquals(14L, (row!!.openingCache + deltas))
+        }
 }

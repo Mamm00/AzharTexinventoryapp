@@ -1,10 +1,15 @@
 package com.alazhartex.stock
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.alazhartex.stock.ui.AlAzharRoot
 import com.alazhartex.stock.ui.theme.AlAzharTexTheme
@@ -16,9 +21,18 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(wrapWithLocale(newBase))
     }
 
+    /** Cold-start prompt for notifications (API 33+). If the user denies, nothing breaks — snackbars still work. */
+    private val requestNotificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* status shown in Settings */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
         setContent {
             AlAzharTexTheme {
                 AlAzharRoot(application as AlAzharApp)
