@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFeatureSetting
 import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.ui.theme.displayLargeEmphasized
 import com.alazhartex.stock.ui.theme.headlineLargeEmphasized
@@ -45,7 +44,7 @@ fun EmphasizedStat(
     val base = when (style) {
         EmphasizedStyle.Display -> MaterialTheme.typography.displayLargeEmphasized
         EmphasizedStyle.Headline -> MaterialTheme.typography.headlineLargeEmphasized
-    }.copy(fontFeatureSettings = FontFeatureSetting("tnum"))
+    }.copy(fontFeatureSettings = "tnum")
     Column(
         modifier = modifier
             .fillMaxWidth()

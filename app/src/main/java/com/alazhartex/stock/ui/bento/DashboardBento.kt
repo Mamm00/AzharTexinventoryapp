@@ -21,7 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.data.repo.ShedCardDto
 import com.alazhartex.stock.data.repo.TopColourDto
 import com.alazhartex.stock.domain.gauge.GaugeBucket
-import androidx.compose.ui.text.font.FontFeatureSetting
 import com.alazhartex.stock.ui.components.EmphasizedStat
 import com.alazhartex.stock.ui.components.EmphasizedStyle
 import com.alazhartex.stock.ui.theme.headlineLargeEmphasized
@@ -68,7 +67,7 @@ private fun KpiTile(
         ) {
             Text(
                 value,
-                style = headlineLargeEmphasized.copy(fontFeatureSettings = FontFeatureSetting("tnum")),
+                style = MaterialTheme.typography.headlineLargeEmphasized.copy(fontFeatureSettings = "tnum"),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
