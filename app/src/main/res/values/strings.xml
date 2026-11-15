@@ -151,7 +151,8 @@
     <string name="toast_rbac_denied">Not permitted: %1$s</string>
     <string name="toast_session_anomaly">Clock anomaly — wall clock moved backwards; mutation refused</string>
     <string name="toast_export_done">Export ready: %1$s</string>
-    <string name="toast_export_failed">Export failed</string>
+    <string name="toast_export_failed_detail">Export failed: %1$s</string>
+    <string name="toast_export_saved_downloads">Saved to Downloads: %1$s</string>
     <string name="toast_import_failed">Import refused at check R%1$d: %2$s</string>
     <string name="toast_import_done">Import complete.</string>
     <string name="toast_refresh_done">Database reloaded from disk.</string>

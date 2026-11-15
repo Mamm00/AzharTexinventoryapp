@@ -117,7 +117,8 @@ fun ReportsScreen(app: AlAzharApp) {
                                     shareCsv(context, file)
                                     snackbar.showSnackbar(context.getString(R.string.toast_export_done, file.name))
                                 } catch (t: Throwable) {
-                                    snackbar.showSnackbar(context.getString(R.string.toast_export_failed))
+                                    android.util.Log.e("AlAzharTex", "CSV export failed", t)
+                                    snackbar.showSnackbar(context.getString(R.string.toast_export_failed_detail, t.message ?: t.javaClass.simpleName))
                                 } finally {
                                     busy = null
                                 }
@@ -174,5 +175,6 @@ private fun shareCsv(context: android.content.Context, file: File) {
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
+    intent.clipData = android.content.ClipData.newRawUri(file.name, uri)
     context.startActivity(Intent.createChooser(intent, file.name))
 }

@@ -2,6 +2,7 @@ package com.alazhartex.stock.ui.screens
 
 import android.app.Activity
 import android.content.Context
+import android.content.ClipData
 import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -247,17 +248,29 @@ fun SettingsScreen(app: AlAzharApp) {
                                     runCatching { com.alazhartex.stock.data.local.DbProvider.refresh(context) }
                                     exported
                                 }
-                                val uri = FileProvider.getUriForFile(context, "com.alazhartex.stock.fileprovider", result.file)
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "application/octet-stream"
-                                    putExtra(Intent.EXTRA_STREAM, uri)
-                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                // Deterministic destination first: shared Downloads folder (works even
+                                // with no receiving app for .db octet-stream files).
+                                val saved = withContext(Dispatchers.IO) { app.container.exportImportManager.saveToDownloads(result) }
+                                // Best-effort share sheet on top — never allowed to fail the export.
+                                runCatching {
+                                    val uri = FileProvider.getUriForFile(context, "com.alazhartex.stock.fileprovider", result.file)
+                                    val intent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "application/octet-stream"
+                                        putExtra(Intent.EXTRA_STREAM, uri)
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        clipData = ClipData.newRawUri(result.file.name, uri)
+                                    }
+                                    context.startActivity(Intent.createChooser(intent, result.file.name))
+                                }.onFailure { android.util.Log.w("AlAzharTex", "share sheet unavailable after export — file is in Downloads/exports", it) }
+                                if (saved != null) {
+                                    snackbar.showSnackbar(context.getString(R.string.toast_export_saved_downloads, result.file.name))
+                                } else {
+                                    snackbar.showSnackbar(context.getString(R.string.toast_export_done, result.file.name))
                                 }
-                                context.startActivity(Intent.createChooser(intent, result.file.name))
-                                snackbar.showSnackbar(context.getString(R.string.toast_export_done, result.file.name))
                                 AlAzharNotifier.notify(context, AlAzharNotifier.ID_EXPORT, context.getString(R.string.notif_export_title), context.getString(R.string.notif_export_body, result.file.name))
                             } catch (t: Throwable) {
-                                snackbar.showSnackbar(context.getString(R.string.toast_export_failed))
+                                android.util.Log.e("AlAzharTex", "export failed", t)
+                                snackbar.showSnackbar(context.getString(R.string.toast_export_failed_detail, t.message ?: t.javaClass.simpleName))
                             } finally {
                                 busy = false
                             }

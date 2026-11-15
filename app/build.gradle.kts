@@ -19,8 +19,8 @@ android {
         applicationId = "com.alazhartex.stock"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = 34
-        versionCode = 13
-        versionName = "1.6.0"
+        versionCode = 14
+        versionName = "1.7.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

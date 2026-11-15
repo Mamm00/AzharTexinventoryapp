@@ -4,6 +4,41 @@ All notable changes to Al Azhar Tex Inventory are documented here. The format lo
 follows [Keep a Changelog](https://keepachangelog.com/); every release ships a signed APK
 attached to its GitHub Release.
 
+## [1.7.0] — 2026-11-14
+
+### Fixed
+- **Root cause of "export does nothing": `PRAGMA wal_checkpoint(TRUNCATE)` was executed
+  via `execSQL()`.** Android rejects row-returning statements on that path
+  ("Queries can be performed using SQLiteDatabase query or rawQuery methods only"), so
+  every export died at the checkpoint — before a single byte was written. The checkpoint
+  now drains the pragma through `query()`, and the instrumented `ExportFlowTest` pins it.
+- **Database export now reliably lands on the phone.** The export flow used to be:
+  write `alazhartex-*.db` into app-private `files/exports/`, then fire a bare
+  `ACTION_SEND` chooser and hope a receiving app accepts an `application/octet-stream`
+  `.db`. On many devices nothing happened — the export was stranded in app-private
+  storage. The flow now:
+  1. writes the file with the previous `VACUUM INTO` path, with a new
+     **checkpoint-and-copy fallback** (plus `PRAGMA integrity_check` verification of the
+     copy) for platforms where `VACUUM INTO` refuses;
+  2. **automatically copies the export (and its `.sha256` sidecar) into the shared
+     Downloads folder** — MediaStore on API 29+ (no permission needed), direct file
+     write on older releases — so the backup is on the phone even if no app will open a
+     `.db`;
+  3. keeps the share sheet as a best-effort extra (now with `ClipData` set, as the
+     chooser path requires), which can no longer fail the export;
+  4. on failure it logs the cause and shows the real error message in the snackbar
+     instead of a bare "Export failed".
+- CSV exports (Reports) get the same treatment: `ClipData` on the share intent and the
+  error detail in the snackbar.
+
+### Added
+- `ExportFlowTest` (instrumented): exports the demo database, asserts the file's sha256
+  matches its sidecar, opens it read-only with `PRAGMA integrity_check` == `ok`, and
+  verifies the automatic Downloads copy is **byte-identical** (deleted afterwards).
+
+### Notes
+- versionCode 14, versionName 1.7.0. Import ladder unchanged.
+
 ## [1.6.0] — 2026-11-14
 
 ### Added
