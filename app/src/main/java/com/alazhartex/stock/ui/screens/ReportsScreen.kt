@@ -35,6 +35,10 @@ import androidx.core.content.FileProvider
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.data.csv.CsvExport
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.alazhartex.stock.ui.components.SplitButton
+import com.alazhartex.stock.ui.reports.LetterheadSplitController
+import java.util.UUID
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -60,6 +64,14 @@ fun ReportsScreen(app: AlAzharApp) {
         value = app.container.readRepository.settingsAll().associate { it.key to it.value }
     }
     var includeLetterhead by remember { mutableStateOf(true) }
+    var letterheadTouched by remember { mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(settings) {
+        if (!letterheadTouched && settings.isNotEmpty()) {
+            includeLetterhead = settings["profile.letterhead_enabled"]?.equals("true", ignoreCase = true) ?: true
+        }
+    }
+    val letterheadController = remember { LetterheadSplitController(scope) }
+    val splitPhase by letterheadController.phase.collectAsStateWithLifecycle()
     var preview by remember { mutableStateOf<Pair<String, String>?>(null) } // reportKey to csvText
     var busy by remember { mutableStateOf<String?>(null) }
 
@@ -76,8 +88,41 @@ fun ReportsScreen(app: AlAzharApp) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
                             Text(stringResource(R.string.label_letterhead), style = MaterialTheme.typography.titleMedium)
-                            Switch(checked = includeLetterhead, onCheckedChange = { includeLetterhead = it })
+                            Switch(checked = includeLetterhead, onCheckedChange = { on ->
+                                letterheadTouched = true
+                                includeLetterhead = on
+                                letterheadController.setLetterhead(on) { enabled ->
+                                    app.container.mastersSettingsRepository.setSetting(
+                                        ACTOR_ADMIN, "profile.letterhead_enabled", enabled.toString(), UUID.randomUUID().toString(),
+                                    )
+                                }
+                            })
                         }
+                        SplitButton(
+                            primaryLabel = stringResource(R.string.action_preview_letterhead),
+                            phase = splitPhase,
+                            onPrimary = {
+                                letterheadController.generate {
+                                    try {
+                                        preview = "stock" to buildCsv(app, "stock")
+                                    } catch (t: Throwable) {
+                                        snackbar.showSnackbar(snackbarFor(context, t))
+                                    }
+                                }
+                            },
+                            letterheadEnabled = includeLetterhead,
+                            onLetterheadChange = { on ->
+                                letterheadTouched = true
+                                includeLetterhead = on
+                                letterheadController.setLetterhead(on) { enabled ->
+                                    app.container.mastersSettingsRepository.setSetting(
+                                        ACTOR_ADMIN, "profile.letterhead_enabled", enabled.toString(), UUID.randomUUID().toString(),
+                                    )
+                                }
+                            },
+                            letterheadLabel = stringResource(R.string.label_include_letterhead),
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
                         if (includeLetterhead && letterheadReady) {
                             Text(legalName, style = MaterialTheme.typography.headlineSmall)
                             listOf("profile.address", "profile.phone", "profile.email", "profile.tax_id", "profile.logo_uri")

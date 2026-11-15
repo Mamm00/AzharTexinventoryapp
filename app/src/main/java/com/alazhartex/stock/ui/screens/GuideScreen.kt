@@ -25,16 +25,49 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.alazhartex.stock.AlAzharApp
+import com.alazhartex.stock.BuildConfig
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.GuideContent
+import com.alazhartex.stock.ui.LocalNavigate
+import com.alazhartex.stock.ui.components.AppPermissionsCard
+import com.alazhartex.stock.ui.components.WhatsNewCard
+import com.alazhartex.stock.ui.components.WhatsNewLoader
+import com.alazhartex.stock.ui.navigation.Routes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
-fun GuideScreen() {
+fun GuideScreen(app: AlAzharApp) {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val arabic = configuration.locales[0].language == "ar"
+    val navigate = LocalNavigate.current
+    val scope = rememberCoroutineScope()
+    val reduceMotion by app.container.displayPrefs.reduceMotion.collectAsStateWithLifecycle(initialValue = false)
+    val dismissedVersion by app.container.displayPrefs.dismissedWhatsNewVersion.collectAsStateWithLifecycle(initialValue = BuildConfig.VERSION_NAME)
+    val whatsNew = remember(arabic) { WhatsNewLoader.load(context, arabic) }
+    val showWhatsNew = whatsNew != null && dismissedVersion != BuildConfig.VERSION_NAME
     Scaffold { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (showWhatsNew) {
+                item(key = "whatsnew", contentType = "whatsnew") {
+                    WhatsNewCard(
+                        whatsNew = requireNotNull(whatsNew),
+                        dismissLabel = stringResource(R.string.whatsnew_dismiss),
+                        title = stringResource(R.string.whatsnew_title, BuildConfig.VERSION_NAME),
+                        onDismiss = { scope.launch { app.container.displayPrefs.setWhatsNewDismissedVersion(BuildConfig.VERSION_NAME) } },
+                    )
+                }
+            }
             item(key = "brand", contentType = "brand") {
                 Box(
                     modifier = Modifier
@@ -60,6 +93,17 @@ fun GuideScreen() {
                         Text(text = stringResource(section.bodyRes), style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
                     }
                 }
+            }
+            item(key = "app_permissions", contentType = "app_permissions") {
+                AppPermissionsCard(
+                    reduceMotion = reduceMotion,
+                    reduceMotionLabel = stringResource(R.string.reduce_motion_label),
+                    reduceMotionStatusText = stringResource(if (reduceMotion) R.string.reduce_motion_status_on else R.string.reduce_motion_status_off),
+                    bodyText = stringResource(R.string.app_permissions_body),
+                    openSettingsLabel = stringResource(R.string.reduce_motion_shortcut),
+                    titleText = stringResource(R.string.app_permissions_title),
+                    onOpenDisplaySettings = { navigate(Routes.SETTINGS) },
+                )
             }
         }
     }

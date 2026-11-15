@@ -14,7 +14,11 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +53,16 @@ fun UtilisationGauge(
     percentFraction: Float,
     modifier: Modifier = Modifier,
     contentDescriptionPrefix: String,
+    onBucketCrossed: ((GaugeBucket) -> Unit)? = null,
 ) {
+    val previousBucket = remember { mutableStateOf<GaugeBucket?>(null) }
+    LaunchedEffect(bucket) {
+        val previous = previousBucket.value
+        if (previous != null && bucket != null && previous != bucket) {
+            onBucketCrossed?.invoke(bucket)
+        }
+        previousBucket.value = bucket
+    }
     val animated by animateFloatAsState(targetValue = percentFraction.coerceIn(0f, 1.5f) / 1.5f, label = "gauge")
     val color = gaugeColor(bucket)
     val desc = "$contentDescriptionPrefix ${percentDisplay ?: "—"} $bucketLabel"

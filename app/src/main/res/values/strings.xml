@@ -73,6 +73,7 @@
     <string name="action_refresh_db">Refresh database</string>
     <string name="summary_refresh_db">Reload all stock, dashboard and roll data from disk</string>
     <string name="action_generate">Generate</string>
+    <string name="action_preview_letterhead">Preview letterhead</string>
     <string name="action_share">Share</string>
 
     <string name="label_capacity">Capacity (rolls)</string>
@@ -83,6 +84,7 @@
     <string name="label_top_sheds">Top sheds by rolls</string>
     <string name="label_drift_ok">No drift — every row balances</string>
     <string name="label_drift_detected">Drift detected</string>
+    <string name="label_drift_detected_detail">Drift detected: %1$d</string>
     <string name="label_grade">Grade</string>
     <string name="label_family">Family</string>
     <string name="label_keeper_code">Keeper code</string>
@@ -310,4 +312,26 @@
     <string name="color_custom_auto">Auto (derived from family)</string>
     <string name="color_custom_auto_short">auto</string>
     <string name="fabric_notes_label">Notes</string>
+    <string name="action_back">Back</string>
+    <string name="label_opening">Opening</string>
+    <string name="label_closing">Closing</string>
+    <string name="reduce_motion_label">Reduce motion</string>
+    <string name="reduce_motion_subtitle">Replace springs and morphs with instant, subtle fades</string>
+    <string name="whatsnew_title">What&#8217;s new in %1$s</string>
+    <string name="whatsnew_dismiss">Dismiss</string>
+    <string name="app_permissions_title">App permissions &amp; motion</string>
+    <string name="app_permissions_body">Notifications, storage and files — plus the motion system you control here.</string>
+    <string name="reduce_motion_status_on">On</string>
+    <string name="reduce_motion_status_off">Off</string>
+    <string name="reduce_motion_shortcut">Open Display settings</string>
+    <string name="fab_menu_open">Quick actions</string>
+    <string name="fab_scrim_label">Dismiss quick actions</string>
+    <string name="action_switch_shed">Switch shed</string>
+    <string name="fab_export">Export</string>
+    <string name="fab_new_movement">New movement</string>
+    <string name="stock_detail_title">Shed details</string>
+    <string name="inventory_detail_title">Mapping details</string>
+    <string name="transfer_pair_summary">%1$s to %2$s, %3$s rolls</string>
+    <string name="profile_session_remaining">Session remaining</string>
+    <string name="session_remaining_none">Session expired</string>
 </resources>

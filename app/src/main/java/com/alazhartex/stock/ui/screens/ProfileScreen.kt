@@ -2,6 +2,7 @@ package com.alazhartex.stock.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -14,13 +15,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.BuildConfig
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.components.LabeledRow
+import com.alazhartex.stock.ui.components.WavyProgressIndicator
+import com.alazhartex.stock.domain.session.SessionPolicy
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.dateTimeString
 
@@ -55,6 +60,18 @@ fun ProfileScreen(app: AlAzharApp) {
             LoadingBox(stringResource(R.string.loading), Modifier.padding(padding))
             return@Scaffold
         }
+        val nowWall = remember { System.currentTimeMillis() }
+        val remainingMillis = s.sessionExpiresAt?.let { it - nowWall }
+        val sessionFraction = remainingMillis?.let { (it.toFloat() / SessionPolicy.SESSION_DURATION_MILLIS.toFloat()).coerceIn(0f, 1f) } ?: 0f
+        val remainingText = remainingMillis?.let {
+            if (it <= 0L) {
+                stringResource(R.string.session_remaining_none)
+            } else {
+                val hours = it / 3_600_000L
+                val minutes = (it % 3_600_000L) / 60_000L
+                "%dh %dm".format(hours, minutes)
+            }
+        }
         val roleLabelRes = when (s.role) {
             "ADMIN" -> R.string.label_role_admin
             "KEEPER" -> R.string.label_role_keeper
@@ -81,7 +98,20 @@ fun ProfileScreen(app: AlAzharApp) {
             Card(colors = CardDefaults.cardColors()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(stringResource(R.string.label_session_expiry), style = MaterialTheme.typography.titleMedium)
-                    Text(s.sessionExpiresAt?.let { dateTimeString(it) } ?: "—", style = MaterialTheme.typography.bodyLarge)
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        WavyProgressIndicator(
+                            progress = sessionFraction,
+                            contentDescriptionPrefix = stringResource(R.string.profile_session_remaining),
+                            modifier = Modifier.size(72.dp),
+                            testTag = "profile_session_ring",
+                        )
+                        Column {
+                            Text(s.sessionExpiresAt?.let { dateTimeString(it) } ?: "—", style = MaterialTheme.typography.bodyLarge)
+                            remainingText?.let {
+                                Text("${stringResource(R.string.profile_session_remaining)}: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
                 }
             }
         }

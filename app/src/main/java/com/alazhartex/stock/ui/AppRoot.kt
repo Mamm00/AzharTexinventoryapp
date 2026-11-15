@@ -47,12 +47,15 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
@@ -75,6 +78,12 @@ import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.navigation.Routes
+import com.alazhartex.stock.ui.navigation.LocalAnimatedVisibilityScope
+import com.alazhartex.stock.ui.navigation.LocalSharedTransitionScope
+import com.alazhartex.stock.ui.motion.LocalReduceMotion
+import com.alazhartex.stock.ui.components.azharGlass
+import com.alazhartex.stock.ui.screens.StockDetailScreen
+import com.alazhartex.stock.ui.screens.InventoryDetailScreen
 import com.alazhartex.stock.ui.screens.AuditScreen
 import com.alazhartex.stock.ui.screens.ColoursScreen
 import com.alazhartex.stock.ui.screens.CrossViewScreen
@@ -121,11 +130,12 @@ private val PRIMARY_DESTINATIONS = DESTINATIONS.filter { it.route in PRIMARY_ROU
 /** ≥840dp (tablet landscape / large window) gets a permanent rail; below, the bottom bar. */
 private const val EXPANDED_WIDTH_DP = 840
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.animation.ExperimentalSharedTransitionApi::class)
 @Composable
 fun AlAzharRoot(app: AlAzharApp) {
     val snackbarHostState = remember { SnackbarHostState() }
     val arabicIndic by app.container.digitsFlow.collectAsStateWithLifecycle()
+    val reduceMotion by app.container.displayPrefs.reduceMotion.collectAsStateWithLifecycle(initialValue = false)
     val bootstrapped by app.container.bootstrapped.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -144,6 +154,7 @@ fun AlAzharRoot(app: AlAzharApp) {
     androidx.compose.runtime.CompositionLocalProvider(
         LocalArabicIndicDigits provides arabicIndic,
         LocalSnackbar provides snackbarHostState,
+        LocalReduceMotion provides reduceMotion,
         LocalNavigate provides { route ->
             navController.navigate(route) {
                 launchSingleTop = true
@@ -212,6 +223,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 topBar = {
                     TopAppBar(
+                        modifier = Modifier.azharGlass(blurRadius = 16.dp, borderAlpha = 0.10f),
                         title = { Text(stringResource(R.string.app_name)) },
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
@@ -262,19 +274,32 @@ fun AlAzharRoot(app: AlAzharApp) {
                         LoadingBox(stringResource(R.string.loading))
                     }
                 } else {
+                    val fadeSpec = tween<Float>(200)
+                    val fadeInSpec = fadeIn(fadeSpec)
+                    val fadeOutSpec = fadeOut(fadeSpec)
+                    SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                    ) {
                     NavHost(
                         navController = navController,
                         startDestination = Routes.DASHBOARD,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        composable(Routes.GUIDE) { GuideScreen() }
-                        composable(Routes.STOCK) { StockScreen(app) }
-                        composable(Routes.INVENTORY) { InventoryScreen(app) }
+                        composable(Routes.GUIDE) { GuideScreen(app) }
+                        composable(Routes.STOCK, enterTransition = { fadeInSpec }, exitTransition = { fadeOutSpec }, popEnterTransition = { fadeInSpec }, popExitTransition = { fadeOutSpec }) {
+                            androidx.compose.runtime.CompositionLocalProvider(LocalAnimatedVisibilityScope provides this@composable) { StockScreen(app) }
+                        }
+                        composable(Routes.INVENTORY, enterTransition = { fadeInSpec }, exitTransition = { fadeOutSpec }, popEnterTransition = { fadeInSpec }, popExitTransition = { fadeOutSpec }) {
+                            androidx.compose.runtime.CompositionLocalProvider(LocalAnimatedVisibilityScope provides this@composable) { InventoryScreen(app) }
+                        }
                         composable(Routes.MOVEMENTS) { MovementsScreen(app) }
                         composable(Routes.COLOURS) { ColoursScreen(app) }
                         composable(Routes.CROSS_VIEW) { CrossViewScreen(app) }
                         composable(Routes.SWATCH_BOOK) { SwatchBookScreen(app) }
-                        composable(Routes.DASHBOARD) { DashboardScreen(app) }
+                        composable(Routes.DASHBOARD, enterTransition = { fadeInSpec }, exitTransition = { fadeOutSpec }, popEnterTransition = { fadeInSpec }, popExitTransition = { fadeOutSpec }) {
+                            androidx.compose.runtime.CompositionLocalProvider(LocalAnimatedVisibilityScope provides this@composable) { DashboardScreen(app) }
+                        }
                         composable(Routes.DASHBOARD_SETTINGS) { DashboardSettingsScreen(app) }
                         composable(Routes.REPORTS) { ReportsScreen(app) }
                         composable(Routes.MASTERS) { MastersScreen(app) }
@@ -282,6 +307,20 @@ fun AlAzharRoot(app: AlAzharApp) {
                         composable(Routes.AUDIT) { AuditScreen(app) }
                         composable(Routes.SETTINGS) { SettingsScreen(app) }
                         composable(Routes.PROFILE) { ProfileScreen(app) }
+                        composable("${Routes.STOCK_DETAIL}/{shedId}", enterTransition = { fadeInSpec }, exitTransition = { fadeOutSpec }, popEnterTransition = { fadeInSpec }, popExitTransition = { fadeOutSpec }) { entry ->
+                            val shedId = entry.arguments?.getString("shedId").orEmpty()
+                            androidx.compose.runtime.CompositionLocalProvider(LocalAnimatedVisibilityScope provides this@composable) {
+                                StockDetailScreen(app, shedId) { navController.popBackStack() }
+                            }
+                        }
+                        composable("${Routes.INVENTORY_DETAIL}/{mappingId}", enterTransition = { fadeInSpec }, exitTransition = { fadeOutSpec }, popEnterTransition = { fadeInSpec }, popExitTransition = { fadeOutSpec }) { entry ->
+                            val mappingId = entry.arguments?.getString("mappingId").orEmpty()
+                            androidx.compose.runtime.CompositionLocalProvider(LocalAnimatedVisibilityScope provides this@composable) {
+                                InventoryDetailScreen(app, mappingId) { navController.popBackStack() }
+                            }
+                        }
+                    }
+                    }
                     }
                 }
                     }

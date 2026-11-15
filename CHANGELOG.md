@@ -4,6 +4,57 @@ All notable changes to Al Azhar Tex Inventory are documented here. The format lo
 follows [Keep a Changelog](https://keepachangelog.com/); every release ships a signed APK
 attached to its GitHub Release.
 
+## [1.8.0] — Unreleased
+
+### Added
+- **Dashboard bento layout.** Hero utilisation compartment (animated arc, emphasized
+  display type), four KPI compartments (total / active / inactive / capacity) with
+  asymmetric 32/8dp silhouettes and tabular figures, a full-width drift status plane
+  (transparent when healthy, error-container when not), Top Sheds rail bars and the
+  **Top Colours orbit** — each swatch tappable (pre-filters Inventory by that colour).
+- **Shared-bounds list → detail navigation.** Stock cards and Inventory lines morph into
+  dedicated read-only detail surfaces (`stock_detail/{shedId}`, `inventory_detail/{mappingId}`)
+  via `SharedTransitionLayout`; back morphs home. RTL-aware back affordance.
+- **Connected transfer cards (Movements).** The two legs of a `transferPairId` transfer
+  render as ONE card joined by an animated connector; collapsed shows the summary line,
+  expanded reveals both legs. Single unit of interaction, expand/collapse with one tap.
+- **Segmented groups** (morphing indicator, ≥48dp targets, detent haptic): Masters tabs,
+  Audit result filter (All / Allowed / Blocked).
+- **FAB menu on the Dashboard** — one FAB, spring-revealed pill actions: Add roll,
+  New movement, Export, Switch shed. Scrim-tap or back dismisses.
+- **Reports letterhead split button** — leading action previews the stock CSV with the
+  letterhead applied; trailing segment is the include-letterhead toggle, persisted through
+  the audited `setSetting` path (`profile.letterhead_enabled`).
+- **Reduce motion (Settings → Display).** Persisted in DataStore (`display_prefs`),
+  surfaced app-wide via `LocalReduceMotion`; under reduce motion every spatial spring
+  collapses to snap, effect springs to a fast fade, indeterminate glyphs stop looping.
+- **Guide: "What's new" card** — data-driven from the bundled `whatsnew.json` (keyed by
+  `versionName`), bullets localised (en/ar), dismissible with dismissal persisted per
+  version. Plus an **App permissions & motion** card deep-linking into Settings → Display.
+- **Shed utilisation rail** (three zone segments, 0–150% scale) on Stock cards and the
+  Stock detail surface; **profile session-ring** (wavy countdown) on Profile.
+- **Emphasized display type scale** (`displayLargeEmphasized` / `headlineLargeEmphasized`,
+  tabular figures) used only by emphasized-stat surfaces.
+- **Liquid-glass chrome** on the top app bar (API 31+ frost, opaque fallback below).
+- **Haptics** (user-initiated only): roll-commit confirm, export confirm, destructive-import
+  warning, gauge bucket-cross detent/warning, refresh/segment/FAB detents. Ambient events
+  never buzz.
+- **What's new card** mention above; `whatsnew.json` bundled and pinned in CONTENT.md.
+
+### Notes
+- versionCode 15, versionName 1.8.0. No schema change (Room v3 export untouched), no new
+  permissions, no audited-mutation-path changes. `dash_hero`, `dash_tile_stock` and
+  `stock_add_<shedId>` test tags preserved for the existing connected smoke suite.
+- `whatsnew.json` is keyed by `versionName`; the file must be re-pinned in CONTENT.md on
+  every release that bumps it (see CONTENT.md §12).
+- Detekt now runs on `:app` (config mirrors `:data`/`:domain`); it remains informational
+  in CI until the first clean baseline exists. The `OneEmphasizedStatPerScreen` and
+  `GlassSurfaceWhitelist` rules referenced in code comments are documented intent, not yet
+  enforced by a custom detekt-rules artifact.
+- List↔detail shared-bounds navigation and the Top Colours orbit morph have no connected
+  smoke coverage yet; the existing all-routes smoke suite is unchanged and stays green.
+- Screenshot tests are not part of this release (no test infrastructure change).
+
 ## [1.7.0] — 2026-11-14
 
 ### Fixed

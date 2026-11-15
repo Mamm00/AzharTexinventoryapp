@@ -63,6 +63,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalView
+import com.alazhartex.stock.ui.haptics.Haptics
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alazhartex.stock.permissions.AlAzharNotifier
 import com.alazhartex.stock.permissions.Permissions
 import kotlinx.coroutines.Dispatchers
@@ -75,10 +78,12 @@ fun SettingsScreen(app: AlAzharApp) {
     val context = LocalContext.current
     val snackbar = LocalSnackbar.current
     val scope = rememberCoroutineScope()
+    val hapticsView = LocalView.current
     val navigate = LocalNavigate.current
     val prefs = context.getSharedPreferences(MainActivity.LOCALE_PREFS, Context.MODE_PRIVATE)
     var language by remember { mutableStateOf(prefs.getString(MainActivity.KEY_LANGUAGE, "ar") ?: "ar") }
     var digits by remember { mutableStateOf(app.container.digitsFlow.value) }
+    val reduceMotion by app.container.displayPrefs.reduceMotion.collectAsStateWithLifecycle(initialValue = false)
     val storedSettings by produceState(initialValue = emptyMap(), rememberDbVersion()) {
         value = app.container.readRepository.settingsAll().associate { it.key to it.value }
     }
@@ -187,6 +192,22 @@ fun SettingsScreen(app: AlAzharApp) {
                 }
             }
 
+            // ---- display (v1.8.0) ----
+            Card(colors = CardDefaults.cardColors()) {
+                Row(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.reduce_motion_label), style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.reduce_motion_subtitle), style = MaterialTheme.typography.bodySmall)
+                    }
+                    Switch(checked = reduceMotion, onCheckedChange = { on ->
+                        scope.launch {
+                            app.container.displayPrefs.setReduceMotion(on)
+                            snackbar.showSnackbar(context.getString(R.string.toast_setting_saved))
+                        }
+                    })
+                }
+            }
+
             // ---- masters catalogue shortcut (v1.1) ----
             Card(colors = CardDefaults.cardColors()) {
                 Row(
@@ -262,6 +283,7 @@ fun SettingsScreen(app: AlAzharApp) {
                                     }
                                     context.startActivity(Intent.createChooser(intent, result.file.name))
                                 }.onFailure { android.util.Log.w("AlAzharTex", "share sheet unavailable after export — file is in Downloads/exports", it) }
+                                Haptics.confirm(hapticsView)
                                 if (saved != null) {
                                     snackbar.showSnackbar(context.getString(R.string.toast_export_saved_downloads, result.file.name))
                                 } else {
@@ -431,6 +453,7 @@ fun SettingsScreen(app: AlAzharApp) {
             confirmButton = {
                 TextButton(onClick = {
                     val db = importStage ?: return@TextButton
+                    Haptics.warning(hapticsView)
                     scope.launch {
                         val current = context.getDatabasePath("alazhartex.db")
                         withContext(Dispatchers.IO) {

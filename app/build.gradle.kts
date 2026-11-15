@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.klint)
+    alias(libs.plugins.detekt)
 }
 
 // Single source of truth for the seed asset: the committed root seed-alazhartex.json.
@@ -19,8 +20,8 @@ android {
         applicationId = "com.alazhartex.stock"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = 34
-        versionCode = 14
-        versionName = "1.7.0"
+        versionCode = 15
+        versionName = "1.8.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -121,4 +122,16 @@ dependencies {
     androidTestImplementation(libs.android.test.ext.junit)
     androidTestImplementation(libs.android.test.runner)
     androidTestImplementation(libs.android.test.rules)
+}
+
+detekt {
+    config.setFrom(files(rootProject.file("config/detekt/detekt.yml")))
+    buildUponDefaultConfig = true
+    // Informational until the first clean baseline exists (mirrors CI: detekt never blocks).
+    ignoreFailures = true
+    parallel = true
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
 }

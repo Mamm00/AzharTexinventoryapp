@@ -13,7 +13,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -37,6 +36,8 @@ import com.alazhartex.stock.domain.model.InvariantViolationException
 import com.alazhartex.stock.ui.LocalSnackbar
 import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LabeledRow
+import com.alazhartex.stock.ui.components.SegmentedGroup
+import com.alazhartex.stock.ui.components.SegmentedOption
 import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.paletteContentDescription
@@ -82,22 +83,26 @@ fun MastersScreen(app: AlAzharApp) {
                 Text("${stringResource(R.string.label_colours)}: ${data.colours.size}", style = MaterialTheme.typography.labelLarge)
                 Text("${stringResource(R.string.label_mappings)}: ${data.mappingCount}", style = MaterialTheme.typography.labelLarge)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                MastersTab.entries.forEach { t ->
-                    FilterChip(
-                        selected = tab == t,
-                        onClick = { tab = t },
-                        label = {
-                            Text(stringResource(when (t) {
+            SegmentedGroup(
+                options = MastersTab.entries.map { t ->
+                    SegmentedOption(
+                        value = t,
+                        label = stringResource(
+                            when (t) {
                                 MastersTab.WAREHOUSES -> R.string.tab_warehouses
                                 MastersTab.FABRICS -> R.string.tab_fabrics
                                 MastersTab.COLOURS -> R.string.tab_colours
                                 MastersTab.MAPPINGS -> R.string.tab_mappings
-                            }))
-                        },
+                            },
+                        ),
+                        testTag = "masters_tab_" + t.name.lowercase(),
                     )
-                }
-            }
+                },
+                selected = tab,
+                onSelected = { tab = it },
+                testTag = "masters_tabs",
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
             when (tab) {
                 MastersTab.WAREHOUSES -> {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 8.dp)) {
