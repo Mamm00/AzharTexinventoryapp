@@ -45,10 +45,11 @@ fun EmphasizedStat(
         EmphasizedStyle.Display -> MaterialTheme.typography.displayLargeEmphasized
         EmphasizedStyle.Headline -> MaterialTheme.typography.headlineLargeEmphasized
     }.copy(fontFeatureSettings = "tnum")
+    val mergedDescription = contentDescription ?: "$caption: $value"
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .semantics { contentDescription = contentDescription ?: "$caption: $value" }
+            .semantics { this.contentDescription = mergedDescription }
             .then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {

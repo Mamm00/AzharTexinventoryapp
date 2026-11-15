@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.lerp
 import androidx.compose.foundation.Canvas
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -14,7 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -95,15 +94,16 @@ fun WavyIndeterminateIndicator(
     )
     val rotationNow = if (reduce) 0f else rotation
     val morphNow = if (reduce) 0.5f else morph
+    val indeterminateDescription = contentDescription
     Canvas(
         modifier = modifier.semantics {
-            contentDescription = contentDescription
+            this.contentDescription = indeterminateDescription
             progressBarRangeInfo = ProgressBarRangeInfo(0f, 0f..1f)
         }.then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
     ) {
         val stroke = strokeWidth.toPx()
         val sizeMin = size.minDimension
-        val corner = lerp(sizeMin / 2f, sizeMin * 0.22f, morphNow)
+        val corner = sizeMin / 2f + (sizeMin * 0.22f - sizeMin / 2f) * morphNow
         if (morphShape) {
             drawRoundRect(
                 color = theme.surfaceVariant,
