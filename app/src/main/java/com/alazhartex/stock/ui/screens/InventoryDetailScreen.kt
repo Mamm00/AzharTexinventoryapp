@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ private data class InventoryDetailState(val loaded: Boolean, val line: com.alazh
  * v1.8.0 shared-bounds inventory detail surface. Read-only view of one warehouse↔fabric↔colour
  * mapping with its opening/closing ledger facts; roll mutations stay on the stock screen.
  */
+@OptIn(androidx.compose.animation.ExperimentalSharedTransitionApi::class)
 @Composable
 fun InventoryDetailScreen(app: AlAzharApp, mappingId: String, onBack: () -> Unit) {
     val arabicIndic = LocalArabicIndicDigits.current

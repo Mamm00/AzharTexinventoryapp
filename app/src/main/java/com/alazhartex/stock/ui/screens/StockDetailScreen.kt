@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,7 @@ private data class StockDetailState(val loaded: Boolean, val card: com.alazharte
  * and this destination's AnimatedVisibilityScope — see AlAzharRoot). Read-only; roll
  * mutations stay on the stock cards' audited dialogs.
  */
+@OptIn(androidx.compose.animation.ExperimentalSharedTransitionApi::class)
 @Composable
 fun StockDetailScreen(app: AlAzharApp, shedId: String, onBack: () -> Unit) {
     val arabicIndic = LocalArabicIndicDigits.current
