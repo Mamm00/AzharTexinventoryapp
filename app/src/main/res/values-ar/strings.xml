@@ -155,7 +155,6 @@
     <string name="toast_rbac_denied">غير مسموح: %1$s</string>
     <string name="toast_session_anomaly">خلل في الساعة — تم تحريك ساعة الجهاز للخلف؛ تم رفض العملية</string>
     <string name="toast_export_done">التصدير جاهز: %1$s</string>
-    <string name="toast_export_failed">فشل التصدير</string>
     <string name="toast_export_failed_detail">فشل التصدير: %1$s</string>
     <string name="toast_export_saved_downloads">تم الحفظ في التنزيلات: %1$s</string>
     <string name="toast_import_failed">تم رفض الاستيراد عند الفحص R%1$d: %2$s</string>

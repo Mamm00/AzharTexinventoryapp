@@ -39,7 +39,7 @@ class ExportFlowTest {
     }
 
     @Test
-    fun exportRoundTripWritesConsistentFileAndDownloadsCopy() = runBlocking {
+    fun exportRoundTripWritesConsistentFileAndDownloadsCopy() = runBlocking<Unit> {
         val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as AlAzharApp
         val result = app.container.exportImportManager.exportDatabase()
         try {

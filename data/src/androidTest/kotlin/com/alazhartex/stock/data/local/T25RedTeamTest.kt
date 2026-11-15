@@ -208,57 +208,62 @@ class T25RedTeamTest {
         }
 
     @Test
-    fun movementTriggerRejectsZeroDelta() = runBlocking<Unit> {
-        seedBase()
-        assertThrows(Exception::class.java) {
-            runBlocking {
-                database.movementDao().insert(
-                    MovementEntity(
-                        id = "mv-0", type = "ADJUSTMENT", mappingId = "mapping-1", qtyDelta = 0L,
-                        transferPairId = null, idempotencyKey = "zero-delta",
-                        actorAccountId = "admin", at = 1_700_000_003_000L, note = "must fail",
-                    ),
+    fun movementTriggerRejectsZeroDelta() =
+        runBlocking<Unit> {
+            seedBase()
+            assertThrows(Exception::class.java) {
+                runBlocking {
+                    database.movementDao().insert(
+                        MovementEntity(
+                            id = "mv-0", type = "ADJUSTMENT", mappingId = "mapping-1", qtyDelta = 0L,
+                            transferPairId = null, idempotencyKey = "zero-delta",
+                            actorAccountId = "admin", at = 1_700_000_003_000L, note = "must fail",
+                        ),
+                    )
+                }
+            }
+        }
+
+    @Test
+    fun colourTriggerRejectsGradeOutsideAD() =
+        runBlocking<Unit> {
+            seedBase()
+            assertThrows(Exception::class.java) {
+                runBlocking {
+                    database.colourDao().insert(
+                        ColourEntity("colour-2", "C-2", "أزرق", "Blue", "E", "Cotton", null, true),
+                    )
+                }
+            }
+        }
+
+    @Test
+    fun movementIdempotencyKeyIsUnique() =
+        runBlocking<Unit> {
+            seedBase()
+            val movement =
+                MovementEntity(
+                    id = "mv-1", type = "IN", mappingId = "mapping-1", qtyDelta = 5L,
+                    transferPairId = null, idempotencyKey = "dup-key",
+                    actorAccountId = "admin", at = 1_700_000_004_000L, note = "first",
                 )
+            database.movementDao().insert(movement)
+            assertThrows(Exception::class.java) {
+                runBlocking {
+                    database.movementDao().insert(movement.copy(id = "mv-2", note = "replay-with-different-row"))
+                }
             }
         }
-    }
 
     @Test
-    fun colourTriggerRejectsGradeOutsideAD() = runBlocking<Unit> {
-        seedBase()
-        assertThrows(Exception::class.java) {
-            runBlocking {
-                database.colourDao().insert(
-                    ColourEntity("colour-2", "C-2", "أزرق", "Blue", "E", "Cotton", null, true),
-                )
+    fun mappingDeleteRestrictedWhenInventoryExists() =
+        runBlocking<Unit> {
+            seedBase()
+            // RESTRICT FK: deleting the mapping must fail while an inventory row references it.
+            assertThrows(Exception::class.java) {
+                runBlocking { database.openHelper.writableDatabase.execSQL("DELETE FROM mappings WHERE id = 'mapping-1'") }
             }
         }
-    }
-
-    @Test
-    fun movementIdempotencyKeyIsUnique() = runBlocking<Unit> {
-        seedBase()
-        val movement = MovementEntity(
-            id = "mv-1", type = "IN", mappingId = "mapping-1", qtyDelta = 5L,
-            transferPairId = null, idempotencyKey = "dup-key",
-            actorAccountId = "admin", at = 1_700_000_004_000L, note = "first",
-        )
-        database.movementDao().insert(movement)
-        assertThrows(Exception::class.java) {
-            runBlocking {
-                database.movementDao().insert(movement.copy(id = "mv-2", note = "replay-with-different-row"))
-            }
-        }
-    }
-
-    @Test
-    fun mappingDeleteRestrictedWhenInventoryExists() = runBlocking<Unit> {
-        seedBase()
-        // RESTRICT FK: deleting the mapping must fail while an inventory row references it.
-        assertThrows(Exception::class.java) {
-            runBlocking { database.openHelper.writableDatabase.execSQL("DELETE FROM mappings WHERE id = 'mapping-1'") }
-        }
-    }
 
     @Test
     fun derivedOpeningMatchesStoredCache() =
