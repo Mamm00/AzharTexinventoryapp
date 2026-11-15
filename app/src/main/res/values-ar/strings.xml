@@ -239,7 +239,6 @@
     <string name="keeper_code_keeper_only">أكواد الأمين تُخزن ببادئة K- للألوان التي يضيفها الأمين</string>
     <string name="picker_title">اختر اللون</string>
     <string name="fabric_new_here">جديد هنا</string>
-    <string name="dashboard_subtitle">لقطة حية لكل المخازن</string>
     <string name="dashboard_quick_actions">إجراءات سريعة</string>
     <string name="picker_search_hint">ابحث بالكود أو الاسم (عربي/إنجليزي)</string>
     <string name="picker_empty">لا توجد ألوان مطابقة</string>

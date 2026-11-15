@@ -157,7 +157,6 @@ fun DashboardScreen(app: AlAzharApp) {
             item {
                 val bentoStrings = BentoStrings(
                     heroCaption = stringResource(R.string.label_utilisation),
-                    heroSubtitle = stringResource(R.string.dashboard_subtitle),
                     totalLabel = stringResource(R.string.label_total_rolls),
                     activeLabel = stringResource(R.string.label_active_rolls),
                     inactiveLabel = stringResource(R.string.label_inactive_rolls),

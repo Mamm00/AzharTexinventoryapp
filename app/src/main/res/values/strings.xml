@@ -231,7 +231,6 @@
     <string name="keeper_code_keeper_only">Keeper codes are stored under a K- prefix for keeper-created colours</string>
     <string name="picker_title">Choose colour</string>
     <string name="fabric_new_here">new here</string>
-    <string name="dashboard_subtitle">Live snapshot of every shed</string>
     <string name="dashboard_quick_actions">Quick actions</string>
     <string name="picker_search_hint">Search code or name (AR/EN)</string>
     <string name="picker_empty">No colours match these filters</string>
