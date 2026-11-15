@@ -14,6 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,6 +36,8 @@ import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +47,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
@@ -89,10 +96,13 @@ private val QUICK_ACTIONS = listOf(
     QuickAction(Routes.GUIDE, R.string.nav_guide, Icons.Filled.MenuBook),
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
     val navigate = LocalNavigate.current
+    var refreshing by remember { mutableStateOf(false) }
+    val refreshScope = rememberCoroutineScope()
     val viewModel: DashboardViewModel = viewModel(
         factory = remember { DashboardViewModelFactory(app.container.readRepository, app.container.overrideStore) },
     )
@@ -118,8 +128,21 @@ fun DashboardScreen(app: AlAzharApp) {
             stringResource(R.string.bucket_over_capacity),
             stringResource(R.string.label_empty_no_rows),
         )
+        PullToRefreshBox(
+            isRefreshing = refreshing,
+            onRefresh = {
+                refreshing = true
+                // Local-only invalidation: re-resolve Room per call; no network involved.
+                com.alazhartex.stock.data.local.DbProvider.bumpVersion()
+                refreshScope.launch {
+                    delay(650)
+                    refreshing = false
+                }
+            },
+            modifier = Modifier.fillMaxSize().padding(padding),
+        ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(12.dp),
+            modifier = Modifier.fillMaxSize().padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // ---- Hero -----------------------------------------------------------
@@ -128,7 +151,7 @@ fun DashboardScreen(app: AlAzharApp) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("dash_hero")
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(24.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -151,11 +174,15 @@ fun DashboardScreen(app: AlAzharApp) {
                         percentFraction = data.percentFraction,
                         contentDescriptionPrefix = stringResource(R.string.app_name),
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        KpiCell(integerString(data.totalRolls, arabicIndic), stringResource(R.string.label_total_rolls), Modifier.weight(1f))
-                        KpiCell(integerString(data.activeRolls, arabicIndic), stringResource(R.string.label_active_rolls), Modifier.weight(1f))
-                        KpiCell(integerString(data.capacityRolls, arabicIndic), stringResource(R.string.label_capacity), Modifier.weight(1f))
-                        KpiCell(integerString(data.inactiveRolls, arabicIndic), stringResource(R.string.label_inactive_rolls), Modifier.weight(1f))
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            KpiCell(integerString(data.totalRolls, arabicIndic), stringResource(R.string.label_total_rolls), Modifier.weight(1f))
+                            KpiCell(integerString(data.activeRolls, arabicIndic), stringResource(R.string.label_active_rolls), Modifier.weight(1f))
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            KpiCell(integerString(data.capacityRolls, arabicIndic), stringResource(R.string.label_capacity), Modifier.weight(1f))
+                            KpiCell(integerString(data.inactiveRolls, arabicIndic), stringResource(R.string.label_inactive_rolls), Modifier.weight(1f))
+                        }
                     }
                     when {
                         data.overridesEnabled && data.overrideFieldDiffs.isNotEmpty() ->
@@ -271,6 +298,7 @@ fun DashboardScreen(app: AlAzharApp) {
                 }
             }
             item { Box(Modifier.height(8.dp)) }
+        }
         }
     }
 }

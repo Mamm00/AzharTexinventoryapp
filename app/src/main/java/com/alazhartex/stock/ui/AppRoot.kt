@@ -36,6 +36,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
@@ -48,6 +52,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -105,6 +114,13 @@ private val DESTINATIONS = listOf(
     DrawerDestination(Routes.PROFILE, R.string.nav_profile, Icons.Filled.Person),
 )
 
+/** The five high-frequency destinations — bottom bar on compact, navigation rail on expanded. */
+private val PRIMARY_ROUTES = listOf(Routes.DASHBOARD, Routes.STOCK, Routes.INVENTORY, Routes.MOVEMENTS, Routes.REPORTS)
+private val PRIMARY_DESTINATIONS = DESTINATIONS.filter { it.route in PRIMARY_ROUTES }
+
+/** ≥840dp (tablet landscape / large window) gets a permanent rail; below, the bottom bar. */
+private const val EXPANDED_WIDTH_DP = 840
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlAzharRoot(app: AlAzharApp) {
@@ -114,6 +130,16 @@ fun AlAzharRoot(app: AlAzharApp) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    val expanded = LocalConfiguration.current.screenWidthDp >= EXPANDED_WIDTH_DP
+    val navigateToPrimary = { route: String ->
+        navController.navigate(route) {
+            launchSingleTop = true
+            restoreState = true
+            popUpTo(Routes.DASHBOARD) { saveState = true }
+        }
+    }
 
     androidx.compose.runtime.CompositionLocalProvider(
         LocalArabicIndicDigits provides arabicIndic,
@@ -189,21 +215,57 @@ fun AlAzharRoot(app: AlAzharApp) {
                         title = { Text(stringResource(R.string.app_name)) },
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.app_name))
+                                Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.action_open_nav))
                             }
                         },
                     )
                 },
+                bottomBar = {
+                    if (!expanded) {
+                        NavigationBar {
+                            PRIMARY_DESTINATIONS.forEach { dest ->
+                                NavigationBarItem(
+                                    selected = currentRoute == dest.route,
+                                    onClick = { navigateToPrimary(dest.route) },
+                                    icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
+                                    label = { Text(stringResource(dest.labelRes), maxLines = 1) },
+                                    modifier = Modifier.testTag("bottom_" + dest.route),
+                                )
+                            }
+                        }
+                    }
+                },
             ) { padding ->
+                Row(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    if (expanded) {
+                        NavigationRail(
+                            header = {
+                                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                    Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.action_open_nav))
+                                }
+                            },
+                        ) {
+                            PRIMARY_DESTINATIONS.forEach { dest ->
+                                NavigationRailItem(
+                                    selected = currentRoute == dest.route,
+                                    onClick = { navigateToPrimary(dest.route) },
+                                    icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
+                                    label = { Text(stringResource(dest.labelRes), maxLines = 1) },
+                                    modifier = Modifier.testTag("rail_" + dest.route),
+                                )
+                            }
+                        }
+                    }
+                    Box(modifier = Modifier.weight(1f)) {
                 if (!bootstrapped) {
-                    Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    Box(modifier = Modifier.fillMaxSize()) {
                         LoadingBox(stringResource(R.string.loading))
                     }
                 } else {
                     NavHost(
                         navController = navController,
                         startDestination = Routes.DASHBOARD,
-                        modifier = Modifier.fillMaxSize().padding(padding),
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         composable(Routes.GUIDE) { GuideScreen() }
                         composable(Routes.STOCK) { StockScreen(app) }
@@ -220,6 +282,8 @@ fun AlAzharRoot(app: AlAzharApp) {
                         composable(Routes.AUDIT) { AuditScreen(app) }
                         composable(Routes.SETTINGS) { SettingsScreen(app) }
                         composable(Routes.PROFILE) { ProfileScreen(app) }
+                    }
+                }
                     }
                 }
             }

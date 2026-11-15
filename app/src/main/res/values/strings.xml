@@ -9,6 +9,7 @@
     <string name="nav_crossview">Cross-View</string>
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_dashboard_settings">Dashboard Settings</string>
+    <string name="action_open_nav">Open navigation menu</string>
     <string name="permissions_title">App permissions</string>
     <string name="permissions_description">AlAzharTex declares access to shared files and media and to notifications. Database export/import via the system file picker needs no permission — these are for direct file access and backup notifications. Each permission can only be granted by you.</string>
     <string name="permissions_notifications">Notifications</string>

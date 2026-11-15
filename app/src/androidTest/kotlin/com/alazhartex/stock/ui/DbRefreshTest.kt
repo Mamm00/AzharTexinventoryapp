@@ -58,7 +58,7 @@ class DbRefreshTest {
     private fun appName(): String = res(R.string.app_name)
 
     private fun openDrawer() {
-        composeTestRule.onNodeWithContentDescription(appName(), useUnmergedTree = true).performClick()
+        composeTestRule.onNodeWithContentDescription(res(R.string.action_open_nav), useUnmergedTree = true).performClick()
     }
 
     @Test

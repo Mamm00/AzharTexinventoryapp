@@ -4,6 +4,40 @@ All notable changes to Al Azhar Tex Inventory are documented here. The format lo
 follows [Keep a Changelog](https://keepachangelog.com/); every release ships a signed APK
 attached to its GitHub Release.
 
+## [1.6.0] — 2026-11-14
+
+### Added
+- **Adaptive navigation (2026 pattern).** The five high-frequency destinations
+  (Dashboard, Stock, Inventory, Movements, Reports) are now one tap away via a **bottom
+  navigation bar** on compact widths, and a **permanent navigation rail** on expanded
+  widths (≥840dp — tablets in landscape). The top app bar and the navigation drawer are
+  unchanged and still reach all 15 destinations; the rail carries a menu button that opens
+  the same drawer. New test tags: `bottom_<route>` / `rail_<route>`.
+- **Material 3 Expressive-leaning shape scale.** App-wide rounded-corner language
+  (16/24/32dp) via a single `Shapes` token set — pill chrome, softer cards.
+- **Dynamic colour (API 31+).** The colour scheme now follows the device wallpaper palette;
+  the AzharTex brand scheme remains the guaranteed fallback (and is used on older releases
+  and where dynamic colour is unavailable). Semantic gauge/drift colours are unaffected —
+  they are set explicitly at their use sites.
+- **Pull-to-refresh on the Dashboard.** Pulling down re-resolves the database locally
+  (in-process `Room` + `DbProvider` version bump) — no network involved.
+- **Accessibility.** The top-bar navigation button now has a proper Arabic/English
+  content description ("Open navigation menu") instead of reusing the app name.
+
+### Changed
+- **Dashboard hero is a bento grid**: the 1×4 KPI strip is now a 2×2 tile grid with
+  larger tap targets and roomier numerals; the hero corner radius follows the 24dp large
+  shape token. All data sources, drift/override semantics and tests are unchanged.
+- versionCode 13, versionName 1.6.0.
+
+### Notes
+- Still offline-first: no network permission, no cloud personalization — the navigation
+  and colour changes are entirely local. Deliberately deferred (too invasive without a
+  design cycle): list-detail panes for Stock/Inventory, role-filtered navigation,
+  on-device insights.
+- Dynamic colour can be reverted by deleting the `Build.VERSION_CODES.S` branch in
+  `ui/theme/Theme.kt` (one line) if brand-constant colour is preferred in future.
+
 ## [1.5.0] — 2026-11-13
 
 ### Added

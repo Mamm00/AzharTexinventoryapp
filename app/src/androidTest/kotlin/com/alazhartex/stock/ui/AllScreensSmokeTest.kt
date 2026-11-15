@@ -71,14 +71,14 @@ class AllScreensSmokeTest {
             " " + node.children.joinToString(" ") { flattenSemanticsText(it) }).trim()
 
     private fun openDrawer() {
-        composeTestRule.onNodeWithContentDescription(appName(), useUnmergedTree = true).performClick()
+        composeTestRule.onNodeWithContentDescription(res(R.string.action_open_nav), useUnmergedTree = true).performClick()
     }
 
     @Test
     fun appLaunchesAndBootstraps() {
         composeTestRule.waitUntilAtLeastOneExists(hasText(appName()), timeoutMillis = 60_000)
-        // Drawer is openable (menu button carries the app name as content description).
-        composeTestRule.onNodeWithContentDescription(appName(), useUnmergedTree = true)
+        // Drawer is openable (menu button carries the action_open_nav content description).
+        composeTestRule.onNodeWithContentDescription(res(R.string.action_open_nav), useUnmergedTree = true)
             .assertIsDisplayed()
     }
 

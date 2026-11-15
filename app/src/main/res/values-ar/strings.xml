@@ -9,6 +9,7 @@
     <string name="nav_crossview">عرض شامل</string>
     <string name="nav_dashboard">لوحة المعلومات</string>
     <string name="nav_dashboard_settings">إعدادات لوحة المعلومات</string>
+    <string name="action_open_nav">افتح قائمة التنقل</string>
     <string name="permissions_title">أذونات التطبيق</string>
     <string name="permissions_description">يصرّح الأزهر تكستيل بالوصول إلى الملفات والوسائط المشتركة وإلى الإشعارات. تصدير/استيراد قاعدة البيانات عبر منتقي النظام لا يحتاج إلى إذن — هذه الأذونات للوصول المباشر إلى الملفات وإشعارات النسخ الاحتياطي. لا يمكن منح كل إذن إلا منك.</string>
     <string name="permissions_notifications">الإشعارات</string>
