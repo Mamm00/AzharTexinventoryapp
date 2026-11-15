@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -62,7 +63,7 @@ private fun KpiTile(
             .then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 14.dp, horizontal = 12.dp),
+            modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
@@ -154,6 +155,13 @@ fun DashboardBento(
         strings.bucketEmpty,
     )
     val heroDesc = "${strings.heroCaption}: ${percentDisplay?.plus("%") ?: "—"} $bucketLabel"
+    val compact = LocalConfiguration.current.screenWidthDp < 840
+    // Shrink the gauge on narrow windows so the percentage column keeps room to breathe.
+    val heroArcSize = when {
+        LocalConfiguration.current.screenWidthDp < 400 -> 96.dp
+        compact -> 104.dp
+        else -> 128.dp
+    }
     BentoGrid(modifier = modifier.fillMaxWidth()) {
         // ---- Hero utilisation compartment -----------------------------------
         Surface(
@@ -169,7 +177,7 @@ fun DashboardBento(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(128.dp)) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(heroArcSize)) {
                     AnimatedArc(fraction = heroAnimated, color = gaugeColor(bucket), strokeWidth = 14f)
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
@@ -228,7 +236,7 @@ fun DashboardBento(
         Surface(
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.bentoSpan(7, 2, compactColumns = 4).semantics { contentDescription = strings.topShedsCaption },
+            modifier = Modifier.bentoSpan(7, 2, compactColumns = 2).semantics { contentDescription = strings.topShedsCaption },
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(strings.topShedsCaption, style = MaterialTheme.typography.titleSmall)
@@ -261,7 +269,7 @@ fun DashboardBento(
         Surface(
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.bentoSpan(5, 2, compactColumns = 4).semantics { contentDescription = strings.topColoursCaption },
+            modifier = Modifier.bentoSpan(5, 2, compactColumns = 2).semantics { contentDescription = strings.topColoursCaption },
         ) {
             Column(
                 modifier = Modifier.padding(16.dp).fillMaxSize(),
@@ -273,9 +281,11 @@ fun DashboardBento(
                     Text(strings.emptyLabel, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     SwatchRing(
-                        colours = topColours.take(10),
+                        colours = topColours.take(if (compact) 8 else 10),
                         arabicDigits = arabicIndic,
                         onColourClick = onColourClick,
+                        orbitRadius = if (compact) 56.dp else 74.dp,
+                        swatchSize = if (compact) 40.dp else 44.dp,
                     )
                 }
             }

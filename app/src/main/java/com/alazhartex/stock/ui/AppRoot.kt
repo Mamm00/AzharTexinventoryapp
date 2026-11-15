@@ -59,6 +59,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -240,7 +241,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                                     selected = currentRoute == dest.route,
                                     onClick = { navigateToPrimary(dest.route) },
                                     icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
-                                    label = { Text(stringResource(dest.labelRes), maxLines = 1) },
+                                    label = { Text(stringResource(dest.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                                     modifier = Modifier.testTag("bottom_" + dest.route),
                                 )
                             }
@@ -262,7 +263,7 @@ fun AlAzharRoot(app: AlAzharApp) {
                                     selected = currentRoute == dest.route,
                                     onClick = { navigateToPrimary(dest.route) },
                                     icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
-                                    label = { Text(stringResource(dest.labelRes), maxLines = 1) },
+                                    label = { Text(stringResource(dest.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                                     modifier = Modifier.testTag("rail_" + dest.route),
                                 )
                             }

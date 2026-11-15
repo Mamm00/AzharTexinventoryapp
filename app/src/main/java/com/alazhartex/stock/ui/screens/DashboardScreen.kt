@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -100,6 +102,7 @@ private val QUICK_ACTIONS = listOf(
 fun DashboardScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
     val navigate = LocalNavigate.current
+    val quickPerRow = if (LocalConfiguration.current.screenWidthDp >= 840) 7 else 4
     var refreshing by remember { mutableStateOf(false) }
     val refreshScope = rememberCoroutineScope()
     val hapticsView = androidx.compose.ui.platform.LocalView.current
@@ -153,8 +156,10 @@ fun DashboardScreen(app: AlAzharApp) {
             },
             modifier = Modifier.fillMaxSize().padding(padding),
         ) {
+        // Cap content width so expanded/tablet layouts don't stretch across a large panel — center it instead.
+        Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(12.dp),
+            modifier = Modifier.fillMaxSize().widthIn(max = 1400.dp).align(Alignment.CenterHorizontally).padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // ---- v1.8.0 bento (hero + KPIs + drift plane + top sheds + top colours) ----
@@ -209,17 +214,18 @@ fun DashboardScreen(app: AlAzharApp) {
                     modifier = Modifier.padding(top = 4.dp),
                 )
             }
-            items(items = QUICK_ACTIONS.chunked(4), key = { row -> row.joinToString("_") { it.route } }, contentType = { "quick_row" }) { rowActions ->
+            items(items = QUICK_ACTIONS.chunked(quickPerRow), key = { row -> row.joinToString("_") { it.route } }, contentType = { "quick_row" }) { rowActions ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     rowActions.forEach { action ->
                         QuickTile(action, Modifier.weight(1f)) { navigate(action.route) }
                     }
                     // pad the last row so tile weights stay even
-                    repeat(4 - rowActions.size) { Box(Modifier.weight(1f)) }
+                    repeat(quickPerRow - rowActions.size) { Box(Modifier.weight(1f)) }
                 }
             }
 
             item { Box(Modifier.height(8.dp)) }
+        }
         }
         }
         val fabActions = listOf(

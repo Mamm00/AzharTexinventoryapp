@@ -44,12 +44,13 @@ fun SwatchRing(
     maxOrbit: Int = 10,
     onColourClick: ((TopColourDto) -> Unit)? = null,
     arabicDigits: Boolean = false,
+    orbitRadius: androidx.compose.ui.unit.Dp = 74.dp,
+    swatchSize: androidx.compose.ui.unit.Dp = 44.dp,
 ) {
     val view = LocalView.current
     val density = LocalDensity.current
     val shown = colours.take(maxOrbit)
-    val orbitRadius = 74.dp
-    val swatch = 44.dp
+    val swatch = swatchSize
     val container = (orbitRadius * 2) + swatch
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
