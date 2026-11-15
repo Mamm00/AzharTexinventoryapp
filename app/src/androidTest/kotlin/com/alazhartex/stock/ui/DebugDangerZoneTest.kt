@@ -106,7 +106,7 @@ class DebugDangerZoneTest {
     }
 
     private fun openDrawer() {
-        composeTestRule.onNodeWithContentDescription(appName(), useUnmergedTree = true).performClick()
+        composeTestRule.onNodeWithContentDescription(res(R.string.action_open_nav), useUnmergedTree = true).performClick()
     }
 
     private fun openSettings() {
