@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.media.MediaStore
+import android.provider.MediaStore
 import android.os.Build
 import android.os.Environment
 import androidx.room.withTransaction
