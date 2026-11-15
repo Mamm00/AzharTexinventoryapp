@@ -7,6 +7,11 @@ attached to its GitHub Release.
 ## [1.7.0] — 2026-11-14
 
 ### Fixed
+- **Root cause of "export does nothing": `PRAGMA wal_checkpoint(TRUNCATE)` was executed
+  via `execSQL()`.** Android rejects row-returning statements on that path
+  ("Queries can be performed using SQLiteDatabase query or rawQuery methods only"), so
+  every export died at the checkpoint — before a single byte was written. The checkpoint
+  now drains the pragma through `query()`, and the instrumented `ExportFlowTest` pins it.
 - **Database export now reliably lands on the phone.** The export flow used to be:
   write `alazhartex-*.db` into app-private `files/exports/`, then fire a bare
   `ACTION_SEND` chooser and hope a receiving app accepts an `application/octet-stream`

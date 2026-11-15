@@ -49,11 +49,16 @@ class ExportImportManager(
 
     fun exportsDirectory(): File = exportsDir
 
+    /** wal_checkpoint (and other row-returning pragmas) must be read, not execSQL'd — Android rejects them otherwise. */
+    private fun drainPragma(db: androidx.sqlite.db.SupportSQLiteDatabase, sql: String) {
+        db.query(sql, emptyArray<Any?>()).use { cursor -> while (cursor.moveToNext()) { /* drain */ } }
+    }
+
     // ---------------- export ----------------
     suspend fun exportDatabase(): ExportResult {
         rewriteManifest()
         // Belt and braces for both paths: a truncated WAL means the main .db file is complete.
-        database.openHelper.writableDatabase.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
+        drainPragma(database.openHelper.writableDatabase, "PRAGMA wal_checkpoint(TRUNCATE)")
         val ts = fileTimestamp()
         val out = File(exportsDir, "alazhartex-export-$ts.db")
         if (out.exists()) out.delete()
@@ -75,7 +80,7 @@ class ExportImportManager(
             database.openHelper.writableDatabase.execSQL("VACUUM INTO '$escaped'")
         } catch (t: Throwable) {
             android.util.Log.w("ExportImportManager", "VACUUM INTO failed — falling back to checkpoint+copy+integrity_check", t)
-            database.openHelper.writableDatabase.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
+            drainPragma(database.openHelper.writableDatabase, "PRAGMA wal_checkpoint(TRUNCATE)")
             val dbFile = context.getDatabasePath("alazhartex.db")
             dbFile.copyTo(out, overwrite = true)
             SQLiteDatabase.openDatabase(out.absolutePath, null, SQLiteDatabase.OPEN_READONLY).use { check ->
