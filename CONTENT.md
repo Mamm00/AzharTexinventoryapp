@@ -73,3 +73,16 @@ App name: AlAzharTex — الأزهر تكستيل. Brand colour accent: Azhar g
 - Custom families: stored in `app_settings` key `custom_families` as JSON `[{id,name_ar,name_en,hue_anchor}]`, NOT Room; excluded from seed-report parity. Hue anchor rule: **(max(existing anchors) + 25) mod 360 → nearest 5°**. Swatches for custom families use a deterministic HSL preview (`PaletteFallback`); the pinned pipeline is untouched. Fabrics/colours referencing custom families store a stable slug key (`custom-<hue>-<id8>`); display names come from settings.
 - Code format pinned: `^[A-Z0-9-]{1,16}$`, uppercase; KEEPER-created colours get a `K-` prefix on `keeper_code` automatically (code column unchanged). Seeded codes immutable.
 - UNIQUE pair fabrics(name_ar, name_en): Room v1→v2 migration (`MIGRATION_1_2`, raw SQL so the Room identity hash is stable) + same index ensured on fresh installs; enforced again inside the same transaction on add/edit.
+
+## 12. v1.8.0 pins — whatsnew.json
+- `app/src/main/assets/whatsnew.json` is the ONLY source of the Guide "What's new" card.
+  Pinned key: `1.8.0` (must match `versionName` in app/build.gradle.kts at build time;
+  the loader returns null — card hidden — for any unpinned version, so the pin and the
+  version bump must land in the same release).
+- Content: 6 en bullets + 6 ar bullets for 1.8.0; valid JSON, LF, UTF-8; both arrays are
+  required. An empty array hides the card.
+- Pinned artefacts of record for 1.8.0 content: the en/ar bullet strings in
+  `WhatsNewCard` render DISMISS button label from `whatsnew_dismiss` and the card title
+  from `whatsnew_title` (both locales, see values/strings.xml + values-ar/strings.xml).
+- Dismissal is persisted per version in DataStore (`display_prefs`, key
+  `whats_new_dismissed_version`) — never in Room, never exported.

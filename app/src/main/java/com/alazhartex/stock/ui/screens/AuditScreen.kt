@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,13 +25,16 @@ import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.components.LoadingBox
+import com.alazhartex.stock.ui.components.SegmentedGroup
+import com.alazhartex.stock.ui.components.SegmentedOption
 import com.alazhartex.stock.ui.dateTimeString
 
 @Composable
 fun AuditScreen(app: AlAzharApp) {
-    var blockedOnly by remember { mutableStateOf(false) }
-    val rows by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.AuditRowDto>?, blockedOnly, rememberDbVersion()) {
-        value = app.container.readRepository.audit(limit = 500, onlyBlocked = blockedOnly)
+    var filterMode by remember { mutableStateOf("ALL") }
+    val rows by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.AuditRowDto>?, filterMode, rememberDbVersion()) {
+        value = app.container.readRepository.audit(limit = 500, onlyBlocked = filterMode == "BLOCKED")
+            .let { if (filterMode == "ALLOWED") it.filter { row -> row.result == "ALLOWED" } else it }
     }
 
     Scaffold { padding ->
@@ -41,21 +43,28 @@ fun AuditScreen(app: AlAzharApp) {
             LoadingBox(stringResource(R.string.loading), Modifier.padding(padding))
             return@Scaffold
         }
+        val filterRow: @Composable () -> Unit = {
+            SegmentedGroup(
+                options = listOf(
+                    SegmentedOption("ALL", stringResource(R.string.label_audit_all), testTag = "audit_filter_all"),
+                    SegmentedOption("ALLOWED", stringResource(R.string.audit_result_allowed), testTag = "audit_filter_allowed"),
+                    SegmentedOption("BLOCKED", stringResource(R.string.audit_result_blocked), testTag = "audit_filter_blocked"),
+                ),
+                selected = filterMode,
+                onSelected = { filterMode = it },
+                testTag = "audit_filter",
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+        }
         if (loaded.isEmpty()) {
             Column(modifier = Modifier.fillMaxSize().padding(padding).padding(24.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 12.dp)) {
-                    FilterChip(selected = !blockedOnly, onClick = { blockedOnly = false }, label = { Text(stringResource(R.string.label_audit_all)) })
-                    FilterChip(selected = blockedOnly, onClick = { blockedOnly = true }, label = { Text(stringResource(R.string.audit_result_blocked)) })
-                }
+                filterRow()
                 Text(stringResource(R.string.label_audit_empty), style = MaterialTheme.typography.bodyLarge)
             }
             return@Scaffold
         }
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 8.dp)) {
-                FilterChip(selected = !blockedOnly, onClick = { blockedOnly = false }, label = { Text(stringResource(R.string.label_audit_all)) })
-                FilterChip(selected = blockedOnly, onClick = { blockedOnly = true }, label = { Text(stringResource(R.string.audit_result_blocked)) })
-            }
+            filterRow()
             LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 items(items = loaded, key = { it.id }, contentType = { "audit" }) { row ->
                     val blocked = row.result == "BLOCKED"

@@ -71,6 +71,10 @@ class AppContainer(private val context: Context) {
     /** UI state: Arabic-Indic digits toggle (persisted in app_settings, loaded at bootstrap). */
     val digitsFlow = MutableStateFlow(false)
 
+    /** v1.8.0: Settings → Display preferences (DataStore, exportable-db-safe) + one-shot inventory filter. */
+    val displayPrefs by lazy { com.alazhartex.stock.ui.display.DisplayPrefs(context) }
+    val pendingInventoryColourFilter = MutableStateFlow<String?>(null)
+
     suspend fun loadPersistedPrefs() {
         digitsFlow.update { DbProvider.ensure(context).appSettingsDao().get("arabic_indic_digits") == "true" }
     }
@@ -88,7 +92,7 @@ class AppContainer(private val context: Context) {
         sessionPrefs.getString(KEY_BOOT_ID, null) ?: UUID.randomUUID().toString().also { rotateProcessBootId() }
 
     companion object {
-        const val APP_VERSION = "1.7.0"
+        const val APP_VERSION = "1.8.0"
         private const val KEY_BOOT_ID = "process_boot_id"
     }
 }

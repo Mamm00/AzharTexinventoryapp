@@ -2,7 +2,6 @@ package com.alazhartex.stock.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,9 +17,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Edit
@@ -33,7 +32,9 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Warehouse
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -63,18 +64,16 @@ import com.alazhartex.stock.AlAzharApp
 import com.alazhartex.stock.R
 import com.alazhartex.stock.ui.LocalArabicIndicDigits
 import com.alazhartex.stock.ui.LocalNavigate
-import com.alazhartex.stock.ui.components.ColourSwatch
 import com.alazhartex.stock.ui.components.LoadingBox
-import com.alazhartex.stock.ui.components.SwatchSize
-import com.alazhartex.stock.ui.components.UtilisationGauge
-import com.alazhartex.stock.ui.components.bucketLabelFor
-import com.alazhartex.stock.ui.components.paletteContentDescription
-import com.alazhartex.stock.ui.components.rememberAnySwatch
-import com.alazhartex.stock.ui.integerString
+import com.alazhartex.stock.ui.components.WavyIndeterminateIndicator
+import com.alazhartex.stock.ui.components.FabMenu
+import com.alazhartex.stock.ui.components.FabMenuAction
+import com.alazhartex.stock.ui.haptics.Haptics
+import com.alazhartex.stock.ui.bento.BentoStrings
+import com.alazhartex.stock.ui.bento.DashboardBento
 import com.alazhartex.stock.ui.dashboard.DashboardViewModel
 import com.alazhartex.stock.ui.dashboard.DashboardViewModelFactory
 import com.alazhartex.stock.ui.navigation.Routes
-import com.alazhartex.stock.ui.percentDisplay
 
 private data class QuickAction(val route: String, val labelRes: Int, val icon: ImageVector)
 
@@ -103,12 +102,16 @@ fun DashboardScreen(app: AlAzharApp) {
     val navigate = LocalNavigate.current
     var refreshing by remember { mutableStateOf(false) }
     val refreshScope = rememberCoroutineScope()
+    val hapticsView = androidx.compose.ui.platform.LocalView.current
     val viewModel: DashboardViewModel = viewModel(
         factory = remember { DashboardViewModelFactory(app.container.readRepository, app.container.overrideStore) },
     )
     val data by viewModel.uiState.collectAsStateWithLifecycle()
+    var fabExpanded by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold { padding ->
+        Box(modifier = Modifier.fillMaxSize()) {
         if (data.loading) {
             LoadingBox(stringResource(R.string.loading), Modifier.padding(padding))
             return@Scaffold
@@ -120,17 +123,22 @@ fun DashboardScreen(app: AlAzharApp) {
             }
             return@Scaffold
         }
-        val bucketLabel = bucketLabelFor(
-            data.bucket,
-            stringResource(R.string.bucket_green),
-            stringResource(R.string.bucket_amber),
-            stringResource(R.string.bucket_red),
-            stringResource(R.string.bucket_over_capacity),
-            stringResource(R.string.label_empty_no_rows),
-        )
         PullToRefreshBox(
             isRefreshing = refreshing,
+            indicator = {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 12.dp),
+                ) {
+                    WavyIndeterminateIndicator(
+                        modifier = Modifier.width(44.dp).height(44.dp),
+                        contentDescription = stringResource(R.string.loading),
+                    )
+                }
+            },
             onRefresh = {
+                Haptics.detent(hapticsView)
                 refreshing = true
                 // Local-only invalidation: re-resolve Room per call; no network involved.
                 com.alazhartex.stock.data.local.DbProvider.bumpVersion()
@@ -145,54 +153,48 @@ fun DashboardScreen(app: AlAzharApp) {
             modifier = Modifier.fillMaxSize().padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // ---- Hero -----------------------------------------------------------
+            // ---- v1.8.0 bento (hero + KPIs + drift plane + top sheds + top colours) ----
             item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("dash_hero")
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text(
-                        stringResource(R.string.nav_dashboard),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                    Text(
-                        stringResource(R.string.dashboard_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                    UtilisationGauge(
-                        label = stringResource(R.string.label_utilisation),
-                        percentDisplay = percentDisplay(data.percentDisplay, arabicIndic),
-                        bucket = data.bucket,
-                        bucketLabel = bucketLabel,
-                        percentFraction = data.percentFraction,
-                        contentDescriptionPrefix = stringResource(R.string.app_name),
-                    )
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            KpiCell(integerString(data.totalRolls, arabicIndic), stringResource(R.string.label_total_rolls), Modifier.weight(1f))
-                            KpiCell(integerString(data.activeRolls, arabicIndic), stringResource(R.string.label_active_rolls), Modifier.weight(1f))
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            KpiCell(integerString(data.capacityRolls, arabicIndic), stringResource(R.string.label_capacity), Modifier.weight(1f))
-                            KpiCell(integerString(data.inactiveRolls, arabicIndic), stringResource(R.string.label_inactive_rolls), Modifier.weight(1f))
-                        }
-                    }
-                    when {
-                        data.overridesEnabled && data.overrideFieldDiffs.isNotEmpty() ->
-                            OverrideBanner(ok = false, count = data.overrideFieldDiffs.size)
-                        data.overridesEnabled ->
-                            OverrideBanner(ok = true, count = 0)
-                        else ->
-                            DriftBanner(ok = data.driftViolations == 0, count = data.driftViolations)
-                    }
-                }
+                val bentoStrings = BentoStrings(
+                    heroCaption = stringResource(R.string.label_utilisation),
+                    totalLabel = stringResource(R.string.label_total_rolls),
+                    activeLabel = stringResource(R.string.label_active_rolls),
+                    inactiveLabel = stringResource(R.string.label_inactive_rolls),
+                    capacityLabel = stringResource(R.string.label_capacity),
+                    bucketGreen = stringResource(R.string.bucket_green),
+                    bucketAmber = stringResource(R.string.bucket_amber),
+                    bucketRed = stringResource(R.string.bucket_red),
+                    bucketOver = stringResource(R.string.bucket_over_capacity),
+                    bucketEmpty = stringResource(R.string.label_empty_no_rows),
+                    driftOk = stringResource(R.string.label_drift_ok),
+                    driftDetected = { count -> context.getString(R.string.label_drift_detected_detail, count) },
+                    overridesOk = stringResource(R.string.banner_overrides_ok),
+                    overridesMismatch = { count -> context.getString(R.string.banner_overrides_mismatch, count) },
+                    topShedsCaption = stringResource(R.string.label_top_sheds),
+                    topColoursCaption = stringResource(R.string.label_top_colours),
+                    emptyLabel = stringResource(R.string.label_empty_no_rows),
+                )
+                DashboardBento(
+                    totalRolls = data.totalRolls,
+                    activeRolls = data.activeRolls,
+                    inactiveRolls = data.inactiveRolls,
+                    capacityRolls = data.capacityRolls,
+                    percentDisplay = data.percentDisplay,
+                    percentFraction = data.percentFraction,
+                    bucket = data.bucket,
+                    topSheds = data.topSheds,
+                    topColours = data.topColours,
+                    driftViolations = data.driftViolations,
+                    overridesEnabled = data.overridesEnabled,
+                    overrideDiffs = data.overrideFieldDiffs.size,
+                    arabicIndic = arabicIndic,
+                    strings = bentoStrings,
+                    onColourClick = { colour ->
+                        app.container.pendingInventoryColourFilter.value = colour.colourCode
+                        navigate(Routes.INVENTORY)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
 
             // ---- Quick actions --------------------------------------------------
@@ -213,176 +215,28 @@ fun DashboardScreen(app: AlAzharApp) {
                 }
             }
 
-            // ---- Top colours ---------------------------------------------------
-            item {
-                Text(
-                    stringResource(R.string.label_top_colours),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 4.dp),
-                )
-            }
-            item {
-                if (data.topColours.isEmpty()) {
-                    Text(stringResource(R.string.label_empty_no_rows), style = MaterialTheme.typography.bodyMedium)
-                } else {
-                    Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        data.topColours.forEach { tc ->
-                            val tcSw = rememberAnySwatch(tc.family, tc.grade, tc.colourCode, tc.customHex)
-                            Surface(
-                                shape = RoundedCornerShape(16.dp),
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(10.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    ColourSwatch(
-                                        value = tcSw.argb,
-                                        onColour = tcSw.onColour,
-                                        contentDescription = paletteContentDescription(tc.colourCode, tc.colourNameEn, tc.colourNameAr, tc.grade),
-                                        size = SwatchSize.Small,
-                                    )
-                                    Column {
-                                        Text(tc.colourCode, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                        Text(tc.colourNameEn, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                        Text(integerString(tc.rolls, arabicIndic), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ---- Top sheds ------------------------------------------------------
-            item {
-                Text(
-                    stringResource(R.string.label_top_sheds),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 4.dp),
-                )
-            }
-            items(items = data.topSheds, key = { it.shedId }, contentType = { "shed" }) { shed ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Text(shed.nameEn, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(integerString(shed.activeRolls, arabicIndic), style = MaterialTheme.typography.bodyLarge)
-                            Text("${shed.percentDisplay ?: "—"}%", style = MaterialTheme.typography.labelLarge)
-                        }
-                        val fraction = percentFraction(shed.percentDisplay)
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(RoundedCornerShape(3.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(fraction)
-                                    .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp))
-                                    .background(MaterialTheme.colorScheme.primary),
-                            )
-                        }
-                    }
-                }
-            }
             item { Box(Modifier.height(8.dp)) }
         }
         }
-    }
-}
-
-@Composable
-private fun KpiCell(value: String, label: String, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp,
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(value, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(label, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, maxLines = 2)
+        val fabActions = listOf(
+            FabMenuAction("add_roll", stringResource(R.string.action_add_roll), Icons.Filled.Add, onClick = { navigate(Routes.STOCK) }),
+            FabMenuAction("new_movement", stringResource(R.string.fab_new_movement), Icons.Filled.SwapHoriz, onClick = { navigate(Routes.MOVEMENTS) }),
+            FabMenuAction("export", stringResource(R.string.fab_export), Icons.Filled.Share, onClick = { navigate(Routes.REPORTS) }),
+            FabMenuAction("switch_shed", stringResource(R.string.action_switch_shed), Icons.Filled.Warehouse, onClick = { navigate(Routes.STOCK) }),
+        )
+        FabMenu(
+            actions = fabActions,
+            expanded = fabExpanded,
+            onExpandedChange = { fabExpanded = it },
+            fabContentDescription = stringResource(R.string.fab_menu_open),
+            scrimContentDescription = stringResource(R.string.fab_scrim_label),
+        )
         }
     }
 }
 
-@Composable
-private fun DriftBanner(ok: Boolean, count: Int) {
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = if (ok) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.errorContainer,
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(10.dp)
-                    .height(10.dp)
-                    .clip(RoundedCornerShape(5.dp))
-                    .background(if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error),
-            )
-            Text(
-                if (ok) {
-                    stringResource(R.string.label_drift_ok)
-                } else {
-                    stringResource(R.string.label_drift_detected) + ": " + count
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (ok) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onErrorContainer,
-            )
-        }
-    }
-}
 
-@Composable
-private fun OverrideBanner(ok: Boolean, count: Int) {
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = if (ok) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.errorContainer,
-        modifier = Modifier.testTag("override_banner"),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(10.dp)
-                    .height(10.dp)
-                    .clip(RoundedCornerShape(5.dp))
-                    .background(if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error),
-            )
-            Text(
-                if (ok) {
-                    stringResource(R.string.banner_overrides_ok)
-                } else {
-                    stringResource(R.string.banner_overrides_mismatch, count)
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (ok) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onErrorContainer,
-            )
-        }
-    }
-}
+
 
 @Composable
 private fun QuickTile(action: QuickAction, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -405,5 +259,3 @@ private fun QuickTile(action: QuickAction, modifier: Modifier = Modifier, onClic
     }
 }
 
-private fun percentFraction(percentDisplay: String?): Float =
-    ((percentDisplay?.toFloatOrNull() ?: 0f) / 100f).coerceIn(0f, 1f)

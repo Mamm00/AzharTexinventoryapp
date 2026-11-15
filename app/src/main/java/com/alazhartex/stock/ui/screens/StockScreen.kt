@@ -1,5 +1,6 @@
 package com.alazhartex.stock.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,19 +49,30 @@ import com.alazhartex.stock.ui.components.LoadingBox
 import com.alazhartex.stock.ui.components.InlineColourPicker
 import com.alazhartex.stock.ui.components.SwatchSize
 import com.alazhartex.stock.ui.components.UtilisationGauge
+import com.alazhartex.stock.ui.components.ShedUtilisationRail
 import com.alazhartex.stock.ui.components.bucketLabelFor
 import com.alazhartex.stock.ui.components.paletteContentDescription
 import com.alazhartex.stock.ui.components.rememberAnySwatch
 import com.alazhartex.stock.ui.integerString
 import com.alazhartex.stock.ui.percentDisplay
+import com.alazhartex.stock.ui.LocalNavigate
+import com.alazhartex.stock.ui.navigation.Routes
+import com.alazhartex.stock.ui.navigation.LocalAnimatedVisibilityScope
+import com.alazhartex.stock.ui.navigation.LocalSharedTransitionScope
+import com.alazhartex.stock.domain.gauge.GaugeBucket
+import com.alazhartex.stock.ui.haptics.Haptics
 import java.util.UUID
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.animation.ExperimentalSharedTransitionApi::class)
 @Composable
 fun StockScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
     val snackbar = LocalSnackbar.current
+    val navigate = LocalNavigate.current
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+    val hapticsView = androidx.compose.ui.platform.LocalView.current
     val refresh = rememberRefresh()
     val tick = refresh.tick.intValue
     val cards by produceState(initialValue = null as List<com.alazhartex.stock.data.repo.ShedCardDto>?, tick, rememberDbVersion()) {
@@ -90,7 +102,18 @@ fun StockScreen(app: AlAzharApp) {
                     stringResource(R.string.bucket_over_capacity),
                     stringResource(R.string.label_empty_no_rows),
                 )
-                Card(colors = CardDefaults.cardColors()) {
+                val sharedKey = "stock-${card.shedId}"
+                var cardModifier: Modifier = Modifier
+                if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                    with(sharedTransitionScope) {
+                        cardModifier = cardModifier.sharedBounds(
+                            sharedContentState = rememberSharedContentState(sharedKey),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                        )
+                    }
+                }
+                cardModifier = cardModifier.clickable { navigate(Routes.stockDetail(card.shedId)) }
+                Card(colors = CardDefaults.cardColors(), modifier = cardModifier) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(card.nameEn, style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
                         Text(card.nameAr, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
@@ -104,6 +127,14 @@ fun StockScreen(app: AlAzharApp) {
                             bucket = card.bucket,
                             bucketLabel = bucketLabel,
                             percentFraction = (card.percentTwoDp.toFloat() / 100f),
+                            contentDescriptionPrefix = stringResource(R.string.label_utilisation_for, card.shedId),
+                            onBucketCrossed = { crossed ->
+                                if (crossed == GaugeBucket.RED) Haptics.warning(hapticsView) else Haptics.detent(hapticsView)
+                            },
+                        )
+                        ShedUtilisationRail(
+                            percentFraction = card.percentTwoDp.toFloat() / 100f,
+                            bucket = card.bucket,
                             contentDescriptionPrefix = stringResource(R.string.label_utilisation_for, card.shedId),
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

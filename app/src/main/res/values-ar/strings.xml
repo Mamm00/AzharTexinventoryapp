@@ -73,6 +73,7 @@
     <string name="action_refresh_db">تحديث قاعدة البيانات</string>
     <string name="summary_refresh_db">أعد تحميل كل بيانات المخزون ولوحات المعلومات واللفائف من القرص</string>
     <string name="action_generate">توليد</string>
+    <string name="action_preview_letterhead">معاينة الترويسة</string>
     <string name="action_share">مشاركة</string>
 
     <string name="label_capacity">السعة (لفة)</string>
@@ -82,7 +83,7 @@
     <string name="label_total_rolls">إجمالي اللفات</string>
     <string name="label_top_sheds">أعلى العنابر بعدد اللفات</string>
     <string name="label_drift_ok">لا يوجد انحراف — كل صف متوازن</string>
-    <string name="label_drift_detected">تم رصد انحراف</string>
+    <string name="label_drift_detected_detail">تم رصد انحراف: %1$d</string>
     <string name="label_grade">الدرجة</string>
     <string name="label_family">الفصيلة</string>
     <string name="label_keeper_code">كود الأمين</string>
@@ -238,7 +239,6 @@
     <string name="keeper_code_keeper_only">أكواد الأمين تُخزن ببادئة K- للألوان التي يضيفها الأمين</string>
     <string name="picker_title">اختر اللون</string>
     <string name="fabric_new_here">جديد هنا</string>
-    <string name="dashboard_subtitle">لقطة حية لكل المخازن</string>
     <string name="dashboard_quick_actions">إجراءات سريعة</string>
     <string name="picker_search_hint">ابحث بالكود أو الاسم (عربي/إنجليزي)</string>
     <string name="picker_empty">لا توجد ألوان مطابقة</string>
@@ -318,4 +318,26 @@
     <string name="color_custom_auto">تلقائي (مشتق من العائلة)</string>
     <string name="color_custom_auto_short">تلقائي</string>
     <string name="fabric_notes_label">ملاحظات</string>
+    <string name="action_back">رجوع</string>
+    <string name="label_opening">الرصيد الافتتاحي</string>
+    <string name="label_closing">الرصيد الختامي</string>
+    <string name="reduce_motion_label">تقليل الحركة</string>
+    <string name="reduce_motion_subtitle">استبدال النوابض والتحولات بانتقالات فورية وتلاشي خفيف</string>
+    <string name="whatsnew_title">الجديد في %1$s</string>
+    <string name="whatsnew_dismiss">إخفاء</string>
+    <string name="app_permissions_title">أذونات التطبيق والحركة</string>
+    <string name="app_permissions_body">الإشعارات والتخزين والملفات — ونظام الحركة الذي تتحكم به هنا.</string>
+    <string name="reduce_motion_status_on">مفعّل</string>
+    <string name="reduce_motion_status_off">إيقاف</string>
+    <string name="reduce_motion_shortcut">فتح إعدادات العرض</string>
+    <string name="fab_menu_open">إجراءات سريعة</string>
+    <string name="fab_scrim_label">إخفاء الإجراءات السريعة</string>
+    <string name="action_switch_shed">تبديل المستودع</string>
+    <string name="fab_export">تصدير</string>
+    <string name="fab_new_movement">حركة جديدة</string>
+    <string name="stock_detail_title">تفاصيل المستودع</string>
+    <string name="inventory_detail_title">تفاصيل الربط</string>
+    <string name="transfer_pair_summary">من %1$s إلى %2$s، %3$s لفة</string>
+    <string name="profile_session_remaining">الوقت المتبقي للجلسة</string>
+    <string name="session_remaining_none">انتهت الجلسة</string>
 </resources>

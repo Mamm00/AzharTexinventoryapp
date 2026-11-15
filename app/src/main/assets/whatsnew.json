@@ -1,0 +1,20 @@
+{
+  "1.8.0": {
+    "en": [
+      "Liquid glass on the top bar (API 31+) — opaque fallback below",
+      "Haptics on user actions only — selections, confirms and destructive steps",
+      "Reduce motion in Settings to Display — springs and morphs become instant",
+      "Bento dashboard: utilisation hero, KPI tiles, drift plane, shed rails, colour orbit",
+      "Quick-actions FAB menu and connected transfer pair cards",
+      "Shared transitions to shed and mapping details"
+    ],
+    "ar": [
+      "زجاج سائل على الشريط العلوي (API 31+) — مع بديل معتم للأسفل",
+      "اهتزازات للإجراءات فقط — التحديد والتأكيد والخطوات التدميرية",
+      "تقليل الحركة في الإعدادات ثم العرض — تتحول النوابض والتحولات إلى فورية",
+      "لوحة تحكم مرنة: بطل الاستغلال وشارات KPI ولوحة الانحراف وأشرطة المستودعات وحلقة الألوان",
+      "قائمة أزرار عائمة للإجراءات السريعة وبطاقات الربط الموصولة للتحويلات",
+      "انتقالات مشتركة إلى تفاصيل المستودع والربط"
+    ]
+  }
+}

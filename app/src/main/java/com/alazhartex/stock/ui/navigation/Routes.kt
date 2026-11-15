@@ -17,5 +17,9 @@ object Routes {
     const val SETTINGS = "settings"
     const val DASHBOARD_SETTINGS = "dashboard_settings"
     const val PROFILE = "profile"
+    const val STOCK_DETAIL = "stock_detail"
+    const val INVENTORY_DETAIL = "inventory_detail"
+    fun stockDetail(shedId: String) = "$STOCK_DETAIL/$shedId"
+    fun inventoryDetail(mappingId: String) = "$INVENTORY_DETAIL/$mappingId"
     val ALL = listOf(GUIDE, STOCK, INVENTORY, MOVEMENTS, COLOURS, CROSS_VIEW, SWATCH_BOOK, DASHBOARD, REPORTS, MASTERS, FABRICS_EDIT, AUDIT, SETTINGS, DASHBOARD_SETTINGS, PROFILE)
 }
