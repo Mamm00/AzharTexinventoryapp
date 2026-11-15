@@ -64,8 +64,7 @@ import com.alazhartex.stock.ui.haptics.Haptics
 import java.util.UUID
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
-@OptIn(androidx.compose.animation.ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.animation.ExperimentalSharedTransitionApi::class)
 @Composable
 fun StockScreen(app: AlAzharApp) {
     val arabicIndic = LocalArabicIndicDigits.current
