@@ -180,6 +180,7 @@ fun DashboardBento(
                         contentDescription = heroDesc,
                     )
                     Text(bucketLabel, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(strings.heroSubtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
         }
@@ -318,6 +319,7 @@ private fun bucketFor(fraction: Float): GaugeBucket = when {
 /** Pre-resolved, locale-safe strings — all copy lives in strings.xml; this struct just ferries it. */
 data class BentoStrings(
     val heroCaption: String,
+    val heroSubtitle: String,
     val totalLabel: String,
     val activeLabel: String,
     val inactiveLabel: String,

@@ -59,7 +59,7 @@ fun FabMenu(
     actions: List<FabMenuAction>,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier,
     fabContentDescription: String,
     scrimContentDescription: String,
 ) {
@@ -87,7 +87,7 @@ fun FabMenu(
         )
     }
     Column(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize().then(modifier),
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Bottom),
     ) {

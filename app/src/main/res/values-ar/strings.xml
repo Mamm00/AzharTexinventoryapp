@@ -83,7 +83,6 @@
     <string name="label_total_rolls">إجمالي اللفات</string>
     <string name="label_top_sheds">أعلى العنابر بعدد اللفات</string>
     <string name="label_drift_ok">لا يوجد انحراف — كل صف متوازن</string>
-    <string name="label_drift_detected">تم رصد انحراف</string>
     <string name="label_drift_detected_detail">تم رصد انحراف: %1$d</string>
     <string name="label_grade">الدرجة</string>
     <string name="label_family">الفصيلة</string>
