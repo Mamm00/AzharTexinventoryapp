@@ -1,8 +1,12 @@
 package com.alazhartex.stock.data.transfer
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.media.MediaStore
+import android.os.Build
+import android.os.Environment
 import androidx.room.withTransaction
 import com.alazhartex.stock.data.local.AppDatabase
 import com.alazhartex.stock.data.local.ManifestEntity
@@ -36,6 +40,8 @@ class ExportImportManager(
     }
 
     data class ImportPreview(val counts: Map<String, Long>, val appVersion: String, val schemaVersion: Long)
+    /** Where an automatic save-to-Downloads copy landed. [uri] is set on API 29+ (MediaStore), [legacyPath] on older devices. */
+    data class DownloadResult(val displayName: String, val uri: android.net.Uri?, val legacyPath: String?)
 
     private val exportsDir: File get() = File(context.filesDir, "exports").apply { mkdirs() }
     private val backupsDir: File get() = File(context.filesDir, "backups").apply { mkdirs() }
@@ -46,16 +52,93 @@ class ExportImportManager(
     // ---------------- export ----------------
     suspend fun exportDatabase(): ExportResult {
         rewriteManifest()
+        // Belt and braces for both paths: a truncated WAL means the main .db file is complete.
         database.openHelper.writableDatabase.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
         val ts = fileTimestamp()
         val out = File(exportsDir, "alazhartex-export-$ts.db")
         if (out.exists()) out.delete()
-        val escaped = out.absolutePath.replace("'", "''")
-        database.openHelper.writableDatabase.execSQL("VACUUM INTO '$escaped'")
+        exportInto(out)
         val sidecar = File(exportsDir, out.name + ".sha256")
         val hashHex = sha256Of(out)
         sidecar.writeText("$hashHex  ${out.name}\n", Charsets.US_ASCII)
         return ExportResult(out, sidecar, hashHex, out.length())
+    }
+
+    /**
+     * Primary: VACUUM INTO (consistent snapshot regardless of WAL state).
+     * Fallback (old SQLite / platform refusal): checkpoint+copy the main DB file, then
+     * verify the copy with PRAGMA integrity_check — an unverified copy is never returned.
+     */
+    private fun exportInto(out: File) {
+        try {
+            val escaped = out.absolutePath.replace("'", "''")
+            database.openHelper.writableDatabase.execSQL("VACUUM INTO '$escaped'")
+        } catch (t: Throwable) {
+            android.util.Log.w("ExportImportManager", "VACUUM INTO failed — falling back to checkpoint+copy+integrity_check", t)
+            database.openHelper.writableDatabase.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
+            val dbFile = context.getDatabasePath("alazhartex.db")
+            dbFile.copyTo(out, overwrite = true)
+            SQLiteDatabase.openDatabase(out.absolutePath, null, SQLiteDatabase.OPEN_READONLY).use { check ->
+                check.rawQuery("PRAGMA integrity_check", null).use { c ->
+                    val verdict = if (c.moveToFirst()) c.getString(0) else "no_result"
+                    check(verdict == "ok") { "integrity_check failed on export copy: $verdict" }
+                }
+            }
+        }
+    }
+
+    /**
+     * Deterministic "the file is on the phone" path: copy the export into shared Downloads
+     * (MediaStore on API 29+ — no permission needed — direct file write on older releases).
+     * Copies the .sha256 sidecar alongside. Returns null (never throws) when the save fails.
+     */
+    fun saveToDownloads(result: ExportResult): DownloadResult? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val dbUri = insertIntoDownloads(result.file, "application/octet-stream") ?: return null
+                val sidecarUri = insertIntoDownloads(result.sidecar, "text/plain")
+                if (sidecarUri == null) {
+                    // keep the export itself even if the sidecar fails
+                    android.util.Log.w("ExportImportManager", "sidecar copy to Downloads failed; keeping the .db")
+                }
+                DownloadResult(result.file.name, dbUri, null)
+            } else {
+                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                if (!dir.exists() && !dir.mkdirs()) return null
+                val dbTarget = File(dir, result.file.name)
+                result.file.copyTo(dbTarget, overwrite = true)
+                runCatching { result.sidecar.copyTo(File(dir, result.sidecar.name), overwrite = true) }
+                DownloadResult(result.file.name, null, dbTarget.absolutePath)
+            }
+        } catch (t: Throwable) {
+            android.util.Log.e("ExportImportManager", "saveToDownloads failed", t)
+            null
+        }
+    }
+
+    private fun insertIntoDownloads(source: File, mime: String): android.net.Uri? {
+        val resolver = context.contentResolver
+        val collection = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, source.name)
+            put(MediaStore.MediaColumns.MIME_TYPE, mime)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            put(MediaStore.MediaColumns.IS_PENDING, 1)
+        }
+        val uri = resolver.insert(collection, values) ?: return null
+        var ok = false
+        try {
+            val written = resolver.openOutputStream(uri)?.use { out ->
+                FileInputStream(source).use { input -> input.copyTo(out, DEFAULT_BUFFER_SIZE) }
+                true
+            } ?: false
+            ok = written
+        } finally {
+            val finish = ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }
+            resolver.update(uri, finish, null, null)
+            if (!ok) resolver.delete(uri, null, null)
+        }
+        return if (ok) uri else null
     }
 
     private suspend fun rewriteManifest() {
