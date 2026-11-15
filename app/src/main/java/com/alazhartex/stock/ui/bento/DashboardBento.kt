@@ -160,7 +160,7 @@ fun DashboardBento(
             shape = RoundedCornerShape(28.dp),
             color = MaterialTheme.colorScheme.primaryContainer,
             modifier = Modifier
-                .bentoSpan(12, 2)
+                .bentoSpan(12, 2, compactColumns = 4)
                 .semantics { contentDescription = heroDesc }
                 .testTag("dash_hero"),
         ) {
@@ -190,7 +190,7 @@ fun DashboardBento(
             contentDescription = "${strings.totalLabel}: ${integerString(totalRolls, arabicIndic)}",
             flipRadius = false,
             testTag = "dash_tile_total",
-            modifier = Modifier.bentoSpan(3, 1),
+            modifier = Modifier.bentoSpan(3, 1, compactColumns = 2),
         )
         KpiTile(
             label = strings.activeLabel,
@@ -198,7 +198,7 @@ fun DashboardBento(
             contentDescription = "${strings.activeLabel}: ${integerString(activeRolls, arabicIndic)}",
             flipRadius = true,
             testTag = "dash_tile_active",
-            modifier = Modifier.bentoSpan(3, 1),
+            modifier = Modifier.bentoSpan(3, 1, compactColumns = 2),
         )
         KpiTile(
             label = strings.inactiveLabel,
@@ -206,7 +206,7 @@ fun DashboardBento(
             contentDescription = "${strings.inactiveLabel}: ${integerString(inactiveRolls, arabicIndic)}",
             flipRadius = true,
             testTag = "dash_tile_inactive",
-            modifier = Modifier.bentoSpan(3, 1),
+            modifier = Modifier.bentoSpan(3, 1, compactColumns = 2),
         )
         KpiTile(
             label = strings.capacityLabel,
@@ -214,7 +214,7 @@ fun DashboardBento(
             contentDescription = "${strings.capacityLabel}: ${integerString(capacityRolls, arabicIndic)}",
             flipRadius = false,
             testTag = "dash_tile_capacity",
-            modifier = Modifier.bentoSpan(3, 1),
+            modifier = Modifier.bentoSpan(3, 1, compactColumns = 2),
         )
         // ---- Full-width drift status plane (not a card) ----------------------
         val issueCount = if (overridesEnabled) overrideDiffs else driftViolations
@@ -222,13 +222,13 @@ fun DashboardBento(
             issueCount = issueCount,
             okText = if (overridesEnabled) strings.overridesOk else strings.driftOk,
             driftText = { count -> if (overridesEnabled) strings.overridesMismatch(count) else strings.driftDetected(count) },
-            modifier = Modifier.bentoSpan(12, 1),
+            modifier = Modifier.bentoSpan(12, 1, compactColumns = 4),
         )
         // ---- Top Sheds rail bars ---------------------------------------------
         Surface(
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.bentoSpan(7, 2).semantics { contentDescription = strings.topShedsCaption },
+            modifier = Modifier.bentoSpan(7, 2, compactColumns = 4).semantics { contentDescription = strings.topShedsCaption },
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(strings.topShedsCaption, style = MaterialTheme.typography.titleSmall)
@@ -261,7 +261,7 @@ fun DashboardBento(
         Surface(
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.bentoSpan(5, 2).semantics { contentDescription = strings.topColoursCaption },
+            modifier = Modifier.bentoSpan(5, 2, compactColumns = 4).semantics { contentDescription = strings.topColoursCaption },
         ) {
             Column(
                 modifier = Modifier.padding(16.dp).fillMaxSize(),

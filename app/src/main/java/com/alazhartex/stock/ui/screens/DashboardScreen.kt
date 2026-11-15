@@ -126,15 +126,19 @@ fun DashboardScreen(app: AlAzharApp) {
         PullToRefreshBox(
             isRefreshing = refreshing,
             indicator = {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 12.dp),
-                ) {
-                    WavyIndeterminateIndicator(
-                        modifier = Modifier.width(44.dp).height(44.dp),
-                        contentDescription = stringResource(R.string.loading),
-                    )
+                // Render only during the active refresh — a permanently-pinned indicator
+                // overlaps the hero card when idle (seen 2026-11-16 on device).
+                if (refreshing) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 12.dp),
+                    ) {
+                        WavyIndeterminateIndicator(
+                            modifier = Modifier.width(44.dp).height(44.dp),
+                            contentDescription = stringResource(R.string.loading),
+                        )
+                    }
                 }
             },
             onRefresh = {
