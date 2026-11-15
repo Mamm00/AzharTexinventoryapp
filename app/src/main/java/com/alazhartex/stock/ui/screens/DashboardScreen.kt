@@ -159,7 +159,7 @@ fun DashboardScreen(app: AlAzharApp) {
         // Cap content width so expanded/tablet layouts don't stretch across a large panel — center it instead.
         Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().widthIn(max = 1400.dp).align(Alignment.CenterHorizontally).padding(12.dp),
+            modifier = Modifier.fillMaxSize().widthIn(max = 1400.dp).align(Alignment.TopCenter).padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // ---- v1.8.0 bento (hero + KPIs + drift plane + top sheds + top colours) ----
