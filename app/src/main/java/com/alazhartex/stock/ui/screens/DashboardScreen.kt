@@ -159,7 +159,7 @@ fun DashboardScreen(app: AlAzharApp) {
         // Cap content width so expanded/tablet layouts don't stretch across a large panel — center it instead.
         Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().widthIn(max = 1400.dp).align(Alignment.TopCenter).padding(12.dp),
+            modifier = Modifier.fillMaxSize().widthIn(max = 1400.dp).align(Alignment.TopCenter).padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // ---- v1.8.0 bento (hero + KPIs + drift plane + top sheds + top colours) ----
@@ -259,11 +259,11 @@ private fun QuickTile(action: QuickAction, modifier: Modifier = Modifier, onClic
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().height(88.dp).padding(6.dp),
+            modifier = Modifier.fillMaxWidth().height(76.dp).padding(6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Icon(action.icon, contentDescription = label, modifier = Modifier.width(26.dp).height(26.dp))
+            Icon(action.icon, contentDescription = label, modifier = Modifier.width(24.dp).height(24.dp))
             Text(label, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }

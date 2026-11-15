@@ -270,7 +270,7 @@ fun ColorWheelDialog(
 }
 
 @Composable
-private fun PresetCell(hex: String, modifier: Modifier = Modifier.size(46.dp), onClick: () -> Unit) {
+private fun PresetCell(hex: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val color = remember(hex) { CustomSwatch.parse(hex)?.let { Color(it.argb) } ?: Color.Transparent }
     Box(
         modifier = modifier

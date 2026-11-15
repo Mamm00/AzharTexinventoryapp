@@ -63,7 +63,7 @@ private fun KpiTile(
             .then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
@@ -72,7 +72,7 @@ private fun KpiTile(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -173,7 +173,7 @@ fun DashboardBento(
                 .testTag("dash_hero"),
         ) {
             Row(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
@@ -243,7 +243,7 @@ fun DashboardBento(
                 if (topSheds.isEmpty()) {
                     Text(strings.emptyLabel, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
-                    topSheds.take(5).forEach { shed ->
+                    topSheds.take(if (compact) 4 else 5).forEach { shed ->
                         val fraction = ((shed.percentDisplay?.toFloatOrNull() ?: 0f) / 100f).coerceIn(0f, 1.5f)
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -281,11 +281,11 @@ fun DashboardBento(
                     Text(strings.emptyLabel, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     SwatchRing(
-                        colours = topColours.take(if (compact) 8 else 10),
+                        colours = topColours.take(if (compact) 7 else 10),
                         arabicDigits = arabicIndic,
                         onColourClick = onColourClick,
-                        orbitRadius = if (compact) 56.dp else 74.dp,
-                        swatchSize = if (compact) 40.dp else 44.dp,
+                        orbitRadius = if (compact) 50.dp else 74.dp,
+                        swatchSize = if (compact) 36.dp else 44.dp,
                     )
                 }
             }
