@@ -16,5 +16,19 @@
       "قائمة أزرار عائمة للإجراءات السريعة وبطاقات الربط الموصولة للتحويلات",
       "انتقالات مشتركة إلى تفاصيل المستودع والربط"
     ]
+  },
+  "1.8.1": {
+    "en": [
+      "Pull-to-refresh wavy indicator no longer pinned over the hero — shows only during an active refresh",
+      "Full KPI values on phones and tablets — capacity no longer clipped to “110,…”",
+      "Large screens: dashboard and detail content capped and centred (1400dp / 860dp)",
+      "Narrow windows (split-screen, foldables): colour preset cells stretch to fit; long labels ellipsize"
+    ],
+    "ar": [
+      "لم يعد مؤشر السحب للتحديث مثبتاً فوق البطاقة الرئيسية — يظهر فقط أثناء التحديث الفعلي",
+      "قيم KPI كاملة على الجوال والتابلت — لم تعد السعة تُقتطع إلى «110,…»",
+      "الشاشات الكبيرة: محتوى اللوحة والتفاصيل محدود ومتمركز (1400dp / 860dp)",
+      "النوافذ الضيقة (split-screen وfoldables): خلايا القوالب تتمدد للملاءمة، والنصوص الطويلة تُختصر بنقاط"
+    ]
   }
 }

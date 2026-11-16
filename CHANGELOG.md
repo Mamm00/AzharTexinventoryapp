@@ -4,7 +4,7 @@ All notable changes to Al Azhar Tex Inventory are documented here. The format lo
 follows [Keep a Changelog](https://keepachangelog.com/); every release ships a signed APK
 attached to its GitHub Release.
 
-## [Unreleased] — 2026-11-16
+## [1.8.1] — 2026-11-16
 
 ### Fixed
 - **Dashboard pull-to-refresh indicator no longer renders at rest.** The custom wavy
