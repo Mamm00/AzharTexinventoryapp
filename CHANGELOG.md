@@ -4,6 +4,27 @@ All notable changes to Al Azhar Tex Inventory are documented here. The format lo
 follows [Keep a Changelog](https://keepachangelog.com/); every release ships a signed APK
 attached to its GitHub Release.
 
+## [Unreleased] — 2026-11-16
+
+### Fixed
+- **Dashboard pull-to-refresh indicator no longer renders at rest.** The custom wavy
+  indeterminate indicator in the `PullToRefreshBox` slot was always composed (pinned
+  top-center, overlapping the hero card on device — seen floating above the hero value);
+  it now composes only while an active refresh is running.
+- **Compact/phone KPI values no longer clipped.** On compact bento (<840dp, 4 columns),
+  3-column spans collapsed to a single column (~78dp at 360dp), so capacity rendered as
+  `110,…`; KPI tiles now span 2 of 4 compact columns, and emphasized values ellipsis
+  instead of hard-clipping at extreme font scales.
+- **Resolution fit for every device class.** Compact rails: Top Sheds capped at 4 rails
+  below 840dp, Top Colours orbit scales down (radius 50dp / 36dp swatch / max 7) so the
+  dashboard composes inside the phone fold (keeps the smoke-test tap target composed).
+  Expanded (≥840dp): dashboard content capped at 1400dp (quick actions 7-per-row),
+  detail-screen content capped at 860dp, both centered on large panels. Very narrow
+  windows (split-screen, foldables, <400dp): colour preset cells stretch to available
+  width instead of a fixed 326dp row, hero gauge shrinks (104dp <840dp, 96dp <400dp),
+  labels across nav rail/bottom bar, quick actions, FAB menu, transfer cards and detail
+  facts ellipsize instead of clipping. Detail-screen title ellipsises.
+
 ## [1.8.0] — 2026-11-15
 
 ### Added
