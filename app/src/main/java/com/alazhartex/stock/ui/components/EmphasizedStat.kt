@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.alazhartex.stock.ui.theme.displayLargeEmphasized
 import com.alazhartex.stock.ui.theme.headlineLargeEmphasized
@@ -54,7 +55,7 @@ fun EmphasizedStat(
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(value, style = base, maxLines = 1)
+            Text(value, style = base, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
             if (delta != null) {
                 val tint = when (deltaPositive) {
                     true -> MaterialTheme.colorScheme.primaryContainer

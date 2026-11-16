@@ -52,7 +52,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -202,9 +201,11 @@ fun ColorWheelDialog(
                     PRESET_ROWS.forEach { row ->
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             row.forEach { preset ->
-                                PresetCell(hex = preset, size = 46.dp) {
-                                    hsvFromHex(preset)?.let(::pushHsv)
-                                }
+                                PresetCell(
+                                    hex = preset,
+                                    modifier = Modifier.weight(1f).height(46.dp),
+                                    onClick = { hsvFromHex(preset)?.let(::pushHsv) },
+                                )
                             }
                         }
                     }
@@ -246,7 +247,7 @@ fun ColorWheelDialog(
                             ) { Text("+", color = Color(0xFF777777), style = MaterialTheme.typography.titleLarge) }
                         } else {
                             Box {
-                                PresetCell(hex = favourite, size = 46.dp) {
+                                PresetCell(hex = favourite, modifier = Modifier.size(46.dp)) {
                                     hsvFromHex(favourite)?.let(::pushHsv)
                                 }
                                 Box(
@@ -269,11 +270,10 @@ fun ColorWheelDialog(
 }
 
 @Composable
-private fun PresetCell(hex: String, size: Dp, onClick: () -> Unit) {
+private fun PresetCell(hex: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val color = remember(hex) { CustomSwatch.parse(hex)?.let { Color(it.argb) } ?: Color.Transparent }
     Box(
-        modifier = Modifier
-            .size(size)
+        modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(color)
             .border(1.dp, Color(0x44FFFFFF), RoundedCornerShape(8.dp))
